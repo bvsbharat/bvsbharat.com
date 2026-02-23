@@ -39,21 +39,9 @@ const featuredHackathons = getSortedPosts(posts, { excludeHackathons: false })
           )}
         </div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <h1 class="my-1 inline-block text-xl font-bold sm:my-4 sm:text-3xl">
-              Hi, I'm @bvsbharat.
-            </h1>
-            <a
-              target="_blank"
-              href="/rss.xml"
-              class="inline-block text-accent"
-              aria-label="RSS Feed"
-              title="RSS Feed"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
-              <span class="sr-only">RSS Feed</span>
-            </a>
-          </div>
+          <h1 class="my-1 inline-block text-xl font-bold sm:my-4 sm:text-3xl">
+            Hi, I'm <a href="https://x.com/bvsbharat" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline decoration-dashed underline-offset-4">@bvsbharat</a>.
+          </h1>
           <p class="text-sm opacity-80 sm:text-base">
             {SITE.desc}
           </p>
