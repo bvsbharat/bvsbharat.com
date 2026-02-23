@@ -9,35 +9,53 @@ interface Props {
 }
 
 const { post, enableTransition = false } = Astro.props;
-const { title, description, pubDatetime, modDatetime } = post.data;
+const { title, description, pubDatetime, modDatetime, heroImage } = post.data;
 const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
 
-const headerProps: Record<string, string> = {
-  class: "text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200",
+const sparkTransition = {
+  forwards: {
+    old: [{ name: "sparkOut", duration: "0.25s", easing: "ease-in", fillMode: "forwards" }],
+    new: [{ name: "sparkIn", duration: "0.5s", easing: "ease-out", fillMode: "backwards" }],
+  },
+  backwards: {
+    old: [{ name: "sparkOut", duration: "0.25s", easing: "ease-in", fillMode: "forwards" }],
+    new: [{ name: "sparkIn", duration: "0.5s", easing: "ease-out", fillMode: "backwards" }],
+  },
 };
 
-if (enableTransition) {
-  headerProps.style = `view-transition-name: ${slug}`;
-}
 ---
 
 <li class="my-6 group">
   <a
     href={postUrl}
-    class="block rounded-lg p-4 -mx-4 transition-all duration-200 hover:bg-muted/40"
+    class="flex gap-4 items-start rounded-lg p-4 -mx-4 transition-all duration-200 hover:bg-muted/40"
   >
-    <h3 {...headerProps}>
-      {title}
-    </h3>
-    <div class="flex items-center gap-3 mb-2 mt-1">
-      <span class="text-sm opacity-70">
-        <FormattedDate date={pubDatetime} />
-        {modDatetime && <span class="italic"> (updated)</span>}
-      </span>
-      <span class="text-sm italic opacity-80">&bull; {readingTime}</span>
+    <div class="flex-1 min-w-0">
+      <h3
+        transition:name={enableTransition ? slug : undefined}
+        transition:animate={enableTransition ? sparkTransition : undefined}
+        class="text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200"
+      >
+        {title}
+      </h3>
+      <div class="flex items-center gap-3 mb-2 mt-1">
+        <span class="text-sm opacity-70">
+          <FormattedDate date={pubDatetime} />
+          {modDatetime && <span class="italic"> (updated)</span>}
+        </span>
+        <span class="text-sm italic opacity-80">&bull; {readingTime}</span>
+      </div>
+      <p class="opacity-80 transition-opacity duration-200 group-hover:opacity-100">{description}</p>
     </div>
-    <p class="opacity-80 transition-opacity duration-200 group-hover:opacity-100">{description}</p>
+    {heroImage && (
+      <img
+        src={heroImage}
+        alt={title}
+        transition:name={enableTransition ? `hero-${slug}` : undefined}
+        class="hidden sm:block w-28 h-20 object-cover rounded border border-border shrink-0 transition-transform duration-200 group-hover:scale-105"
+      />
+    )}
   </a>
 </li>

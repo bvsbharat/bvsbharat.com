@@ -2,7 +2,7 @@ export const SITE = {
   website: "https://bvsbharat.com",
   author: "Bharat Bhavnasi",
   profile: "https://bvsbharat.com/about",
-  desc: "Sr. Engineer → Agentic AI Architect | Building Voice AI Agents, Multi-Agent Systems & Developer Tools | 30+ Hackathon Winner",
+  desc: "Senior Engineer turned Agentic AI Architect — I build Voice AI Agents, Multi-Agent Systems, and Developer Tools. With 30+ hackathon wins, I love turning bold ideas into real products at the intersection of AI and engineering.",
   title: "Bharat Bhavnasi",
   ogImage: "og-default.png",
   lightAndDarkMode: true,

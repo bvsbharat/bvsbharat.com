@@ -3,28 +3,45 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* View Transitions API - smooth page transitions */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.25s;
+/* Spark title animation for view transitions */
+@keyframes sparkIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+    filter: brightness(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.5);
+  }
+  60% {
+    filter: brightness(1.3);
+  }
+  80% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
 }
 
-::view-transition-old(root) {
-  animation: fade-out 0.25s ease-out;
-}
-
-::view-transition-new(root) {
-  animation: fade-in 0.25s ease-out;
-}
-
-@keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes sparkOut {
+  0% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  30% {
+    filter: brightness(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+    filter: brightness(1.5);
+  }
 }
 
 
@@ -40,9 +57,9 @@ html[data-theme="light"] {
 html[data-theme="dark"] {
   --background: #212737;
   --foreground: #eaedf3;
-  --accent: #ff6b01;
+  --accent: #00d4ff;
   --muted: #343f60bf;
-  --border: #ab4b08;
+  --border: #0891b2;
 }
 
 @theme {
