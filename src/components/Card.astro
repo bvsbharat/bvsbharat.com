@@ -14,17 +14,6 @@ const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
 
-const sparkTransition = {
-  forwards: {
-    old: [{ name: "sparkOut", duration: "0.25s", easing: "ease-in", fillMode: "forwards" }],
-    new: [{ name: "sparkIn", duration: "0.5s", easing: "ease-out", fillMode: "backwards" }],
-  },
-  backwards: {
-    old: [{ name: "sparkOut", duration: "0.25s", easing: "ease-in", fillMode: "forwards" }],
-    new: [{ name: "sparkIn", duration: "0.5s", easing: "ease-out", fillMode: "backwards" }],
-  },
-};
-
 ---
 
 <li class="my-6 group">
@@ -35,7 +24,6 @@ const sparkTransition = {
     <div class="flex-1 min-w-0">
       <h3
         transition:name={enableTransition ? slug : undefined}
-        transition:animate={enableTransition ? sparkTransition : undefined}
         class="text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200"
       >
         {title}
