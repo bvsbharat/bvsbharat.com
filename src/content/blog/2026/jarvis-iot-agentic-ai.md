@@ -15,6 +15,10 @@ Building a system where AI doesn't just respond — it acts. An AI agent that un
 
 That 10-year-old version of me who watched Iron Man and dreamed of having JARVIS just became reality.
 
+<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:2rem 0;">
+  <iframe src="https://www.youtube.com/embed/gU7JpAJIDOE" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
+</div>
+
 ## The Vision
 
 Imagine an AI system that:
