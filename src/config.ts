@@ -6,8 +6,9 @@ export const SITE = {
   title: "Bharat Bhavnasi",
   ogImage: "og-default.png",
   lightAndDarkMode: true,
-  postPerIndex: 5,
+  postPerIndex: 4,
   postPerPage: 10,
+  featuredPerIndex: 3,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
   showBackButton: true,

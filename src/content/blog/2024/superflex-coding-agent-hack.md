@@ -1,5 +1,5 @@
 ---
-title: "Hackathon Win #11 — Building AI with AI Tool Superflex"
+title: "Building AI with AI Tool Superflex"
 description: "Used Superflex to build Dev AI Agent — an entire AI-powered coding assistant from scratch. AI-powered coding for the win!"
 pubDatetime: 2024-12-15T00:00:00Z
 tags:
@@ -40,6 +40,6 @@ The speed was remarkable. What would normally take a weekend of coding was compr
 
 ## Looking Back
 
-Hackathon Win #11! This one was special because it proved a point — AI-powered coding is not just a gimmick, it's a genuine force multiplier. The ability to build a fully functional AI agent in just a few hours using another AI tool showed me the compounding power of AI in software development.
+This one was special because it proved a point — AI-powered coding is not just a gimmick, it's a genuine force multiplier. The ability to build a fully functional AI agent in just a few hours using another AI tool showed me the compounding power of AI in software development.
 
 AI-powered coding for the win!

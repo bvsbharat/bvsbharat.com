@@ -11,7 +11,7 @@ import { getCollection } from "astro:content";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 
 const posts = await getCollection("blog");
-const sortedPosts = getSortedPosts(posts);
+const sortedPosts = getSortedPosts(posts, { excludeHackathons: false });
 const featuredPosts = sortedPosts.filter((p) => p.data.featured);
 const recentPosts = sortedPosts.filter((p) => !p.data.featured);
 
@@ -66,7 +66,7 @@ const featuredHackathons = getSortedPosts(posts, { excludeHackathons: false })
         <section id="featured" class="pt-12 pb-6">
           <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
           <ul>
-            {featuredPosts.map((post) => <Card post={post} />)}
+            {featuredPosts.slice(0, SITE.featuredPerIndex).map((post) => <Card post={post} />)}
           </ul>
         </section>
         {recentPosts.length > 0 && <Hr />}

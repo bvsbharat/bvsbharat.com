@@ -3,6 +3,32 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Astro View Transitions - smooth page transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(root) {
+  animation-name: fadeOut;
+}
+
+::view-transition-new(root) {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
 :root,
 html[data-theme="light"] {
   --background: #fdfdfd;

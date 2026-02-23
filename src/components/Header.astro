@@ -129,11 +129,18 @@ const isActive = (path: string) => {
     updateThemeIcons();
 
     themeBtn?.addEventListener("click", () => {
-      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-      const newTheme = isDark ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", newTheme);
-      localStorage.setItem("theme", newTheme);
-      updateThemeIcons();
+      const setTheme = () => {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        const newTheme = isDark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateThemeIcons();
+      };
+      if (document.startViewTransition) {
+        document.startViewTransition(setTheme);
+      } else {
+        setTheme();
+      }
     });
   }
 
