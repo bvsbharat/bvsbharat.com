@@ -14,17 +14,23 @@ const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
 
+// Extract YouTube video ID from post body for thumbnail
+const youtubeMatch = post.body?.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+const youtubeId = youtubeMatch ? youtubeMatch[1] : null;
+const cardImage = heroImage || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null);
+const isVideo = !heroImage && !!youtubeId;
+
 ---
 
-<li class="my-2 group">
+<li class="my-2 group even:bg-muted/30 odd:bg-transparent rounded-lg">
   <a
     href={postUrl}
-    class="flex gap-4 items-start rounded-lg p-4 -mx-4 transition-all duration-200 hover:bg-muted/40"
+    class="flex items-stretch rounded-lg overflow-hidden transition-all duration-200 hover:bg-muted/50"
   >
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0 p-4">
       <h3
         transition:name={enableTransition ? slug : undefined}
-        class="text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200"
+        class="text-lg font-medium text-accent transition-colors duration-200"
       >
         {title}
       </h3>
@@ -37,13 +43,22 @@ const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
       </div>
       <p class="opacity-80 transition-opacity duration-200 group-hover:opacity-100">{description}</p>
     </div>
-    {heroImage && (
-      <img
-        src={heroImage}
-        alt={title}
-        transition:name={enableTransition ? `hero-${slug}` : undefined}
-        class="hidden sm:block w-28 h-20 object-cover rounded border border-border shrink-0 transition-transform duration-200 group-hover:scale-105"
-      />
+    {cardImage && (
+      <div class="hidden sm:block w-48 shrink-0 relative overflow-hidden">
+        <img
+          src={cardImage}
+          alt={title}
+          transition:name={enableTransition ? `hero-${slug}` : undefined}
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+        />
+        {isVideo && (
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="bg-black/60 rounded-full p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </div>
+          </div>
+        )}
+      </div>
     )}
   </a>
 </li>

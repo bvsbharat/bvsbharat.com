@@ -9,6 +9,7 @@ tags:
   - agents
   - advertising
 featured: true
+heroImage: "/images/snowoptima-svai-hub.jpg"
 ---
 
 Hackathon winning isn't just about building fast — it's about learning how to think, plan, and win as a team under pressure.
