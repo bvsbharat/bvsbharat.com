@@ -33,7 +33,7 @@ const readingTime = getReadingTime(post.body ?? "");
       <header class="mb-8 mt-8">
         <h1
           class="text-2xl font-bold leading-tight tracking-wide text-accent sm:text-3xl"
-          style={`view-transition-name: post-${post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-")}`}
+          style={`view-transition-name: ${post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-")}`}
         >{title}</h1>
         <div class="mt-3 flex flex-wrap items-center gap-3 text-sm opacity-70">
           <FormattedDate date={pubDatetime} />

@@ -16,7 +16,7 @@ const currentPosts = sortedPosts.slice(0, SITE.postPerPage);
 <Layout title="Blog">
   <Main pageTitle="Blog" pageDesc="All my articles and thoughts.">
     <ul>
-      {currentPosts.map((post) => <Card post={post} />)}
+      {currentPosts.map((post) => <Card post={post} enableTransition />)}
     </ul>
     <Pagination
       currentPage={1}

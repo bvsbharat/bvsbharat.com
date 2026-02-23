@@ -31,7 +31,7 @@ const { posts, currentPage, totalPages } = Astro.props;
 <Layout title={`Blog — Page ${currentPage}`}>
   <Main pageTitle="Blog" pageDesc="All my articles and thoughts.">
     <ul>
-      {posts.map((post: any) => <Card post={post} />)}
+      {posts.map((post: any) => <Card post={post} enableTransition />)}
     </ul>
     <Pagination
       currentPage={currentPage}

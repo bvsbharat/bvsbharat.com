@@ -5,15 +5,22 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   post: CollectionEntry<"blog">;
-  section?: string;
+  enableTransition?: boolean;
 }
 
-const { post, section = "" } = Astro.props;
+const { post, enableTransition = false } = Astro.props;
 const { title, description, pubDatetime, modDatetime } = post.data;
 const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
-const transitionName = section ? `${section}-${slug}` : `post-${slug}`;
+
+const headerProps: Record<string, string> = {
+  class: "text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200",
+};
+
+if (enableTransition) {
+  headerProps.style = `view-transition-name: ${slug}`;
+}
 ---
 
 <li class="my-6 group">
@@ -21,10 +28,7 @@ const transitionName = section ? `${section}-${slug}` : `post-${slug}`;
     href={postUrl}
     class="block rounded-lg p-4 -mx-4 transition-all duration-200 hover:bg-muted/40"
   >
-    <h3
-      class="text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200"
-      style={`view-transition-name: ${transitionName}`}
-    >
+    <h3 {...headerProps}>
       {title}
     </h3>
     <div class="flex items-center gap-3 mb-2 mt-1">
