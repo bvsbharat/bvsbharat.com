@@ -1,0 +1,43 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Card from "@/components/Card.astro";
+import Pagination from "@/components/Pagination.astro";
+import { SITE } from "@/config";
+import { getCollection } from "astro:content";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  const sortedPosts = getSortedPosts(posts);
+  const totalPages = Math.ceil(sortedPosts.length / SITE.postPerPage);
+
+  return Array.from({ length: totalPages - 1 }, (_, i) => ({
+    params: { page: String(i + 2) },
+    props: {
+      posts: sortedPosts.slice(
+        (i + 1) * SITE.postPerPage,
+        (i + 2) * SITE.postPerPage
+      ),
+      currentPage: i + 2,
+      totalPages,
+    },
+  }));
+}
+
+const { posts, currentPage, totalPages } = Astro.props;
+---
+
+<Layout title={`Blog — Page ${currentPage}`}>
+  <Main pageTitle="Blog" pageDesc="All my articles and thoughts.">
+    <ul>
+      {posts.map((post: any) => <Card post={post} />)}
+    </ul>
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      prevUrl={currentPage === 2 ? "/posts" : `/posts/${currentPage - 1}`}
+      nextUrl={currentPage < totalPages ? `/posts/${currentPage + 1}` : undefined}
+    />
+  </Main>
+</Layout>

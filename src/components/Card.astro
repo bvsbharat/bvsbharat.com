@@ -1,0 +1,35 @@
+---
+import FormattedDate from "./FormattedDate.astro";
+import { getReadingTime } from "@/utils/readingTime";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDatetime, modDatetime } = post.data;
+const readingTime = getReadingTime(post.body ?? "");
+const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
+---
+
+<li class="my-8">
+  <div>
+    <a
+      href={postUrl}
+      class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
+    >
+      <h3 class="text-lg font-medium decoration-dashed hover:underline">
+        {title}
+      </h3>
+    </a>
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-sm opacity-70">
+        <FormattedDate date={pubDatetime} />
+        {modDatetime && <span class="italic"> (updated)</span>}
+      </span>
+      <span class="text-sm italic opacity-80">&bull; {readingTime}</span>
+    </div>
+    <p class="opacity-80">{description}</p>
+  </div>
+</li>

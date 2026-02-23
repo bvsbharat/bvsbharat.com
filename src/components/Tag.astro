@@ -1,0 +1,20 @@
+---
+import { slugify } from "@/utils/slugify";
+
+interface Props {
+  tag: string;
+  size?: "sm" | "md";
+}
+
+const { tag, size = "sm" } = Astro.props;
+---
+
+<a
+  href={`/tags/${slugify(tag)}`}
+  class:list={[
+    "inline-block rounded bg-muted/75 hover:text-accent transition-colors",
+    size === "sm" ? "px-2 py-0.5 text-xs" : "px-3 py-1 text-sm",
+  ]}
+>
+  #{tag}
+</a>

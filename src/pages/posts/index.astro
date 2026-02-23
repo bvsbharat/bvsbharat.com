@@ -1,0 +1,27 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Card from "@/components/Card.astro";
+import Pagination from "@/components/Pagination.astro";
+import { SITE } from "@/config";
+import { getCollection } from "astro:content";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+
+const posts = await getCollection("blog");
+const sortedPosts = getSortedPosts(posts);
+const totalPages = Math.ceil(sortedPosts.length / SITE.postPerPage);
+const currentPosts = sortedPosts.slice(0, SITE.postPerPage);
+---
+
+<Layout title="Blog">
+  <Main pageTitle="Blog" pageDesc="All my articles and thoughts.">
+    <ul>
+      {currentPosts.map((post) => <Card post={post} />)}
+    </ul>
+    <Pagination
+      currentPage={1}
+      totalPages={totalPages}
+      nextUrl={totalPages > 1 ? "/posts/2" : undefined}
+    />
+  </Main>
+</Layout>

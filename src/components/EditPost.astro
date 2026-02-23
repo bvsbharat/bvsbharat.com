@@ -1,0 +1,21 @@
+---
+import { SITE } from "@/config";
+
+interface Props {
+  filePath: string;
+}
+
+const { filePath } = Astro.props;
+const { editPost } = SITE;
+---
+
+{editPost.enabled && (
+  <a
+    href={`${editPost.url}${editPost.appendFilePath ? `src/content/blog/${filePath}` : ""}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-sm opacity-70 hover:text-accent transition-colors"
+  >
+    {editPost.text}
+  </a>
+)}

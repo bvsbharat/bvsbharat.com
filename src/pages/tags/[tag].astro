@@ -1,0 +1,38 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import Card from "@/components/Card.astro";
+import { getCollection } from "astro:content";
+import { getUniqueTags } from "@/utils/getUniqueTags";
+import { getPostsByTag } from "@/utils/getPostsByTag";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  const tags = getUniqueTags(posts);
+
+  return tags.map(({ tag, tagSlug }) => ({
+    params: { tag: tagSlug },
+    props: {
+      tag,
+      posts: getPostsByTag(posts, tag),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Layout title={`Tag: ${tag}`}>
+  <Main pageTitle={`#${tag}`} pageDesc={`${posts.length} post${posts.length === 1 ? "" : "s"} tagged with "${tag}".`}>
+    <ul>
+      {posts.map((post: any) => <Card post={post} />)}
+    </ul>
+    <a
+      href="/tags"
+      class="mt-6 inline-flex items-center gap-1 text-sm text-accent decoration-dashed underline-offset-4 hover:underline"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      All tags
+    </a>
+  </Main>
+</Layout>

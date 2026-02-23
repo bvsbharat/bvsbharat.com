@@ -1,0 +1,23 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+---
+
+<Layout title="Search">
+  <Main pageTitle="Search" pageDesc="Search through all articles.">
+    <div id="search" class="min-h-[300px]"></div>
+  </Main>
+</Layout>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const el = document.getElementById("search");
+    if (el && (window as any).PagefindUI) {
+      new (window as any).PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        showImages: false,
+      });
+    }
+  });
+</script>

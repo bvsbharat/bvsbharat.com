@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Main from "@/layouts/Main.astro";
+import { getCollection } from "astro:content";
+import { getUniqueTags } from "@/utils/getUniqueTags";
+
+const posts = await getCollection("blog");
+const tags = getUniqueTags(posts);
+---
+
+<Layout title="Tags">
+  <Main pageTitle="Tags" pageDesc="All topics I've written about.">
+    <div class="flex flex-wrap gap-3">
+      {tags.map(({ tag, tagSlug, count }) => (
+        <a
+          href={`/tags/${tagSlug}`}
+          class="rounded bg-muted/75 px-4 py-2 text-sm hover:text-accent transition-colors"
+        >
+          #{tag}
+          <span class="ml-1 text-xs opacity-70">({count})</span>
+        </a>
+      ))}
+    </div>
+  </Main>
+</Layout>
