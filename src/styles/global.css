@@ -84,7 +84,8 @@ html[data-theme="dark"] {
 
   section,
   footer {
-    @apply mx-auto max-w-3xl px-4;
+    @apply mx-auto px-4;
+    max-width: 1020px;
   }
 }
 
