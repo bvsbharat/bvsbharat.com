@@ -34,7 +34,7 @@ export const SOCIALS = [
     name: "RSS",
     href: "/rss.xml",
     icon: "rss",
-    active: true,
+    active: false,
   },
 ] as const;
 
