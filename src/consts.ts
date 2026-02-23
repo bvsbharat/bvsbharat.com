@@ -25,6 +25,12 @@ export const SOCIALS = [
     active: true,
   },
   {
+    name: "YouTube",
+    href: "https://www.youtube.com/@bharatbvs",
+    icon: "youtube",
+    active: true,
+  },
+  {
     name: "Email",
     href: "mailto:bharatbvs@gmail.com",
     icon: "email",
