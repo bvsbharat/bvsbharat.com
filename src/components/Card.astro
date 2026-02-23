@@ -13,23 +13,24 @@ const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 ---
 
-<li class="my-8">
-  <div>
-    <a
-      href={postUrl}
-      class="inline-block text-lg font-medium text-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
+<li class="my-6 group">
+  <a
+    href={postUrl}
+    class="block rounded-lg p-4 -mx-4 transition-all duration-200 hover:bg-muted/40"
+  >
+    <h3
+      class="text-lg font-medium text-accent decoration-dashed underline-offset-4 group-hover:underline transition-colors duration-200"
+      style={`view-transition-name: post-${post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-")}`}
     >
-      <h3 class="text-lg font-medium decoration-dashed hover:underline" transition:name={`card-title-${post.id.replace(/\.(md|mdx)$/, "")}`}>
-        {title}
-      </h3>
-    </a>
-    <div class="flex items-center gap-3 mb-3">
+      {title}
+    </h3>
+    <div class="flex items-center gap-3 mb-2 mt-1">
       <span class="text-sm opacity-70">
         <FormattedDate date={pubDatetime} />
         {modDatetime && <span class="italic"> (updated)</span>}
       </span>
       <span class="text-sm italic opacity-80">&bull; {readingTime}</span>
     </div>
-    <p class="opacity-80">{description}</p>
-  </div>
+    <p class="opacity-80 transition-opacity duration-200 group-hover:opacity-100">{description}</p>
+  </a>
 </li>

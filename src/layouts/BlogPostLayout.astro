@@ -31,7 +31,10 @@ const readingTime = getReadingTime(post.body ?? "");
   <main id="main-content" class="mx-auto w-full flex-1 px-4 pb-12" style="max-width:1020px">
     <article data-pagefind-body>
       <header class="mb-8 mt-8">
-        <h1 class="text-2xl font-bold leading-tight tracking-wide text-accent sm:text-3xl" transition:name={`post-title-${post.id.replace(/\.(md|mdx)$/, "")}`}>{title}</h1>
+        <h1
+          class="text-2xl font-bold leading-tight tracking-wide text-accent sm:text-3xl"
+          style={`view-transition-name: post-${post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-")}`}
+        >{title}</h1>
         <div class="mt-3 flex flex-wrap items-center gap-3 text-sm opacity-70">
           <FormattedDate date={pubDatetime} />
           {modDatetime && (
@@ -52,7 +55,7 @@ const readingTime = getReadingTime(post.body ?? "");
         <img
           src={heroImage}
           alt={title}
-          class="mb-8 w-full rounded-lg border-2 border-border"
+          class="mb-8 w-full rounded-lg border-2 border-border transition-shadow duration-300 hover:shadow-lg"
         />
       )}
 

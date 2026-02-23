@@ -36,6 +36,7 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="view-transition" content="same-origin" />
 
     <!-- General Meta Tags -->
     <title>{pageTitle}</title>
@@ -97,6 +98,10 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
         }
         setTheme();
         document.addEventListener("astro:after-swap", setTheme);
+        // Scroll to top on page navigation
+        document.addEventListener("astro:after-swap", function() {
+          window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+        });
       })();
     </script>
 

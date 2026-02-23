@@ -3,29 +3,47 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* Astro View Transitions - smooth page transitions */
+/* View Transitions API */
+:root {
+  view-transition-name: root;
+}
+
+/* Page transition animations */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.3s;
-  animation-timing-function: ease-in-out;
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::view-transition-old(root) {
-  animation-name: fadeOut;
+  animation-name: slideOut;
 }
 
 ::view-transition-new(root) {
-  animation-name: fadeIn;
+  animation-name: slideIn;
 }
 
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+@keyframes slideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Shared element transitions - smooth morph between pages */
+::view-transition-old(post-title),
+::view-transition-new(post-title) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(page-heading),
+::view-transition-new(page-heading) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
