@@ -1,0 +1,11 @@
+[     271ms] Error: Minified React error #425; visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at rg (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:40170)
+    at https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:100830
+    at oI (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:106225)
+    at oD (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:99173)
+    at https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:98980
+    at oO (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:98987)
+    at ox (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:9:94026)
+    at x (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:33:1373)
+    at MessagePort.T (https://bharatbvs.vercel.app/_next/static/chunks/framework-114634acb84f8baa.js:33:1903)
+[     300ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://bharatbvs.vercel.app/favicon.ico:0

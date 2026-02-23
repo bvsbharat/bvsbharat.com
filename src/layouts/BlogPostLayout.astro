@@ -28,7 +28,7 @@ const readingTime = getReadingTime(post.body ?? "");
   scrollSmooth
 >
   <Header />
-  <main id="main-content" class="mx-auto w-full max-w-3xl flex-1 px-4 pb-12">
+  <main id="main-content" class="mx-auto w-full flex-1 px-4 pb-12" style="max-width:1020px">
     <article data-pagefind-body>
       <header class="mb-8 mt-8">
         <h1 class="text-2xl font-bold leading-tight tracking-wide text-accent sm:text-3xl" transition:name={`post-title-${post.id.replace(/\.(md|mdx)$/, "")}`}>{title}</h1>
