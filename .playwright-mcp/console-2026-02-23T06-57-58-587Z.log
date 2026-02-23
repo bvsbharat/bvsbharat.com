@@ -1,0 +1,4 @@
+[     190ms] [ERROR] Refused to apply style from 'https://bvsbharat.com/pagefind/pagefind-ui.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. @ https://bvsbharat.com/:0
+[     200ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://bvsbharat.com/pagefind/pagefind-ui.js:0
+[     200ms] [ERROR] Refused to execute script from 'https://bvsbharat.com/pagefind/pagefind-ui.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ https://bvsbharat.com/:0
+[   15653ms] [ERROR] Unexpected duplicate view-transition-name: post-2025-snowoptima-svai-hub-hackathon @ https://bvsbharat.com/:0
