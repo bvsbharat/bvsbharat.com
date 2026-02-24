@@ -10,6 +10,7 @@ tags:
   - meta
   - coding
 featured: false
+heroImage: "/images/dev-ai-agent-meta.jpg"
 ---
 
 I'm excited to share that our project **Dev_AI_Agent** received both the **Best Use of Llama 3.1 Award** from Meta and placed as **Runner-Up** at the AI Agent Hackathon!

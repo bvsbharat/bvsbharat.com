@@ -12,11 +12,9 @@ import { getSortedPosts } from "@/utils/getSortedPosts";
 
 const posts = await getCollection("blog");
 const sortedPosts = getSortedPosts(posts, { excludeHackathons: false });
-const featuredPosts = sortedPosts.filter((p) => p.data.featured);
-const recentPosts = sortedPosts.filter((p) => !p.data.featured);
-
-const featuredHackathons = getSortedPosts(posts, { excludeHackathons: false })
-  .filter((p) => p.data.featured && p.data.tags.includes("hackathon"));
+const nonHackathonPosts = sortedPosts.filter((p) => !p.data.tags.includes("hackathon"));
+const featuredPosts = nonHackathonPosts.filter((p) => p.data.featured);
+const recentPosts = nonHackathonPosts.filter((p) => !p.data.featured);
 ---
 
 <Layout>
@@ -82,26 +80,6 @@ const featuredHackathons = getSortedPosts(posts, { excludeHackathons: false })
       </div>
     )}
 
-    {featuredHackathons.length > 0 && (
-      <>
-        <Hr />
-        <section id="featured-hackathons" class="pt-8 pb-4">
-          <h2 class="text-2xl font-semibold tracking-wide">Featured Hackathons</h2>
-          <ul>
-            {featuredHackathons.map((post) => <Card post={post} />)}
-          </ul>
-        </section>
-        <div class="my-8 text-center">
-          <a
-            href="/hackathons"
-            class="inline-flex items-center gap-1 text-accent decoration-dashed underline-offset-4 hover:underline font-medium"
-          >
-            All Hackathons
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-          </a>
-        </div>
-      </>
-    )}
   </main>
   <Footer />
 </Layout>

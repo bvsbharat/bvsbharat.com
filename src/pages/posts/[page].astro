@@ -9,7 +9,7 @@ import { getSortedPosts } from "@/utils/getSortedPosts";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  const sortedPosts = getSortedPosts(posts, { excludeHackathons: false });
+  const sortedPosts = getSortedPosts(posts, { excludeHackathons: false }).filter((p) => !p.data.tags.includes("hackathon"));
   const totalPages = Math.ceil(sortedPosts.length / SITE.postPerPage);
 
   return Array.from({ length: totalPages - 1 }, (_, i) => ({

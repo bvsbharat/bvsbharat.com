@@ -8,94 +8,83 @@ interface Project {
   name: string;
   description: string;
   github: string;
-  category: string;
-  tech?: string[];
+  language?: string;
+  languageColor?: string;
+  stars?: string;
 }
 
 const projects: Project[] = [
   {
-    name: "Asidely",
-    description:
-      "Your side AI helper, anywhere — a Mac application providing intelligent, context-aware assistance.",
+    name: "Asidely/Asidely.app",
+    description: "Your side AI helper, anywhere — a Mac application providing intelligent, context-aware assistance.",
     github: "https://github.com/Asidely/Asidely.app",
-    category: "macOS",
-    tech: ["Swift", "macOS", "AI"],
+    language: "Swift",
+    languageColor: "#F05138",
   },
-{
-    name: "open-agent-sdks",
-    description:
-      "Multi-language SDKs for constructing voice AI agents.",
+  {
+    name: "bvsbharat/open-agent-sdks",
+    description: "Multi-language SDKs for constructing voice AI agents.",
     github: "https://github.com/bvsbharat/open-agent-sdks",
-    category: "Agents",
-    tech: ["TypeScript", "Python", "Voice AI"],
+    language: "TypeScript",
+    languageColor: "#3178C6",
   },
   {
-    name: "SleekVoice",
-    description:
-      "Enterprise voice AI agent platform for Mac — a CLI-first approach to building and deploying voice agents.",
+    name: "bvsbharat/Sleek",
+    description: "Enterprise voice AI agent platform for Mac — a CLI-first approach to building and deploying voice agents.",
     github: "https://github.com/bvsbharat/Sleek",
-    category: "Voice AI",
-    tech: ["Swift", "CLI", "macOS"],
+    language: "Swift",
+    languageColor: "#F05138",
   },
   {
-    name: "Dev-Agents",
-    description:
-      "AI agents focused on code generation and debugging workflows.",
+    name: "bvsbharat/10xDev",
+    description: "AI agents focused on code generation and debugging workflows.",
     github: "https://github.com/bvsbharat/10xDev",
-    category: "Agents",
-    tech: ["TypeScript", "AI", "Code Generation"],
+    language: "TypeScript",
+    languageColor: "#3178C6",
   },
   {
-    name: "Gemini-Navigator",
-    description:
-      "Helps users navigate complex websites like IRS.gov efficiently using Gemini.",
+    name: "bvsbharat/gemini-5head",
+    description: "Helps users navigate complex websites like IRS.gov efficiently using Gemini.",
     github: "https://github.com/bvsbharat/gemini-5head",
-    category: "AI/LLM",
-    tech: ["Gemini", "TypeScript", "Web Navigation"],
+    language: "TypeScript",
+    languageColor: "#3178C6",
   },
   {
-    name: "ClaimReimagined",
-    description:
-      "Insurance claims processing platform powered by AI — automating intake, triage, and routing.",
+    name: "bvsbharat/ClaimReimagined",
+    description: "Insurance claims processing platform powered by AI — automating intake, triage, and routing.",
     github: "https://github.com/bvsbharat/ClaimReimagined",
-    category: "Fintech",
-    tech: ["React", "Python", "AI"],
+    language: "Python",
+    languageColor: "#3572A5",
   },
   {
-    name: "SuperAgent.app",
-    description:
-      "Mac command center with agent orchestration capabilities — manage and coordinate multiple AI agents.",
+    name: "bvsbharat/homebrew-superagents",
+    description: "Mac command center with agent orchestration capabilities — manage and coordinate multiple AI agents.",
     github: "https://github.com/bvsbharat/homebrew-superagents",
-    category: "Agents",
-    tech: ["Swift", "macOS", "Agent Orchestration"],
+    language: "Swift",
+    languageColor: "#F05138",
   },
   {
-    name: "AgentOS",
-    description:
-      "Operating system layer for AI agents — providing infrastructure for agent lifecycle management.",
+    name: "bvsbharat/AgentOS",
+    description: "Operating system layer for AI agents — providing infrastructure for agent lifecycle management.",
     github: "https://github.com/bvsbharat/AgentOS",
-    category: "Agents",
-    tech: ["TypeScript", "Infrastructure"],
+    language: "TypeScript",
+    languageColor: "#3178C6",
   },
   {
-    name: "bolt.new",
-    description:
-      "Fork and contributions to the bolt.new full-stack web development agent.",
+    name: "bvsbharat/bolt.new",
+    description: "Fork and contributions to the bolt.new full-stack web development agent.",
     github: "https://github.com/bvsbharat/bolt.new",
-    category: "Web",
-    tech: ["TypeScript", "React", "AI"],
+    language: "TypeScript",
+    languageColor: "#3178C6",
   },
   {
-    name: "Reunite.ai",
-    description:
-      "AI-powered missing person identification and recovery system.",
+    name: "bvsbharat/reunite",
+    description: "AI-powered missing person identification and recovery system.",
     github: "https://github.com/bvsbharat/reunite",
-    category: "AI/LLM",
-    tech: ["Python", "Computer Vision", "AI"],
+    language: "Python",
+    languageColor: "#3572A5",
   },
 ];
-
-const categories = [...new Set(projects.map(p => p.category))];
 ---
 
 <Layout title="Open Source" description="Open source projects by Bharat BVS — voice AI, agents, macOS apps, and more.">
@@ -108,51 +97,51 @@ const categories = [...new Set(projects.map(p => p.category))];
       <p class="mt-2 opacity-70">
         Projects I've built and open-sourced — voice AI, agents, macOS apps, and developer tools.
       </p>
-      <a
-        href="https://github.com/bvsbharat"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-3 inline-flex items-center gap-1.5 text-sm text-accent decoration-dashed underline-offset-4 hover:underline"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-        View all on GitHub
-      </a>
     </section>
 
     <Hr />
 
-    <section class="pt-8 pb-4">
-      <ul class="grid gap-4 sm:grid-cols-2">
+    <section class="pt-4 pb-4">
+      <ul class="divide-y divide-border">
         {projects.map((project) => (
-          <li class="rounded-lg border border-border p-4 transition-colors hover:border-accent/50">
-            <div class="flex flex-wrap items-start justify-between gap-2">
-              <h3 class="font-medium">{project.name}</h3>
-              <span class="rounded bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent">
-                {project.category}
-              </span>
-            </div>
-            <p class="mt-2 text-sm opacity-70">{project.description}</p>
-            {project.tech && project.tech.length > 0 && (
-              <div class="mt-2 flex flex-wrap gap-1.5">
-                {project.tech.map((t) => (
-                  <span class="rounded bg-muted/75 px-2 py-0.5 text-xs opacity-70">
-                    {t}
-                  </span>
-                ))}
+          <li class="py-5 transition-colors hover:bg-muted/20 -mx-4 px-4 rounded">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 text-accent font-semibold hover:underline underline-offset-4"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50 shrink-0"><path d="m18 13 6-6-6-6"/><path d="M2 5v4a7 7 0 0 0 7 7h15"/></svg>
+                  {project.name}
+                </a>
+                <p class="mt-1 text-sm opacity-70 line-clamp-2">{project.description}</p>
+                <div class="mt-2 flex items-center gap-4 text-xs opacity-60">
+                  {project.language && (
+                    <span class="inline-flex items-center gap-1.5">
+                      <span class="inline-block w-3 h-3 rounded-full" style={`background-color: ${project.languageColor}`}></span>
+                      {project.language}
+                    </span>
+                  )}
+                </div>
               </div>
-            )}
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mt-3 inline-flex items-center gap-1 text-xs text-accent decoration-dashed underline-offset-4 hover:underline"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              View Source
-            </a>
+            </div>
           </li>
         ))}
       </ul>
+
+      <div class="mt-8 text-center">
+        <a
+          href="https://github.com/bvsbharat"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/40 hover:text-accent"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+          View all repositories on GitHub
+        </a>
+      </div>
     </section>
   </main>
   <Footer />

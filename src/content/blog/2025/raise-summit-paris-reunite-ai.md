@@ -8,6 +8,7 @@ tags:
   - social-good
   - paris
 featured: true
+heroImage: "/images/raise-summit-paris.jpg"
 ---
 
 We're the **2nd Runner-Up** at the World's Largest AI Hackathon — RAISE Your Hack!

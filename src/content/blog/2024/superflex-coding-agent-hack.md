@@ -8,38 +8,46 @@ tags:
   - agents
   - coding
 featured: false
+heroImage: "/images/superflex-coding-agent.jpg"
 ---
 
-This hackathon was an absolute blast! I used **Superflex** to build an entire app from scratch — it felt like having a coding superpower.
-
-Coming up with an idea? Easy. Bringing it to life in just a few hours? Also easy — if you've got a solid idea and let AI do the heavy lifting!
+This hackathon was an exercise in meta-engineering — using an AI tool to build another AI tool. I used **Superflex** to build **Dev AI Agent** from scratch in a few hours.
 
 ## What We Built
 
-**Dev AI Agent** — a revolutionary AI-powered coding assistant for automated software development. The agent can understand natural language descriptions of features, generate code, run tests, and iterate on solutions autonomously.
+**Dev AI Agent** — an autonomous coding assistant that takes natural language feature descriptions and produces working, tested code. Unlike simple code-generation tools, Dev AI Agent operates as a full development loop: plan, code, test, iterate.
 
-### Key Features
+### Architecture
 
-- **Natural Language to Code** — Describe what you want in plain English, and the agent generates production-ready code
-- **Autonomous Iteration** — The agent tests its own output and iterates until the solution passes all checks
-- **Multi-File Understanding** — Context-aware code generation that understands project structure and dependencies
-- **AI-Powered Development** — Built using Superflex and Simli AI for an end-to-end AI development experience
+The agent follows a multi-step pipeline:
 
-## The Superflex Experience
+1. **Intent Parser** — Breaks down natural language into structured task specifications using LLM-based extraction
+2. **Planner Agent** — Generates an execution plan: which files to create/modify, dependencies to install, and test cases to write
+3. **Code Generator** — Produces code using context-aware generation that reads existing project files, understands imports, and respects coding patterns
+4. **Test Runner** — Executes generated tests automatically and captures failures
+5. **Self-Correction Loop** — Feeds test failures back into the generator with error context, iterating up to 3 times until tests pass
 
-What made this hackathon unique was the meta nature of it — using an AI tool (Superflex) to build an AI tool (Dev AI Agent). Superflex handled the scaffolding, boilerplate, and repetitive coding tasks, letting me focus on the core agent logic and architecture.
+### Technical Implementation
 
-The speed was remarkable. What would normally take a weekend of coding was compressed into a few focused hours. The AI pair-programming experience with Superflex felt natural — like working with a senior developer who never gets tired and always remembers the codebase.
+- **LLM Orchestration** — Used LangChain for chaining prompts across the planning and generation stages with structured output parsing
+- **AST Analysis** — Parsed existing project code into abstract syntax trees to understand imports, exports, and function signatures before generating new code
+- **Sandboxed Execution** — Ran generated code and tests in isolated Docker containers to prevent side effects
+- **Context Window Management** — Implemented a sliding-window approach to feed relevant code context without exceeding token limits
 
-## What I Learned
+### Key Capabilities
 
-- **AI-Assisted Development** — How AI coding tools can 10x development speed when used effectively
-- **Agent Architecture** — Building autonomous agents that can plan, execute, and self-correct
-- **Rapid Prototyping** — Going from idea to working demo in hours with AI assistance
-- **The Future of Coding** — Experiencing firsthand how AI is transforming software development
+- **Natural Language to Code** — Describe features in plain English, get production-ready code with proper error handling and types
+- **Autonomous Iteration** — Tests its own output and iterates until the solution passes all checks
+- **Multi-File Understanding** — Reads project structure, respects existing patterns, and generates code that integrates cleanly
+- **Dependency Resolution** — Automatically identifies and installs required packages
 
-## Looking Back
+## The Superflex Factor
 
-This one was special because it proved a point — AI-powered coding is not just a gimmick, it's a genuine force multiplier. The ability to build a fully functional AI agent in just a few hours using another AI tool showed me the compounding power of AI in software development.
+Building with Superflex compressed the development timeline dramatically. It handled scaffolding, boilerplate, and repetitive patterns while I focused on the core agent logic — the planning algorithm, context management, and self-correction loop. The AI-assisted development felt like pair programming with a tireless partner who has perfect recall of the codebase.
 
-AI-powered coding for the win!
+## Key Takeaways
+
+- **Compounding AI** — Using AI to build AI creates a multiplicative effect on development speed
+- **Agent Architecture Patterns** — Plan-execute-verify loops are essential for reliable autonomous agents
+- **Context is King** — The quality of generated code is directly proportional to the quality of context fed to the LLM
+- **Sandboxing Matters** — Autonomous code execution requires strict isolation to maintain system integrity

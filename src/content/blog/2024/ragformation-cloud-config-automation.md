@@ -10,6 +10,7 @@ tags:
   - aws
   - hackathon
 featured: true
+heroImage: "/images/ragformation-cloud-config.jpg"
 ---
 
 Cloud architecture design shouldn't take weeks. We built **RAGformation** — an AI-powered system that automates cloud configuration, service selection, and cost estimation in minutes.

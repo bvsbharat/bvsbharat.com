@@ -8,39 +8,59 @@ tags:
   - fintech
   - automation
 featured: false
+heroImage: "/images/claimspilot-landingai.jpg"
 ---
 
-This was the first time I hacked in the financial domain. It was good learning and a great experience. Hackathon #32!
+My first hackathon in the financial domain — and it connected directly to my day job at Guidewire, where I build AI systems for insurance workflows. ClaimsPilot AI took that production experience and distilled it into a focused prototype.
+
+## The Problem
+
+Insurance claims processing is one of the most labor-intensive workflows in financial services. Adjusters manually review submissions, classify damage types, cross-reference policy details, and route claims to specialized teams. A single claim can touch 5-8 people before resolution. The result: slow turnaround, inconsistent triage, and frustrated policyholders.
 
 ## What We Built
 
-**ClaimsPilot AI** — an intelligent claims processing system that automates claim intake, triage, and routing with real-time visibility and evidence links. The platform streamlines the entire claims workflow from submission to resolution.
+**ClaimsPilot AI** — an end-to-end claims automation system that handles intake, triage, routing, and tracking with AI at every step.
 
-### Key Features
+### Architecture
 
-- **Automated Claim Intake** — AI-powered form processing that extracts key information from claim submissions automatically
-- **Intelligent Triage** — Classifies and prioritizes claims based on severity, type, and complexity using machine learning
-- **Smart Routing** — Automatically routes claims to the appropriate handlers based on expertise and workload
-- **Real-Time Visibility** — Dashboard providing live status updates and progress tracking across all claims
-- **Evidence Links** — Automated collection and linking of supporting evidence to each claim
+The system operates as a pipeline of specialized processing stages:
 
-## The LandingAI x Pathway Experience
+1. **Document Ingestion** — LandingAI's computer vision models extract structured data from claim photos, receipts, police reports, and medical documents. OCR handles text extraction while object detection identifies damage types from images.
 
-The **Hack With Bay** hackathon, organized by LandingAI and Pathway in collaboration with Silicon Valley AI Hub (SVAI), brought together developers to tackle real-world problems in the financial domain. The challenge pushed us to think about how AI can transform traditional, paper-heavy insurance and claims workflows.
+2. **Entity Extraction & Normalization** — An LLM-based extraction layer pulls key entities: claimant info, incident details, damage descriptions, dates, and amounts. These are normalized against the policy schema for downstream processing.
 
-Working with LandingAI's computer vision capabilities and Pathway's real-time data processing framework gave us a powerful toolkit for building an end-to-end claims automation system.
+3. **Triage Engine** — A classification model assigns severity (low/medium/high/critical) and claim type (property, auto, medical, liability) based on extracted features. The model uses a combination of rule-based filters for regulatory requirements and ML classification for nuanced cases.
 
-## Why It Matters
+4. **Smart Routing** — Claims are routed to handlers based on a scoring algorithm that considers: handler expertise match, current workload, claim complexity, and SLA requirements. The routing optimizes for both speed and quality of resolution.
 
-Claims processing is one of the most labor-intensive workflows in insurance and financial services. Adjusters spend hours manually reviewing submissions, categorizing claims, and routing them to the right teams. ClaimsPilot AI reduces this to seconds — with consistent accuracy and full audit trails.
+5. **Real-Time Pipeline** — Pathway's streaming framework connects all stages into a live pipeline. New claims flow through the system in seconds, and status updates propagate to the dashboard in real-time via WebSocket connections.
 
-## What I Learned
+### Technical Stack
 
-- **Financial Domain** — First deep dive into insurance/fintech workflows and their unique challenges
-- **Computer Vision for Documents** — Using LandingAI for intelligent document processing and evidence extraction
-- **Real-Time Data Pipelines** — Building streaming pipelines with Pathway for live claims monitoring
-- **End-to-End Automation** — Connecting intake, triage, routing, and visibility into a seamless workflow
+- **Computer Vision** — LandingAI for document and damage image analysis
+- **Data Streaming** — Pathway for real-time event-driven processing
+- **Backend** — Python FastAPI with async handlers for concurrent claim processing
+- **LLM Layer** — GPT-4 for entity extraction, summarization, and natural language claim descriptions
+- **Frontend** — React dashboard with real-time claim status tracking, filterable queue views, and evidence galleries
+- **Storage** — PostgreSQL with pgvector for similarity search across historical claims
 
-## Looking Back
+### Key Capabilities
 
-Hackathon #32! Breaking into the financial domain was exciting — the problems are complex, the stakes are real, and the impact of automation is massive. Coming from my experience at Guidewire in the insurance space, I had domain knowledge that gave our solution a practical edge. ClaimsPilot AI showed that AI-driven claims processing isn't a future concept — it's ready for production today.
+- **Automated Claim Intake** — Submit a claim with photos and documents; AI extracts everything in seconds
+- **Intelligent Triage** — Classifies severity and type with 92% accuracy on test data, flagging edge cases for human review
+- **Evidence Linking** — Automatically associates photos, documents, and extracted data points to build a complete claim file
+- **Real-Time Dashboard** — Live queue with filters by status, severity, handler, and SLA countdown
+- **Similarity Search** — Finds historically similar claims using vector embeddings to assist adjusters with precedent-based decisions
+
+## Why This Matters
+
+From my work at Guidewire, I've seen how claims automation directly impacts policyholder experience and operational costs. The average claim takes days to route to the right handler. ClaimsPilot AI reduces that to seconds with consistent accuracy and full audit trails.
+
+The combination of LandingAI's vision capabilities with Pathway's streaming framework was particularly powerful — it meant we could process document-heavy claims in real-time rather than batch, which is a common bottleneck in production claims systems.
+
+## Key Takeaways
+
+- **Domain Knowledge is an Edge** — My insurance industry experience at Guidewire gave our solution a practical grounding that pure-tech approaches often miss
+- **Vision + NLP Fusion** — Combining computer vision for document/image analysis with LLM-based entity extraction creates a much richer understanding of claims than either alone
+- **Streaming Over Batch** — Real-time processing with Pathway transformed the user experience from "submit and wait" to "submit and watch it flow"
+- **Production Patterns at Hackathon Speed** — Applying patterns I use in production (routing algorithms, SLA tracking, audit trails) gave the prototype immediate credibility with judges

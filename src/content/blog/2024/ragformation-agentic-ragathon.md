@@ -9,9 +9,10 @@ tags:
   - llamaindex
   - cloud
 featured: false
+heroImage: "/images/ragformation-box.jpg"
 ---
 
-Excited to share our latest achievement — **RAGformation** snagged the **"Best Use of Box"** award at the Agentic RAG-A-THON ($12K cash prizes)!
+Excited to share our latest achievement — **RAGformation** snagged the **"Best Use of Box"** award at the Agentic RAG-A-THON!
 
 ## What is RAGformation?
 

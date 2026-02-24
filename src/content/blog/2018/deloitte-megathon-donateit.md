@@ -8,6 +8,7 @@ tags:
   - social-good
   - deloitte
 featured: false
+heroImage: "/images/deloitte-megathon.jpg"
 ---
 
 Thrilled to share that my team emerged as **winners at the Deloitte Megathon**, where we were challenged to create revolutionary apps in categories like mobile, AR, AI, and Progressive Web Apps. We chose to build a transformative social platform for Deloitte's global community.

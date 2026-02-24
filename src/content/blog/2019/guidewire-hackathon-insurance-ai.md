@@ -9,6 +9,7 @@ tags:
   - nlp
   - chrome-extension
 featured: false
+heroImage: "/images/guidewire-hackathon.jpg"
 ---
 
 We secured the **Runner-Up** position at the Guidewire Software hackathon focused on innovating the insurance sector!
