@@ -1,7 +1,7 @@
 ---
 title: "MCP Has a Tools Problem — And Code Mode Might Fix It"
 description: "AI agents are drowning in tools. The more APIs you connect via MCP, the worse your agent performs. Here's why, and what Code Mode changes."
-pubDatetime: 2026-02-23T00:00:00Z
+pubDatetime: 2026-02-24T00:00:00Z
 tags:
   - ai
   - agents
