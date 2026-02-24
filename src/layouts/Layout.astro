@@ -2,6 +2,7 @@
 import "@/styles/global.css";
 import { SITE } from "@/config";
 import { ClientRouter, fade } from "astro:transitions";
+import JsonLD from "@/components/JsonLD.astro";
 
 interface Props {
   title?: string;
@@ -11,6 +12,14 @@ interface Props {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  article?: {
+    title: string;
+    description: string;
+    pubDatetime: Date;
+    modDatetime?: Date | null;
+    heroImage?: string;
+    url: string;
+  };
 }
 
 const {
@@ -21,6 +30,7 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  article,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage ?? SITE.ogImage, Astro.url.origin).href;
@@ -43,6 +53,7 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <meta name="description" content={description} />
     <meta name="author" content={SITE.author} />
     <meta name="google-site-verification" content="f8UoTSiaZuyz5H8PMQi_XFVZSxj5cZA0gk-uGCJ17sQ" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Open Graph / Facebook -->
@@ -51,6 +62,8 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={socialImageURL} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:locale" content="en_US" />
     {pubDatetime && (
       <meta
         property="article:published_time"
@@ -107,6 +120,9 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <!-- Pagefind -->
     <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
     <script is:inline src="/pagefind/pagefind-ui.js"></script>
+
+    <!-- Structured Data -->
+    <JsonLD article={article} />
   </head>
   <body transition:animate={fade({ duration: '0.3s' })}>
     <a href="#main-content" class="skip-to-content">Skip to content</a>

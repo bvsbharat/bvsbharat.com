@@ -1,0 +1,76 @@
+---
+import { SITE } from "@/config";
+import { SOCIALS } from "@/consts";
+
+interface Props {
+  article?: {
+    title: string;
+    description: string;
+    pubDatetime: Date;
+    modDatetime?: Date | null;
+    heroImage?: string;
+    url: string;
+  };
+}
+
+const { article } = Astro.props;
+
+const siteUrl = SITE.website;
+
+const sameAs = SOCIALS.filter(s => s.active && s.name !== "Email" && s.name !== "RSS")
+  .map(s => s.href);
+
+const baseGraph = [
+  {
+    "@type": "WebSite",
+    "name": SITE.title,
+    "url": siteUrl,
+    "description": SITE.desc,
+    "author": { "@id": `${siteUrl}/#person` },
+  },
+  {
+    "@type": "Person",
+    "@id": `${siteUrl}/#person`,
+    "name": SITE.author,
+    "url": SITE.profile,
+    "sameAs": sameAs,
+  },
+];
+
+const baseSchema = {
+  "@context": "https://schema.org",
+  "@graph": baseGraph,
+};
+
+const articleSchema = article ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": article.title,
+  "description": article.description,
+  "datePublished": article.pubDatetime.toISOString(),
+  ...(article.modDatetime ? { "dateModified": article.modDatetime.toISOString() } : {}),
+  "author": { "@id": `${siteUrl}/#person` },
+  "publisher": { "@id": `${siteUrl}/#person` },
+  "url": article.url,
+  ...(article.heroImage ? { "image": new URL(article.heroImage, siteUrl).href } : {}),
+  "mainEntityOfPage": { "@type": "WebPage", "@id": article.url },
+} : null;
+
+const breadcrumbSchema = article ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${siteUrl}/posts` },
+    { "@type": "ListItem", "position": 3, "name": article.title },
+  ],
+} : null;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(baseSchema)} />
+{articleSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+)}
+{breadcrumbSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+)}

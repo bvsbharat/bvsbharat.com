@@ -18,6 +18,7 @@ const { post } = Astro.props;
 const { title, description, pubDatetime, modDatetime, tags, heroImage } = post.data;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body ?? "");
+const postUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 const sparkTransition = {
   forwards: {
@@ -37,6 +38,14 @@ const sparkTransition = {
   pubDatetime={pubDatetime}
   modDatetime={modDatetime}
   scrollSmooth
+  article={{
+    title,
+    description,
+    pubDatetime,
+    modDatetime,
+    heroImage,
+    url: postUrl,
+  }}
 >
   <Header />
   <main id="main-content" class="mx-auto w-full flex-1 px-4 pb-12" style="max-width:1020px">

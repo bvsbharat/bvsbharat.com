@@ -1,10 +1,13 @@
 import type { APIRoute } from "astro";
 
+const siteUrl = import.meta.env.SITE;
 const robotsTxt = `
 User-agent: *
 Allow: /
+Disallow: /pagefind/
 
-Sitemap: ${new URL("sitemap-index.xml", import.meta.env.SITE).href}
+Sitemap: ${new URL("sitemap-index.xml", siteUrl).href}
+Host: ${siteUrl}
 `.trim();
 
 export const GET: APIRoute = () => {

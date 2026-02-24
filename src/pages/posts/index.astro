@@ -13,7 +13,7 @@ const totalPages = Math.ceil(sortedPosts.length / SITE.postPerPage);
 const currentPosts = sortedPosts.slice(0, SITE.postPerPage);
 ---
 
-<Layout title="Blog">
+<Layout title="Blog" description="Articles on AI, voice agents, multi-agent systems, and software engineering by Bharat Bhavnasi.">
   <Main pageTitle="Blog" pageDesc="All my articles and thoughts.">
     <ul>
       {currentPosts.map((post) => <Card post={post} enableTransition />)}
