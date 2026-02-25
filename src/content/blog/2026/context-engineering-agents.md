@@ -1,7 +1,7 @@
 ---
 title: "Context Engineering: Managing AI Agent Intelligence"
 description: "Learn how to optimize AI agent performance by managing context window efficiently - the key to smarter, faster agents."
-pubDate: "2026-02-25"
+pubDatetime: 2026-02-25T08:00:00Z
 tags: ["agents", "context-engineering", "llm", "optimization"]
 ---
 
@@ -64,7 +64,7 @@ This prevents one task's noise from polluting another's focus.
 
 ## The Real-World Impact
 
-Manus (one of the most popular consumer AI agents) applies all three strategies. Why?
+Manus (a popular consumer AI agents) applies all three strategies. Why?
 
 Because **context engineering is the difference between an agent that works and one that doesn't.**
 
@@ -76,9 +76,9 @@ By managing what goes into the context window, Manus can:
 
 ## Key Takeaway
 
-Here's how Andrej Karpathy summed it up:
+Here's how Andreji Karpatsky summed it up:
 
-> "Context engineering is the delicate art and science of filling the context window with just the right information for the next step."
+> "Context engineering is the delicate art and science of filling the context window with just the right information for the next step.
 
 This is the future of agent development. As agents become more powerful, context engineering becomes **table stakes**.
 
@@ -100,4 +100,4 @@ The agents that manage their context win. Period.
 
 ---
 
-*Originally inspired by Lance Martin's deep dive into Manus. Simplified and adapted for builders of all levels.*
+*Originally inspired by Lance Martin's deep dive in Manus. Simplified and adapted for builders of all levels.*
