@@ -9,7 +9,20 @@ interface Props {
 }
 
 const { post, enableTransition = false } = Astro.props;
-const { title, description, pubDatetime, modDatetime, heroImage } = post.data;
+const { title, description, pubDatetime, modDatetime, heroImage, tags } = post.data;
+
+// Tag color mapping — colored circle with asterisk (OutlineCV style)
+const tagColorMap: Record<string, string> = {
+  ai: "#c8e632",
+  hackathon: "#F59E0B",
+  react: "#61DAFB",
+  agents: "#7DD3FC",
+  llm: "#10B981",
+  "context-engineering": "#F97316",
+  optimization: "#3B82F6",
+};
+const primaryTag = tags?.[0]?.toLowerCase() ?? "";
+const tagColor = tagColorMap[primaryTag] ?? "#6B7280";
 const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
@@ -32,12 +45,25 @@ const showVideoThumb = !cardImage && !!localVideo;
     class="flex items-stretch rounded-lg overflow-hidden transition-all duration-200 hover:bg-muted/50"
   >
     <div class="flex-1 min-w-0 p-4">
-      <h3
-        transition:name={enableTransition ? slug : undefined}
-        class="text-lg font-medium text-accent transition-colors duration-200"
-      >
-        {title}
-      </h3>
+      <div class="flex items-center gap-3">
+        <span
+          class="shrink-0 inline-flex items-center justify-center rounded-full"
+          style={`background-color: ${tagColor}; width: 28px; height: 28px;`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="2" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" />
+          </svg>
+        </span>
+        <h3
+          transition:name={enableTransition ? slug : undefined}
+          class="text-lg font-normal text-foreground transition-colors duration-200"
+        >
+          {title}
+        </h3>
+      </div>
       <div class="flex items-center gap-3 mb-2 mt-1">
         <span class="text-sm opacity-70">
           <FormattedDate date={pubDatetime} />
@@ -45,7 +71,7 @@ const showVideoThumb = !cardImage && !!localVideo;
         </span>
         <span class="text-sm italic opacity-80">&bull; {readingTime}</span>
       </div>
-      <p class="opacity-80 transition-opacity duration-200 group-hover:opacity-100">{description}</p>
+      <p class="opacity-60 text-sm transition-opacity duration-200 group-hover:opacity-80">{description}</p>
     </div>
     {(cardImage || showVideoThumb) && (
       <div class="hidden sm:block w-48 shrink-0 relative overflow-hidden">

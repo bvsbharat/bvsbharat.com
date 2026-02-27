@@ -47,19 +47,21 @@
 
 :root,
 html[data-theme="light"] {
-  --background: #ffffff;
-  --foreground: #1d1d1f;
-  --accent: #0066cc;
-  --muted: #f5f5f7;
-  --border: #d2d2d7;
+  --background: #f6f7f1;
+  --foreground: #5a5a58;
+  --accent: #5a5a58;
+  --muted: #edeee8;
+  --border: #d4cfc5;
+  --accent-link: #4a7eb5;
 }
 
 html[data-theme="dark"] {
   --background: #212737;
   --foreground: #eaedf3;
-  --accent: #00d4ff;
+  --accent: #eaedf3;
   --muted: #343f60bf;
-  --border: #0891b2;
+  --border: #ffffff;
+  --accent-link: #00d4ff;
 }
 
 @theme {
@@ -67,13 +69,15 @@ html[data-theme="dark"] {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-accent-link: var(--accent-link);
   --color-muted: var(--muted);
   --color-border: var(--border);
 }
 
 @layer base {
   * {
-    @apply border-border outline-accent/75;
+    @apply border-border/60 outline-accent/50;
+    border-style: dotted;
     scrollbar-width: auto;
     scrollbar-color: var(--color-muted) transparent;
   }
@@ -83,9 +87,11 @@ html[data-theme="dark"] {
   }
 
   body {
-    @apply flex min-h-dvh flex-col bg-background font-mono text-foreground selection:bg-accent/75 selection:text-background;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, "Helvetica Neue", sans-serif;
+    @apply flex min-h-dvh flex-col bg-background text-foreground selection:bg-foreground/10 selection:text-foreground;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    line-height: 1.8;
   }
 
   a,
@@ -107,7 +113,7 @@ html[data-theme="dark"] {
 
 /* Active nav link */
 .active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-4;
+  @apply underline decoration-dotted decoration-1 underline-offset-4 opacity-70;
 }
 
 /* Horizontal rule */

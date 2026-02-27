@@ -47,6 +47,11 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Google Fonts — Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
     <!-- Google Analytics (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TTV16ZS899"></script>
     <script is:inline>
@@ -111,7 +116,7 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
           if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
             return localStorage.getItem("theme");
           }
-          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          return "light";
         }
         function setTheme() {
           var theme = getTheme();
