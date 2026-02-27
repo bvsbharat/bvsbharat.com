@@ -45,12 +45,12 @@ const showVideoThumb = !cardImage && !!localVideo;
     class="flex items-stretch rounded-lg overflow-hidden transition-all duration-200 hover:bg-muted/50"
   >
     <div class="flex-1 min-w-0 p-4">
-      <div class="flex items-center gap-3">
+      <div class="relative sm:pl-8">
         <span
-          class="shrink-0 inline-flex items-center justify-center rounded-full"
-          style={`background-color: ${tagColor}; width: 28px; height: 28px;`}
+          class="absolute left-0 top-[5px] hidden sm:inline-flex items-center justify-center rounded-full"
+          style={`background-color: ${tagColor}; width: 20px; height: 20px;`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
             <line x1="12" y1="2" x2="12" y2="22" />
             <line x1="2" y1="12" x2="22" y2="12" />
             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
@@ -59,7 +59,7 @@ const showVideoThumb = !cardImage && !!localVideo;
         </span>
         <h3
           transition:name={enableTransition ? slug : undefined}
-          class="text-lg font-normal text-foreground transition-colors duration-200"
+          class="text-base sm:text-lg font-normal text-foreground transition-colors duration-200"
         >
           {title}
         </h3>
