@@ -1,9 +1,15 @@
-# From Fine-Tuning Curiosity to Training a Virtual Startup: A Deep Dive into Multi-Agent Reinforcement Learning with GRPO
-
-*How exploring LLM fine-tuning led to building a Gymnasium-compatible RL environment where 7 LLM-powered agents run a company — trained with GRPO + LoRA on Qwen 2.5 14B — and what we learned about reward design, emergent collaboration, and the future of agentic AI.*
-
 ---
-
+title: "rom Fine-Tuning Curiosity to Training a Virtual Startup: A Deep Dive into Multi-Agent Reinforcement Learning with GRPO"
+description: "How exploring LLM fine-tuning led to building a Gymnasium-compatible RL environment where 7 LLM-powered agents run a company — trained with GRPO + LoRA on Qwen 2.5 14B — and what we learned about reward design, emergent collaboration, and the future of agentic AI."
+pubDatetime: 2026-03-20T00:00:00Z
+tags:
+  - ai
+  - ux
+  - agents
+  - opinion
+featured: true
+heroImage: "/images/ai-app-paradox.png"
+---
 ## The Spark: Why RL Became the Next Obsession
 
 It started with a deep dive into how LLM fine-tuning actually works. Not the API calls — the mechanics underneath. The more I studied techniques like RLHF and GRPO, the more a pattern emerged: if you truly want to understand how models learn and improve, you need to understand reinforcement learning at a fundamental level.
