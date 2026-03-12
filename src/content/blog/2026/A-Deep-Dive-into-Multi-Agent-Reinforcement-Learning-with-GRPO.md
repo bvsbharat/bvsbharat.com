@@ -1,12 +1,11 @@
 ---
 title: "From Fine-Tuning Curiosity to Training a Virtual Startup: A Deep Dive into Multi-Agent Reinforcement Learning with GRPO"
 description: "How exploring LLM fine-tuning led to building a Gymnasium-compatible RL environment where 7 LLM-powered agents run a company — trained with GRPO + LoRA on Qwen 2.5 14B — and what we learned about reward design, emergent collaboration, and the future of agentic AI."
-pubDatetime: 2026-03-10T00:00:00Z
+pubDatetime: 2026-03-07T00:00:00Z
 tags:
   - ai
   - agents
   - rl
-  - hackathon
 featured: true
 heroImage: "https://www.youtube.com/watch?v=0i6xT683rMI"
 ---
