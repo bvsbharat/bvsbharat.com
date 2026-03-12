@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="windowGrad" x1="0" y1="0" x2="0" y2="1" >
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.05" stroke="#94a3b8" stroke-width="0.5">
+    <line x1="0" y1="0" x2="0" y2="630"/><line x1="40" y1="0" x2="40" y2="630"/>
+    <line x1="80" y1="0" x2="80" y2="630"/><line x1="120" y1="0" x2="120" y2="630"/>
+    <line x1="160" y1="0" x2="160" y2="630"/><line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="240" y1="0" x2="240" y2="630"/><line x1="280" y1="0" x2="280" y2="630"/>
+    <line x1="320" y1="0" x2="320" y2="630"/><line x1="360" y1="0" x2="360" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/><line x1="440" y1="0" x2="440" y2="630"/>
+    <line x1="480" y1="0" x2="480" y2="630"/><line x1="520" y1="0" x2="520" y2="630"/>
+    <line x1="560" y1="0" x2="560" y2="630"/><line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="640" y1="0" x2="640" y2="630"/><line x1="680" y1="0" x2="680" y2="630"/>
+    <line x1="720" y1="0" x2="720" y2="630"/><line x1="760" y1="0" x2="760" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/><line x1="840" y1="0" x2="840" y2="630"/>
+    <line x1="880" y1="0" x2="880" y2="630"/><line x1="920" y1="0" x2="920" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1000" y1="0" x2="1000" y2="630"/>
+    <line x1="1040" y1="0" x2="1040" y2="630"/><line x1="1080" y1="0" x2="1080" y2="630"/>
+    <line x1="1120" y1="0" x2="1120" y2="630"/><line x1="1160" y1="0" x2="1160" y2="630"/>
+    <line x1="0" y1="40" x2="1200" y2="40"/><line x1="0" y1="80" x2="1200" y2="80"/>
+    <line x1="0" y1="120" x2="1200" y2="120"/><line x1="0" y1="160" x2="1200" y2="160"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/><line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="280" x2="1200" y2="280"/><line x1="0" y1="320" x2="1200" y2="320"/>
+    <line x1="0" y1="360" x2="1200" y2="360"/><line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="440" x2="1200" y2="440"/><line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="0" y1="520" x2="1200" y2="520"/><line x1="0" y1="560" x2="1200" y2="560"/>
+    <line x1="0" y1="600" x2="1200" y2="600"/>
+  </g>
+
+  <!-- Left side: Context Window visualization -->
+  <g filter="softShadow">
+    <!-- Context window frame -->
+    <rect x="60" y="60" width="480" height="510" rx="12" fill="url(#windowGrad)" stroke="#475569" stroke-width="1.5"/>
+
+    <!-- Window title bar -->
+    <rect x="60" y="60" width="480" height="40" rx="12" fill="#334155"/>
+    <rect x="60" y="88" width="480" height="12" fill="#334155"/>
+    <circle cx="84" cy="80" r="6" fill="#f87171"/>
+    <circle cx="104" cy="80" r="6" fill="#fbbf24"/>
+    <circle cx="124" cy="80" r="6" fill="#34d399"/>
+    <text x="300" y="84" font-family="monospace" font-size="13" fill="#94a3b8" text-anchor="middle">context_window [128K tokens]</text>
+
+    <!-- System Prompt block -->
+    <rect x="78" y="114" width="444" height="52" rx="6" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1"/>
+    <rect x="78" y="114" width="6" height="52" rx="3" fill="url(#accentGrad)"/>
+    <text x="98" y="135" font-family="monospace" font-size="12" font-weight="bold" fill="#818cf8">SYSTEM PROMPT</text>
+    <text x="98" y="153" font-family="monospace" font-size="11" fill="#94a3b8">You are an AI agent. Tools: bash, read, write...</text>
+
+    <!-- Tool Definitions block -->
+    <rect x="78" y="176" width="444" height="46" rx="6" fill="#06b6d4" fill-opacity="0.1" stroke="#06b6d4" stroke-width="1"/>
+    <rect x="78" y="176" width="6" height="46" rx="3" fill="url(#cyanGrad)"/>
+    <text x="98" y="196" font-family="monospace" font-size="12" font-weight="bold" fill="#22d3ee">TOOL DEFINITIONS</text>
+    <text x="98" y="212" font-family="monospace" font-size="11" fill="#94a3b8">{"name": "search", "params": {...}}</text>
+
+    <!-- Conversation History block (faded/compressed) -->
+    <rect x="78" y="232" width="444" height="72" rx="6" fill="#f59e0b" fill-opacity="0.08" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+    <rect x="78" y="232" width="6" height="72" rx="3" fill="url(#amberGrad)"/>
+    <text x="98" y="253" font-family="monospace" font-size="12" font-weight="bold" fill="#fbbf24">HISTORY (compacted)</text>
+    <text x="98" y="270" font-family="monospace" font-size="11" fill="#64748b">Summary: searched 3 sources, extracted data</text>
+    <text x="98" y="286" font-family="monospace" font-size="11" fill="#64748b">files: /tmp/results_001.json, /tmp/page.html</text>
+
+    <!-- Recent Tool Results block -->
+    <rect x="78" y="314" width="444" height="80" rx="6" fill="#10b981" fill-opacity="0.12" stroke="#10b981" stroke-width="1"/>
+    <rect x="78" y="314" width="6" height="80" rx="3" fill="url(#greenGrad)"/>
+    <text x="98" y="335" font-family="monospace" font-size="12" font-weight="bold" fill="#34d399">RECENT TOOL RESULTS</text>
+    <text x="98" y="353" font-family="monospace" font-size="11" fill="#94a3b8">$ grep -r "pricing" ./data/</text>
+    <text x="98" y="369" font-family="monospace" font-size="11" fill="#94a3b8">Found 12 matches in 4 files...</text>
+    <text x="98" y="385" font-family="monospace" font-size="11" fill="#94a3b8">[full results - 2,400 tokens]</text>
+
+    <!-- Current State block -->
+    <rect x="78" y="404" width="444" height="52" rx="6" fill="#f43f5e" fill-opacity="0.12" stroke="#f43f5e" stroke-width="1"/>
+    <rect x="78" y="404" width="6" height="52" rx="3" fill="url(#roseGrad)"/>
+    <text x="98" y="425" font-family="monospace" font-size="12" font-weight="bold" fill="#fb7185">AGENT STATE</text>
+    <text x="98" y="443" font-family="monospace" font-size="11" fill="#94a3b8">step: 34/50 | plan: comparing features | next: write report</text>
+
+    <!-- Token usage bar -->
+    <rect x="78" y="474" width="444" height="24" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+    <rect x="80" y="476" width="310" height="20" rx="3" fill="url(#accentGrad)" fill-opacity="0.6"/>
+    <text x="300" y="491" font-family="monospace" font-size="11" fill="#e2e8f0" text-anchor="middle">71% context used -- 91K / 128K tokens</text>
+
+    <!-- Warning indicator -->
+    <rect x="78" y="508" width="444" height="28" rx="4" fill="#f59e0b" fill-opacity="0.08"/>
+    <text x="300" y="527" font-family="monospace" font-size="11" fill="#fbbf24" text-anchor="middle">Compaction triggered at 80% -- keeping signal high</text>
+  </g>
+
+  <!-- Right side: The 5 techniques -->
+  <g>
+    <text x="660" y="95" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#94a3b8" letter-spacing="3">THE FIVE TECHNIQUES</text>
+
+    <!-- Technique 1: Compaction -->
+    <g filter="glow">
+      <rect x="620" y="118" width="530" height="68" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="1"/>
+      <circle cx="652" cy="152" r="18" fill="#6366f1" fill-opacity="0.2" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="652" y="157" font-family="monospace" font-size="14" font-weight="bold" fill="#818cf8" text-anchor="middle">1</text>
+      <text x="684" y="146" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#e2e8f0">Compaction</text>
+      <text x="684" y="166" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Shrink old results to references. Summarize when needed.</text>
+    </g>
+
+    <!-- Technique 2: Offloading -->
+    <g filter="glow">
+      <rect x="620" y="196" width="530" height="68" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1"/>
+      <circle cx="652" cy="230" r="18" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1.5"/>
+      <text x="652" y="235" font-family="monospace" font-size="14" font-weight="bold" fill="#34d399" text-anchor="middle">2</text>
+      <text x="684" y="224" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#e2e8f0">Offloading</text>
+      <text x="684" y="244" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Move data to files, DBs, vector stores. Keep pointers only.</text>
+    </g>
+
+    <!-- Technique 3: Isolation -->
+    <g filter="glow">
+      <rect x="620" y="274" width="530" height="68" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1"/>
+      <circle cx="652" cy="308" r="18" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="652" y="313" font-family="monospace" font-size="14" font-weight="bold" fill="#fbbf24" text-anchor="middle">3</text>
+      <text x="684" y="302" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#e2e8f0">Isolation</text>
+      <text x="684" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Each sub-task gets its own fresh context window.</text>
+    </g>
+
+    <!-- Technique 4: Caching -->
+    <g filter="glow">
+      <rect x="620" y="352" width="530" height="68" rx="8" fill="#1e293b" stroke="#06b6d4" stroke-width="1"/>
+      <circle cx="652" cy="386" r="18" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="1.5"/>
+      <text x="652" y="391" font-family="monospace" font-size="14" font-weight="bold" fill="#22d3ee" text-anchor="middle">4</text>
+      <text x="684" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#e2e8f0">Caching</text>
+      <text x="684" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Reuse KV-cache for static prefixes. 90% cost reduction.</text>
+    </g>
+
+    <!-- Technique 5: Prioritization -->
+    <g filter="glow">
+      <rect x="620" y="430" width="530" height="68" rx="8" fill="#1e293b" stroke="#f43f5e" stroke-width="1"/>
+      <circle cx="652" cy="464" r="18" fill="#f43f5e" fill-opacity="0.2" stroke="#f43f5e" stroke-width="1.5"/>
+      <text x="652" y="469" font-family="monospace" font-size="14" font-weight="bold" fill="#fb7185" text-anchor="middle">5</text>
+      <text x="684" y="458" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="bold" fill="#e2e8f0">Prioritization</text>
+      <text x="684" y="478" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Budget tokens by category. Critical info at start and end.</text>
+    </g>
+
+    <!-- Bottom tagline -->
+    <text x="885" y="540" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">The right information at the right time</text>
+    <text x="885" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">-- no more, no less.</text>
+  </g>
+</svg>
