@@ -26,3 +26,9 @@ pnpm-debug.log*
 
 # pagefind
 public/pagefind/
+
+# claude code
+.claude/
+
+# playwright mcp
+.playwright-mcp/
