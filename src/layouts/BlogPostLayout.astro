@@ -72,7 +72,21 @@ const sparkTransition = {
         )}
       </header>
 
-      {heroImage && (
+      {heroImage && heroImage.includes("youtube.com") ? (() => {
+        const url = new URL(heroImage);
+        const videoId = url.searchParams.get("v") || url.pathname.split("/").pop();
+        return (
+          <div class="mb-8 aspect-video w-full overflow-hidden rounded-lg border-2 border-border">
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              class="h-full w-full"
+            />
+          </div>
+        );
+      })() : heroImage && (
         <img
           src={heroImage}
           alt={title}

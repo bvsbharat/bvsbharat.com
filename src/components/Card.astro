@@ -27,14 +27,26 @@ const readingTime = getReadingTime(post.body ?? "");
 const postUrl = `/posts/${post.id.replace(/\.(md|mdx)$/, "")}`;
 const slug = post.id.replace(/\.(md|mdx)$/, "").replace(/\//g, "-");
 
-// Extract YouTube video ID from post body for thumbnail
-const youtubeMatch = post.body?.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-const youtubeId = youtubeMatch ? youtubeMatch[1] : null;
+// Extract YouTube video ID from heroImage or post body
+let youtubeId: string | null = null;
+if (heroImage?.includes("youtube.com")) {
+  try {
+    const url = new URL(heroImage);
+    youtubeId = url.searchParams.get("v") || url.pathname.split("/").pop() || null;
+  } catch {}
+}
+if (!youtubeId) {
+  const youtubeMatch = post.body?.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+  youtubeId = youtubeMatch ? youtubeMatch[1] : null;
+}
 // Extract local video from post body
 const localVideoMatch = post.body?.match(/src="(\/[^"]+\.mp4)"/);
 const localVideo = localVideoMatch ? localVideoMatch[1] : null;
-const cardImage = heroImage || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null);
-const hasVideo = (!heroImage && !!youtubeId) || (!heroImage && !youtubeId && !!localVideo);
+const heroIsYoutube = heroImage?.includes("youtube.com");
+const cardImage = heroIsYoutube
+  ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+  : heroImage || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null);
+const hasVideo = heroIsYoutube || (!heroImage && !!youtubeId) || (!heroImage && !youtubeId && !!localVideo);
 const showVideoThumb = !cardImage && !!localVideo;
 
 ---
