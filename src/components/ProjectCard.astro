@@ -1,0 +1,118 @@
+---
+interface Props {
+  project: {
+    name: string;
+    description: string;
+    github: string;
+    language: string;
+    languageColor: string;
+    featured?: boolean;
+  };
+}
+
+const { project } = Astro.props;
+const repoName = project.name.split("/")[1] ?? project.name;
+---
+
+<a
+  href={project.github}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="project-card group"
+>
+  <div class="card-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="repo-icon">
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+    <span class="repo-name">{repoName}</span>
+    {project.featured && <span class="featured-badge">Featured</span>}
+  </div>
+  <p class="card-description">{project.description}</p>
+  <div class="card-footer">
+    <span class="language">
+      <span class="language-dot" style={`background-color: ${project.languageColor};`}></span>
+      {project.language}
+    </span>
+  </div>
+</a>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .project-card:hover {
+    border-color: var(--accent, #667eea);
+    background-color: var(--card-hover, rgba(102, 126, 234, 0.05));
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .repo-icon {
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  .repo-name {
+    font-weight: 600;
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .featured-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .card-description {
+    font-size: 0.875rem;
+    opacity: 0.7;
+    line-height: 1.5;
+    flex: 1;
+    margin: 0;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+
+  .language {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .language-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+</style>
