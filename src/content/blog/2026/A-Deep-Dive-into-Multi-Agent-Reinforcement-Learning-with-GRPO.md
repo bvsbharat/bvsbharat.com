@@ -125,11 +125,9 @@ For a 14B parameter model, this means ~56B parameters in memory. That's impracti
 
 GRPO eliminates the critic and reward model entirely. Here's the key idea:
 
-For each prompt **q**, GRPO generates **G completions** (the "group") from the current policy. Each completion gets a scalar reward. Then:
+For each prompt $q$, GRPO generates $G$ completions (the "group") from the current policy. Each completion gets a scalar reward. Then:
 
-```
-Advantage(completion_i) = (reward_i - mean(rewards)) / std(rewards)
-```
+$$\hat{A}_i = \frac{r_i - \text{mean}(\mathbf{r})}{\text{std}(\mathbf{r})}$$
 
 That's it. The advantage is a simple **Z-score normalization** within the group. No neural network, no GAE (Generalized Advantage Estimation), no value function. This single equation replaces the entire critic model.
 
@@ -137,20 +135,15 @@ That's it. The advantage is a simple **Z-score normalization** within the group.
 
 The complete objective function:
 
-```
-L_GRPO(theta) = -1/sum(|o_i|) * sum_{i=1}^{G} sum_{t=1}^{|o_i|}
-    [ min( r_{i,t} * A_hat_i,
-           clip(r_{i,t}, 1-epsilon, 1+epsilon) * A_hat_i )
-      - beta * D_KL[pi_theta || pi_ref] ]
-```
+$$\mathcal{L}_{\text{GRPO}}(\theta) = -\frac{1}{\sum_{i=1}^{G}|o_i|} \sum_{i=1}^{G} \sum_{t=1}^{|o_i|} \left[ \min\left( r_{i,t} \cdot \hat{A}_i, \; \text{clip}(r_{i,t}, \, 1-\epsilon, \, 1+\epsilon) \cdot \hat{A}_i \right) - \beta \cdot D_{\text{KL}}\left[\pi_\theta \| \pi_{\text{ref}}\right] \right]$$
 
 Where:
-- **G** = number of generations per prompt (typically 4-16)
-- **r_{i,t}** = probability ratio `pi_theta(token_t) / pi_old(token_t)` — how much the policy has shifted
-- **A_hat_i** = `(reward_i - mean) / std` — the group-relative advantage
-- **epsilon** = clipping parameter (0.2) — the PPO-style trust region
-- **beta** = KL divergence coefficient (often 0.0 in modern practice)
-- The `min(...)` is the standard clipped surrogate objective that prevents too-large policy updates
+- $G$ = number of generations per prompt (typically 4-16)
+- $r_{i,t} = \frac{\pi_\theta(\text{token}_t)}{\pi_{\text{old}}(\text{token}_t)}$ — the probability ratio (how much the policy has shifted)
+- $\hat{A}_i = \frac{r_i - \mu}{\sigma}$ — the group-relative advantage (Z-score)
+- $\epsilon$ = clipping parameter (0.2) — the PPO-style trust region
+- $\beta$ = KL divergence coefficient (often 0.0 in modern practice)
+- The $\min(\cdots)$ is the standard clipped surrogate objective that prevents too-large policy updates
 
 The critical insight: **the advantage is constant across all tokens in a completion**. Unlike PPO where each token gets its own advantage from the critic, GRPO assigns the same per-sequence advantage to every token. If the whole completion was good, every token gets credit. If it was bad, every token gets penalized.
 
@@ -277,10 +270,10 @@ Each agent implements a memory system inspired by Stanford's **"Generative Agent
 **1. Memory Stream**: A growing record of experiences, each with an importance score (1-10, rated by the LLM). Our `MemoryStream` has a 200-entry capacity with LRU eviction.
 
 **2. Retrieval Function**: When an agent needs to act, memories are scored by combining:
-```
-score = recency × importance × relevance
-```
-Where recency uses exponential decay: `score = importance × e^(-0.01 × age_in_turns)`. Top-scoring memories are injected into the prompt as context.
+
+$$\text{score} = \text{recency} \times \text{importance} \times \text{relevance}$$
+
+Where recency uses exponential decay: $\text{score} = \text{importance} \times e^{-0.01 \times \text{age}}$. Top-scoring memories are injected into the prompt as context.
 
 **3. Reflection**: Periodically (every 70 turns), agents synthesize higher-level insights from recent memories. A Sales agent might reflect: "Fintech deals close faster when we demo the analytics dashboard first." These reflections are stored back as first-class memories with high importance scores, creating a hierarchy: raw observations at the leaves, reflections in the middle, meta-reflections at the root.
 
@@ -405,7 +398,7 @@ Specific bonuses: Content writing about a shipped feature (+1.0), Sales referenc
 
 ### Base Shaping: Why +0.1 Matters for GRPO
 
-Every successful action gets +0.1. This seems trivial but is critical for GRPO training. GRPO works by comparing multiple completions within a group via Z-score normalization. If most turns produce 0.0 reward, `std(rewards) ≈ 0` and the normalization produces near-zero advantages — no learning signal. The +0.1 base ensures that even "maintenance" turns (team syncs, planning, docs) produce non-zero rewards, giving GRPO gradient signal on every single turn of a 420-turn episode.
+Every successful action gets +0.1. This seems trivial but is critical for GRPO training. GRPO works by comparing multiple completions within a group via Z-score normalization. If most turns produce 0.0 reward, $\sigma(\mathbf{r}) \approx 0$ and the normalization produces near-zero advantages — no learning signal. The +0.1 base ensures that even "maintenance" turns (team syncs, planning, docs) produce non-zero rewards, giving GRPO gradient signal on every single turn of a 420-turn episode.
 
 ---
 
@@ -415,22 +408,18 @@ Every successful action gets +0.1. This seems trivial but is critical for GRPO t
 
 **LoRA (Low-Rank Adaptation)** makes fine-tuning a 14B parameter model feasible on a single GPU. The core idea from Hu et al. (2021):
 
-For any pretrained weight matrix **W₀** (shape d × k), LoRA constrains the update to be low-rank:
+For any pretrained weight matrix $W_0$ (shape $d \times k$), LoRA constrains the update to be low-rank:
 
-```
-W = W₀ + ΔW = W₀ + B × A
-```
+$$W = W_0 + \Delta W = W_0 + BA$$
 
-Where **B** (d × r) and **A** (r × k) are small matrices, and **r << min(d, k)** is the rank. The forward pass becomes:
+Where $B \in \mathbb{R}^{d \times r}$ and $A \in \mathbb{R}^{r \times k}$ are small matrices, and $r \ll \min(d, k)$ is the rank. The forward pass becomes:
 
-```
-h = W₀x + (alpha/r) × B × A × x
-```
+$$h = W_0 x + \frac{\alpha}{r} \cdot BAx$$
 
 Key properties:
-- **B is initialized to zero**, so training starts from the exact pretrained model
-- At **rank 32** on a 14B model, trainable parameters are ~0.3-0.6% of total — we're training millions of parameters, not billions
-- At inference, LoRA weights can be **merged** back into the base model with zero overhead: `W_merged = W₀ + (alpha/r) × B × A`
+- $B$ is initialized to zero, so training starts from the exact pretrained model
+- At rank 32 on a 14B model, trainable parameters are ~0.3-0.6% of total — we're training millions of parameters, not billions
+- At inference, LoRA weights can be **merged** back into the base model with zero overhead: $W_{\text{merged}} = W_0 + \frac{\alpha}{r} \cdot BA$
 - Multiple LoRA adapters can be **hot-swapped** on the same base model
 
 We target **all attention and MLP projections**: `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`. This covers the full information flow through each transformer layer.
@@ -497,7 +486,7 @@ GRPOConfig(
 )
 ```
 
-**Why `temperature=0.9`?** GRPO requires **diverse rollouts** to produce meaningful advantages. If all 4 completions are identical (low temperature), `std(rewards) ≈ 0` and the Z-score normalization produces zero advantage — no learning. High temperature ensures each completion takes a different strategic approach, giving GRPO the variance it needs.
+**Why `temperature=0.9`?** GRPO requires **diverse rollouts** to produce meaningful advantages. If all 4 completions are identical (low temperature), $\sigma(\mathbf{r}) \approx 0$ and the Z-score normalization produces zero advantage — no learning. High temperature ensures each completion takes a different strategic approach, giving GRPO the variance it needs.
 
 **Why `num_generations=4` not 8?** The default in TRL is 8, but we reduced to 4 to fit Qwen 2.5 14B on a single H100 with room for the optimizer states. This is the main VRAM knob — reduce it first if you hit OOM.
 
@@ -578,7 +567,7 @@ Cold-starting GRPO on random model outputs is painful — initial trajectories a
 
 - Hand-crafted optimal action sequences per role with KPI-aware reasoning
 - Context-specific messages referencing real customer names and features
-- **Negative examples included** — mediocre actions with low rewards. GRPO needs reward variance within each group; if all examples are perfect, `std(rewards) ≈ 0` and no learning happens
+- **Negative examples included** — mediocre actions with low rewards. GRPO needs reward variance within each group; if all examples are perfect, $\sigma(\mathbf{r}) \approx 0$ and no learning happens
 - 50+ episodes across all 5 scenarios
 - Outputs per-role JSONL files ready for `GRPOTrainer`
 
@@ -674,7 +663,7 @@ python -m pytest office_os/tests/test_env.py -v
 
 ## Key Takeaways
 
-1. **GRPO gives you deep intuition for fine-tuning.** The Z-score normalization `(reward - mean) / std` within a group of completions — that single equation replaces the entire critic model from PPO. Understanding this makes the whole RL-for-LLMs landscape click.
+1. **GRPO gives you deep intuition for fine-tuning.** The Z-score normalization $\hat{A}_i = (r_i - \mu) / \sigma$ within a group of completions — that single equation replaces the entire critic model from PPO. Understanding this makes the whole RL-for-LLMs landscape click.
 
 2. **Environments are the product.** The RL community talks about algorithms, but the bottleneck is environments. OpenEnv's mission to standardize environment creation with Gymnasium-style APIs is exactly right. The environment *is* the curriculum.
 

@@ -47,6 +47,9 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- KaTeX math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UCUCR7tHJYYCtyBOUN5CEXEY3dbxFRSZ1MQEE8zwTVEyCKnB8QL" crossorigin="anonymous" />
+
     <!-- Google Fonts — Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
