@@ -20,7 +20,7 @@ export const SOCIALS = [
   },
   {
     name: "LinkedIn",
-    href: "https://linkedin.com/in/bvsbharat",
+    href: "https://www.linkedin.com/in/bharatsatya/",
     icon: "linkedin",
     active: true,
   },
