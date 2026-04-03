@@ -27,11 +27,7 @@ What developers are really asking is: **how do I make my agent sound human?**
 
 Here's the thing — a cascaded pipeline can match S2S latency these days, and it's significantly more reliable at tool calling. But left to its defaults, it produces something unmistakable: *written language read out loud*.
 
-Look no further than Anthropic's Super Bowl commercial for a textbook example of what happens when polished LLM prose meets a TTS engine:
-
-<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:2rem 0;">
-  <iframe src="https://www.youtube.com/embed/dQx-pKz0sE4" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
-</div>
+Look no further than Anthropic's recent Super Bowl commercial for a textbook example of what happens when polished LLM prose meets a TTS engine.
 
 The root cause is simple: LLMs are trained on mountains of text and post-trained to produce clean, grammatically correct writing. That's perfect for chatbots and emails. But **humans don't talk the way they write**. Real speech is full of filler words, mid-sentence corrections, little laughs, soft pauses, and sentences that wander.
 
