@@ -16,7 +16,7 @@ Every voice AI developer eventually hits the same wall: the agent works, it's fa
 This is the uncanny valley of voice AI, and it's not a model problem. It's a prompting problem.
 
 <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:2rem 0;">
-  <iframe src="https://www.youtube.com/embed/JhFMYlMFOCs" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
+  <iframe src="https://www.youtube.com/embed/FBSam25u8O4" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
 </div>
 
 ## The S2S vs. Cascade Debate (and Why It's the Wrong Question)
