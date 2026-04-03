@@ -1,7 +1,5 @@
 export const NAVIGATION = [
   { name: "Blog", href: "/posts" },
-  { name: "Open Source", href: "/opensource" },
-  { name: "Hackathons", href: "/hackathons" },
   { name: "About", href: "/about" },
 ] as const;
 
