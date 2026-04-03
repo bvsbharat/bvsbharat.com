@@ -30,7 +30,7 @@ export const SOCIALS = [
   },
   {
     name: "Email",
-    href: "mailto:bharatbvs@gmail.com",
+    href: "https://cal.id/bvsbharat",
     icon: "email",
     active: true,
   },
