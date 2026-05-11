@@ -15,7 +15,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, description, pubDatetime, modDatetime, tags, heroImage } = post.data;
+const { title, description, pubDatetime, modDatetime, tags, heroImage, ogImage } = post.data;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body ?? "");
 const postUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -35,6 +35,7 @@ const sparkTransition = {
 <Layout
   title={title}
   description={description}
+  ogImage={ogImage ?? heroImage}
   pubDatetime={pubDatetime}
   modDatetime={modDatetime}
   scrollSmooth
@@ -109,3 +110,39 @@ const sparkTransition = {
   </main>
   <Footer />
 </Layout>
+
+<script>
+  // Lazy-render mermaid diagrams. Shiki turns ```mermaid``` fences into
+  // <pre data-language="mermaid"><code>…</code></pre> — we swap those for
+  // mermaid-rendered SVGs only on pages that contain one.
+  const mermaidBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
+  if (mermaidBlocks.length > 0) {
+    const isDark = document.documentElement.classList.contains("dark");
+    const mermaid = (
+      await import(
+        "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+      )
+    ).default;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? "dark" : "default",
+      securityLevel: "loose",
+      themeVariables: {
+        fontFamily:
+          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+        fontSize: "14px",
+      },
+      flowchart: { curve: "basis", htmlLabels: true, padding: 12 },
+      sequence: { useMaxWidth: true, mirrorActors: false, boxMargin: 8 },
+    });
+    mermaidBlocks.forEach((block, i) => {
+      const source = (block.textContent || "").trim();
+      const wrapper = document.createElement("div");
+      wrapper.className = "mermaid not-prose my-6 flex justify-center";
+      wrapper.id = `mermaid-${i}`;
+      wrapper.textContent = source;
+      block.replaceWith(wrapper);
+    });
+    await mermaid.run({ querySelector: ".mermaid" });
+  }
+</script>

@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Title block -->
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">AGENT  ARCHITECTURE</text>
+    <text x="80" y="186" font-size="60" font-weight="800" fill="#f8fafc">Skills + Connectors</text>
+    <text x="80" y="252" font-size="60" font-weight="800" fill="url(#indigoGrad)">+ Subagents</text>
+    <text x="80" y="308" font-size="22" font-weight="400" fill="#cbd5e1">Anthropic's 3-layer agent template, unpacked</text>
+  </g>
+
+  <!-- Three layered cards on the right -->
+  <g transform="translate(700, 130)" filter="url(#softShadow)">
+    <!-- Orchestrator (central) -->
+    <g transform="translate(120, 0)">
+      <rect x="0" y="0" width="200" height="68" rx="14" fill="#1e293b" stroke="url(#amberGrad)" stroke-width="2"/>
+      <text x="100" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fbbf24" letter-spacing="2">ORCHESTRATOR</text>
+      <text x="100" y="52" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">agents/&lt;slug&gt;.md</text>
+    </g>
+
+    <!-- Connection lines from orchestrator to three layers -->
+    <g stroke="#475569" stroke-width="1.5" fill="none" stroke-dasharray="4 4" opacity="0.7">
+      <path d="M 220 68 Q 180 110 110 130"/>
+      <path d="M 220 68 L 220 130"/>
+      <path d="M 220 68 Q 260 110 330 130"/>
+    </g>
+
+    <!-- Skills card -->
+    <g transform="translate(10, 130)">
+      <rect x="0" y="0" width="200" height="120" rx="14" fill="#1e293b" stroke="url(#greenGrad)" stroke-width="2"/>
+      <text x="20" y="32" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#34d399" letter-spacing="2">SKILLS</text>
+      <text x="20" y="58" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">gl-reconciliation/</text>
+      <text x="20" y="78" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">break-tracing/</text>
+      <text x="20" y="98" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">accruals/</text>
+      <text x="20" y="113" font-family="Inter, sans-serif" font-size="10" fill="#64748b" font-style="italic">domain knowledge</text>
+    </g>
+
+    <!-- Connectors card -->
+    <g transform="translate(120, 130)">
+      <rect x="0" y="0" width="200" height="120" rx="14" fill="#1e293b" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <text x="20" y="32" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#22d3ee" letter-spacing="2">CONNECTORS</text>
+      <text x="20" y="58" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">FactSet · Moody's</text>
+      <text x="20" y="78" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">S&amp;P · LSEG · Daloopa</text>
+      <text x="20" y="98" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">PitchBook · Egnyte</text>
+      <text x="20" y="113" font-family="Inter, sans-serif" font-size="10" fill="#64748b" font-style="italic">governed data via MCP</text>
+    </g>
+
+    <!-- Subagents card -->
+    <g transform="translate(230, 130)">
+      <rect x="0" y="0" width="200" height="120" rx="14" fill="#1e293b" stroke="url(#roseGrad)" stroke-width="2"/>
+      <text x="20" y="32" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fb7185" letter-spacing="2">SUBAGENTS</text>
+      <text x="20" y="58" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">break-tracer</text>
+      <text x="20" y="78" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">journal-classifier</text>
+      <text x="20" y="98" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#cbd5e1">variance-explainer</text>
+      <text x="20" y="113" font-family="Inter, sans-serif" font-size="10" fill="#64748b" font-style="italic">depth-1 specialists</text>
+    </g>
+
+    <!-- Subtle inter-layer chips (markers) -->
+    <g opacity="0.9">
+      <circle cx="110" cy="130" r="4" fill="#34d399" filter="url(#glow)"/>
+      <circle cx="220" cy="130" r="4" fill="#22d3ee" filter="url(#glow)"/>
+      <circle cx="330" cy="130" r="4" fill="#fb7185" filter="url(#glow)"/>
+    </g>
+  </g>
+
+  <!-- Token-cost callout (bottom-left) -->
+  <g transform="translate(80, 470)">
+    <rect x="0" y="0" width="380" height="92" rx="14" fill="#0b1220" stroke="#334155" stroke-width="1"/>
+    <text x="22" y="32" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#94a3b8" letter-spacing="2">FORMAT</text>
+    <text x="22" y="58" font-family="ui-monospace, Menlo, monospace" font-size="14" fill="#e2e8f0">manifest.json + agents/*.md +</text>
+    <text x="22" y="78" font-family="ui-monospace, Menlo, monospace" font-size="14" fill="#e2e8f0">skills/ + commands/ + .mcp.json</text>
+  </g>
+
+  <!-- Author signature -->
+  <g transform="translate(80, 590)">
+    <circle cx="0" cy="-6" r="5" fill="url(#indigoGrad)"/>
+    <text x="14" y="0" font-family="Inter, sans-serif" font-size="14" fill="#64748b">bvsbharat.com  ·  May 2026</text>
+  </g>
+</svg>

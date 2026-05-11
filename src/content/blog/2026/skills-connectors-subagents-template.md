@@ -10,6 +10,8 @@ tags:
   - claude-code
 featured: false
 draft: false
+heroImage: "/images/skills-connectors-subagents-hero.svg"
+ogImage: "/images/skills-connectors-subagents-hero.svg"
 ---
 
 On May 5, 2026, Anthropic [released ten ready-to-run agent templates](https://www.anthropic.com/news/finance-agents) for financial services — pitchbook builders, KYC screeners, month-end closers, statement auditors. The headline reads like a vertical play. It isn't.
