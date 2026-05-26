@@ -22,53 +22,73 @@ CrewAI today is two cooperating things, not one:
 - **Crews** — the *reasoning* layer. A group of agents (roles) execute a sequence of tasks. The agents share context, can ask each other for help, and an optional manager agent decides who does what.
 - **Flows** — the *orchestration* layer. Event-driven control flow that triggers crews, branches on state, persists across runs, and chains multiple crews together.
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="CrewAI Crews and Flows architecture">
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="CrewAI Flows and Crews dual-layer architecture">
   <defs>
-    <marker id="arr4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+    <marker id="a5" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#475569"/></marker>
   </defs>
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="30" y="20" width="700" height="80" rx="6" />
-    <text x="60" y="45" font-weight="600">Flow</text>
-    <text x="60" y="63" opacity="0.7">event-driven, persistent</text>
-    <rect x="170" y="40" width="120" height="40" rx="6" />
-    <text x="230" y="65" text-anchor="middle">@start trigger</text>
-    <rect x="320" y="40" width="120" height="40" rx="6" />
-    <text x="380" y="65" text-anchor="middle">@listen branch</text>
-    <rect x="470" y="40" width="120" height="40" rx="6" />
-    <text x="530" y="65" text-anchor="middle">@listen merge</text>
-    <rect x="620" y="40" width="100" height="40" rx="6" />
-    <text x="670" y="65" text-anchor="middle">finalize</text>
 
-    <line x1="290" y1="60" x2="315" y2="60" marker-end="url(#arr4)" />
-    <line x1="440" y1="60" x2="465" y2="60" marker-end="url(#arr4)" />
-    <line x1="590" y1="60" x2="615" y2="60" marker-end="url(#arr4)" />
+  <rect x="30" y="30" width="840" height="120" rx="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <text x="50" y="58" fill="#78350F" font-weight="700" font-size="16">Flow Layer</text>
+  <text x="50" y="78" fill="#92400E" font-size="12">event-driven · persistent state</text>
 
-    <rect x="30" y="140" width="340" height="190" rx="6" />
-    <text x="60" y="165" font-weight="600">Crew A — research</text>
-    <ellipse cx="120" cy="220" rx="55" ry="30" />
-    <text x="120" y="218" text-anchor="middle">Researcher</text>
-    <text x="120" y="234" text-anchor="middle" opacity="0.7" font-size="10">searches, cites</text>
-    <ellipse cx="280" cy="220" rx="55" ry="30" />
-    <text x="280" y="218" text-anchor="middle">Analyst</text>
-    <text x="280" y="234" text-anchor="middle" opacity="0.7" font-size="10">synthesizes</text>
-    <rect x="120" y="275" width="160" height="40" rx="6" />
-    <text x="200" y="300" text-anchor="middle">Task: brief.md</text>
+  <rect x="200" y="80" width="140" height="56" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="270" y="106" text-anchor="middle" fill="#78350F" font-weight="700" font-size="14">@start</text>
+  <text x="270" y="124" text-anchor="middle" fill="#92400E" font-size="11">trigger</text>
 
-    <rect x="390" y="140" width="340" height="190" rx="6" />
-    <text x="420" y="165" font-weight="600">Crew B — publish</text>
-    <ellipse cx="480" cy="220" rx="55" ry="30" />
-    <text x="480" y="218" text-anchor="middle">Writer</text>
-    <text x="480" y="234" text-anchor="middle" opacity="0.7" font-size="10">drafts</text>
-    <ellipse cx="640" cy="220" rx="55" ry="30" />
-    <text x="640" y="218" text-anchor="middle">Editor</text>
-    <text x="640" y="234" text-anchor="middle" opacity="0.7" font-size="10">polishes</text>
-    <rect x="480" y="275" width="160" height="40" rx="6" />
-    <text x="560" y="300" text-anchor="middle">Task: post.md</text>
+  <rect x="370" y="80" width="140" height="56" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="440" y="106" text-anchor="middle" fill="#78350F" font-weight="700" font-size="14">@listen branch</text>
 
-    <line x1="200" y1="80" x2="200" y2="135" marker-end="url(#arr4)" stroke-dasharray="3,3" />
-    <line x1="560" y1="80" x2="560" y2="135" marker-end="url(#arr4)" stroke-dasharray="3,3" />
-    <line x1="370" y1="290" x2="385" y2="290" marker-end="url(#arr4)" />
+  <rect x="540" y="80" width="140" height="56" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="610" y="106" text-anchor="middle" fill="#78350F" font-weight="700" font-size="14">@listen merge</text>
+
+  <rect x="710" y="80" width="140" height="56" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="780" y="106" text-anchor="middle" fill="#78350F" font-weight="700" font-size="14">finalize</text>
+
+  <g stroke="#92400E" stroke-width="2.5" fill="none">
+    <line x1="340" y1="108" x2="365" y2="108" marker-end="url(#a5)"/>
+    <line x1="510" y1="108" x2="535" y2="108" marker-end="url(#a5)"/>
+    <line x1="680" y1="108" x2="705" y2="108" marker-end="url(#a5)"/>
+  </g>
+
+  <rect x="30" y="180" width="400" height="240" rx="14" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <text x="50" y="208" fill="#064E3B" font-weight="700" font-size="16">Crew A — Research</text>
+
+  <rect x="60" y="226" width="160" height="80" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="140" y="258" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="14">Researcher</text>
+  <text x="140" y="278" text-anchor="middle" fill="#065F46" font-size="11">searches, cites</text>
+  <text x="140" y="294" text-anchor="middle" fill="#065F46" font-size="11">web · arxiv tools</text>
+
+  <rect x="240" y="226" width="160" height="80" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="320" y="258" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="14">Analyst</text>
+  <text x="320" y="278" text-anchor="middle" fill="#065F46" font-size="11">synthesizes</text>
+  <text x="320" y="294" text-anchor="middle" fill="#065F46" font-size="11">structured output</text>
+
+  <rect x="120" y="335" width="220" height="56" rx="10" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="230" y="361" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="14">Task → brief.md</text>
+  <text x="230" y="378" text-anchor="middle" fill="#5B21B6" font-size="11">sequential process</text>
+
+  <rect x="470" y="180" width="400" height="240" rx="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <text x="490" y="208" fill="#1E3A8A" font-weight="700" font-size="16">Crew B — Publish</text>
+
+  <rect x="500" y="226" width="160" height="80" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="580" y="258" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="14">Writer</text>
+  <text x="580" y="278" text-anchor="middle" fill="#1E40AF" font-size="11">drafts article</text>
+  <text x="580" y="294" text-anchor="middle" fill="#1E40AF" font-size="11">house style</text>
+
+  <rect x="680" y="226" width="160" height="80" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="760" y="258" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="14">Editor</text>
+  <text x="760" y="278" text-anchor="middle" fill="#1E40AF" font-size="11">polishes</text>
+  <text x="760" y="294" text-anchor="middle" fill="#1E40AF" font-size="11">fact-checks</text>
+
+  <rect x="560" y="335" width="220" height="56" rx="10" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="670" y="361" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="14">Task → post.md</text>
+  <text x="670" y="378" text-anchor="middle" fill="#5B21B6" font-size="11">final output</text>
+
+  <g stroke="#475569" stroke-width="2.5" fill="none">
+    <path d="M270 136 L270 175" marker-end="url(#a5)" stroke-dasharray="5,4"/>
+    <path d="M610 136 L670 175" marker-end="url(#a5)" stroke-dasharray="5,4"/>
+    <line x1="340" y1="363" x2="555" y2="363" marker-end="url(#a5)"/>
   </g>
 </svg>
 </div>

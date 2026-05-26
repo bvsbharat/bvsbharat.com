@@ -3,6 +3,7 @@ title: "Deep Agents: Planner / Executor / Critic Becomes the Default"
 description: "The three-role pattern that powered Manus, then LangChain Deep Agents, then half the production agents shipping in early 2026. Why it works, when it doesn't, and how to actually build one."
 pubDatetime: 2026-03-12T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - architecture
   - deep-agents
@@ -10,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/deep-agents-hero.svg"
+ogImage: "/images/deep-agents-hero.svg"
 ---
 
 LangChain's [Deep Agents](https://www.langchain.com/deep-agents) framework went 1.0 in late January, and the shape it crystallizes — planner, executor, critic, with a shared todo list — is now the dominant pattern for any agent expected to do more than three tool calls in a row. I've spent the last six weeks rebuilding three production agents around it and the lessons are clear enough to write down.

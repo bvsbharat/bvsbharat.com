@@ -3,6 +3,7 @@ title: "Sub-Agents Are the New Microservices"
 description: "The orchestrator-worker pattern that took over agent design in late 2025 is the same pattern that took over backend design in 2014. The wins are real. So are the failure modes."
 pubDatetime: 2026-02-05T08:00:00-08:00
 tags:
+  - agent-tools
   - agents
   - architecture
   - sub-agents
@@ -10,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/sub-agents-hero.svg"
+ogImage: "/images/sub-agents-hero.svg"
 ---
 
 A year ago, "build an agent" meant build one prompt-tool loop and tune it. Today, every serious agent framework — Claude Code, OpenAI Agents SDK, Strands, Google ADK, LangGraph — ships a sub-agent primitive as a first-class concept. The orchestrator-worker pattern won, decisively and quickly, and the parallel to the microservices wave of the mid-2010s is too close to ignore.

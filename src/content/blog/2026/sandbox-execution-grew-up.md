@@ -3,6 +3,7 @@ title: "Sandbox Execution: Code Interpreters Grew Up"
 description: "Firecracker microVMs, gVisor containers, persistent workspaces, and the $24M Series A nobody quite expected. The sandbox layer beneath every serious agent — and how to pick the right one."
 pubDatetime: 2026-04-10T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - sandbox
   - infrastructure
@@ -10,6 +11,8 @@ tags:
   - modal
 featured: false
 draft: false
+heroImage: "/images/sandbox-execution-hero.svg"
+ogImage: "/images/sandbox-execution-hero.svg"
 ---
 
 Daytona raised a $24M Series A in February. E2B has been running production sandboxes for Anthropic and OpenAI under the hood for over a year. Modal added Python sandboxes for agent code execution and the demand has reportedly outstripped their initial capacity planning. There's a quiet infrastructure layer beneath every serious agent right now, and it's getting big enough that the people building it stopped having to explain themselves.

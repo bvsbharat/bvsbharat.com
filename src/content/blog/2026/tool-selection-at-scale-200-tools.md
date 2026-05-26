@@ -3,6 +3,7 @@ title: "Tool Selection at Scale: When Your Agent Has 200 Tools"
 description: "Past ~30 tools, agent reliability falls off a cliff. Past ~100, it's chaos. Here's the actual engineering — RAG-over-tools, semantic routing, dynamic loading, and namespacing — that production teams ship to stay sane."
 pubDatetime: 2026-02-12T08:00:00-08:00
 tags:
+  - agent-tools
   - agents
   - mcp
   - tools
@@ -10,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/tool-selection-hero.svg"
+ogImage: "/images/tool-selection-hero.svg"
 ---
 
 The numbers I've been collecting from production agent deployments over the last six months tell a consistent story. Up to about 30 tools, an agent picks the right one at >95% accuracy. From 30 to 100, accuracy drops to roughly 80%. Past 100, it's somewhere between 60% and "depends what model you're using and which way the wind is blowing." At 200 tools — a number every multi-server MCP deployment is now reaching — you have what is technically called a problem.

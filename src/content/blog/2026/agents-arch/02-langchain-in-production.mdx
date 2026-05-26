@@ -21,27 +21,32 @@ For two years the framework tried to be both the building blocks *and* the agent
 
 The mental model that works:
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 740 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="LangChain layered architecture">
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="40" y="20" width="660" height="50" rx="6" />
-    <text x="370" y="50" text-anchor="middle" font-size="13" font-weight="600">Your Application (FastAPI, queue worker, Slack bot, ...)</text>
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="LangChain layered architecture">
+  <rect x="40" y="30" width="820" height="60" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="450" y="55" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="16">Your Application</text>
+  <text x="450" y="76" text-anchor="middle" fill="#1E40AF" font-size="13">FastAPI · queue worker · Slack bot · CLI</text>
 
-    <rect x="40" y="90" width="660" height="50" rx="6" stroke-dasharray="0" />
-    <text x="370" y="120" text-anchor="middle" font-size="13" font-weight="600">LangGraph — state graphs, checkpoints, control flow</text>
+  <rect x="40" y="115" width="820" height="60" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="450" y="140" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="16">LangGraph — state graphs, checkpoints, control flow</text>
+  <text x="450" y="161" text-anchor="middle" fill="#065F46" font-size="13">nodes · reducers · interrupts · resume</text>
 
-    <rect x="40" y="160" width="660" height="70" rx="6" />
-    <text x="370" y="185" text-anchor="middle" font-size="13" font-weight="600">LangChain Core — Runnables, Tools, Retrievers, Parsers</text>
-    <text x="370" y="205" text-anchor="middle" opacity="0.7">composable, typed, async-native</text>
-    <text x="370" y="222" text-anchor="middle" opacity="0.7">callbacks → LangSmith / Langfuse</text>
+  <rect x="40" y="200" width="820" height="90" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="450" y="230" text-anchor="middle" fill="#78350F" font-weight="700" font-size="16">LangChain Core — Runnables · Tools · Retrievers · Parsers</text>
+  <text x="450" y="253" text-anchor="middle" fill="#92400E" font-size="13">composable · typed · async-native · LCEL pipelines</text>
+  <text x="450" y="274" text-anchor="middle" fill="#92400E" font-size="13">callbacks → LangSmith / Langfuse</text>
 
-    <rect x="40" y="250" width="200" height="50" rx="6" />
-    <text x="140" y="280" text-anchor="middle">LLM Providers</text>
-    <rect x="270" y="250" width="200" height="50" rx="6" />
-    <text x="370" y="280" text-anchor="middle">Vector Stores</text>
-    <rect x="500" y="250" width="200" height="50" rx="6" />
-    <text x="600" y="280" text-anchor="middle">External Tools / APIs</text>
-  </g>
+  <rect x="40" y="320" width="255" height="70" rx="10" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="167" y="350" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="15">LLM Providers</text>
+  <text x="167" y="370" text-anchor="middle" fill="#5B21B6" font-size="12">Anthropic · OpenAI · Google</text>
+
+  <rect x="322" y="320" width="256" height="70" rx="10" fill="#FCE7F3" stroke="#EC4899" stroke-width="2"/>
+  <text x="450" y="350" text-anchor="middle" fill="#831843" font-weight="700" font-size="15">Vector + Hybrid Stores</text>
+  <text x="450" y="370" text-anchor="middle" fill="#9D174D" font-size="12">PGVector · Pinecone · BM25</text>
+
+  <rect x="605" y="320" width="255" height="70" rx="10" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2"/>
+  <text x="732" y="350" text-anchor="middle" fill="#164E63" font-weight="700" font-size="15">External Tools / APIs</text>
+  <text x="732" y="370" text-anchor="middle" fill="#155E75" font-size="12">MCP servers · REST · gRPC</text>
 </svg>
 </div>
 

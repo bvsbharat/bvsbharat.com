@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">AGENT  FRAMEWORKS</text>
+    <text x="80" y="186" font-size="56" font-weight="800" fill="#f8fafc">Four orchestration</text>
+    <text x="80" y="246" font-size="56" font-weight="800" fill="url(#indigoGrad)">styles, not six tools</text>
+    <text x="80" y="298" font-size="20" font-weight="400" fill="#cbd5e1">The decision tree before the framework debate</text>
+  </g>
+
+  <!-- 4 orchestration style cards -->
+  <g transform="translate(80, 360)" filter="url(#softShadow)">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="250" height="180" rx="14" fill="#1e293b" stroke="url(#indigoGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#818cf8" letter-spacing="2">GRAPH-BASED</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="#f8fafc">DAG + checkpoints</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">LangGraph</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">MS Agent Framework</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">Mastra</text>
+      <!-- mini DAG icon -->
+      <g transform="translate(190, 130)" stroke="#818cf8" stroke-width="1.5" fill="#1e293b">
+        <circle cx="0" cy="0" r="6"/>
+        <circle cx="20" cy="20" r="6"/>
+        <circle cx="-15" cy="25" r="6"/>
+        <line x1="3" y1="4" x2="17" y2="16"/>
+        <line x1="-3" y1="4" x2="-12" y2="21"/>
+      </g>
+    </g>
+
+    <g transform="translate(265, 0)">
+      <rect x="0" y="0" width="250" height="180" rx="14" fill="#1e293b" stroke="url(#greenGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#34d399" letter-spacing="2">ROLE-BASED</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="#f8fafc">Cast of personas</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">CrewAI</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">Agno</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">AutoGen v2</text>
+      <g transform="translate(190, 130)" stroke="#34d399" fill="#1e293b" stroke-width="1.5">
+        <circle cx="0" cy="0" r="5"/>
+        <circle cx="14" cy="-3" r="5"/>
+        <circle cx="7" cy="12" r="5"/>
+        <line x1="0" y1="0" x2="14" y2="-3"/>
+        <line x1="0" y1="0" x2="7" y2="12"/>
+        <line x1="14" y1="-3" x2="7" y2="12"/>
+      </g>
+    </g>
+
+    <g transform="translate(530, 0)">
+      <rect x="0" y="0" width="250" height="180" rx="14" fill="#1e293b" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#22d3ee" letter-spacing="2">HANDOFF-BASED</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="#f8fafc">Transfer chains</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">OpenAI Agents SDK</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">AG2</text>
+      <g transform="translate(190, 130)" stroke="#22d3ee" fill="#1e293b" stroke-width="1.5">
+        <rect x="-12" y="-6" width="10" height="10" rx="2"/>
+        <path d="M 0 -1 L 10 -1" stroke="#22d3ee"/>
+        <path d="M 7 -4 L 10 -1 L 7 2" fill="none"/>
+        <rect x="12" y="-6" width="10" height="10" rx="2"/>
+      </g>
+    </g>
+
+    <g transform="translate(795, 0)">
+      <rect x="0" y="0" width="250" height="180" rx="14" fill="#1e293b" stroke="url(#roseGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fb7185" letter-spacing="2">HIERARCHICAL</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="#f8fafc">Lead + subagents</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">Google ADK</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">Strands</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">Managed Agents</text>
+      <g transform="translate(190, 130)" stroke="#fb7185" fill="#1e293b" stroke-width="1.5">
+        <circle cx="5" cy="-6" r="5"/>
+        <circle cx="-7" cy="10" r="4"/>
+        <circle cx="5" cy="14" r="4"/>
+        <circle cx="17" cy="10" r="4"/>
+        <line x1="5" y1="-1" x2="-7" y2="6"/>
+        <line x1="5" y1="-1" x2="5" y2="10"/>
+        <line x1="5" y1="-1" x2="17" y2="6"/>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(80, 590)">
+    <circle cx="0" cy="-6" r="5" fill="url(#indigoGrad)"/>
+    <text x="14" y="0" font-family="Inter, sans-serif" font-size="14" fill="#64748b">bvsbharat.com  ·  Jan 2026</text>
+  </g>
+</svg>

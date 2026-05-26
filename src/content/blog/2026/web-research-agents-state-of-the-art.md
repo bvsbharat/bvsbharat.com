@@ -3,6 +3,7 @@ title: "Web Research Agents: The State of the Art, March 2026"
 description: "Operator died, Browser Use became the default substrate, Manus shipped at scale, and the gap between demo and reliable production narrowed considerably. A field report."
 pubDatetime: 2026-03-19T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - web-agents
   - browser-use
@@ -10,6 +11,8 @@ tags:
   - research
 featured: false
 draft: false
+heroImage: "/images/web-research-agents-hero.svg"
+ogImage: "/images/web-research-agents-hero.svg"
 ---
 
 OpenAI killed Operator on August 31, 2025. I want to start there because it's the part of the story everyone forgets, and the lesson it teaches is the most important one in this space. Operator was the splashy launch that put browser agents on the map — and it shipped, struggled with the long tail of the open web (CAPTCHAs, complex JavaScript flows, session quirks), and got shut down inside seven months. Meanwhile [Browser Use](https://github.com/browser-use/browser-use), an MIT-licensed Python library that didn't get a press tour, hit 40,000 GitHub stars and quietly became the substrate every other web agent now sits on top of.

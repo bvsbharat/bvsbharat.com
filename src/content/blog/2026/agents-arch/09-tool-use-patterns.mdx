@@ -25,42 +25,51 @@ Three eras, each layered on the last.
 
 The mental model that holds in 2026:
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Agent tool surface — local tools and MCP servers">
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="Agent tool surface: local, provider, MCP">
   <defs>
-    <marker id="arr7" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+    <marker id="a9" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#475569"/></marker>
   </defs>
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="280" y="20" width="200" height="60" rx="6" />
-    <text x="380" y="45" text-anchor="middle" font-weight="700">Agent</text>
-    <text x="380" y="65" text-anchor="middle" opacity="0.7">function-calling API</text>
 
-    <rect x="30" y="140" width="200" height="60" rx="6" />
-    <text x="130" y="165" text-anchor="middle" font-weight="600">Local tools</text>
-    <text x="130" y="185" text-anchor="middle" opacity="0.7">@tool, FunctionTool</text>
+  <rect x="330" y="30" width="240" height="80" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <text x="450" y="62" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="18">Agent</text>
+  <text x="450" y="85" text-anchor="middle" fill="#065F46" font-size="13">function-calling API</text>
+  <text x="450" y="102" text-anchor="middle" fill="#065F46" font-size="13">scoped tool set</text>
 
-    <rect x="280" y="140" width="200" height="60" rx="6" />
-    <text x="380" y="165" text-anchor="middle" font-weight="600">Provider tools</text>
-    <text x="380" y="185" text-anchor="middle" opacity="0.7">bash, file, code interp</text>
+  <rect x="40" y="170" width="240" height="80" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5"/>
+  <text x="160" y="200" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="16">Local Tools</text>
+  <text x="160" y="222" text-anchor="middle" fill="#1E40AF" font-size="13">@tool · FunctionTool</text>
+  <text x="160" y="240" text-anchor="middle" fill="#1E40AF" font-size="13">in-process Python</text>
 
-    <rect x="530" y="140" width="200" height="60" rx="6" />
-    <text x="630" y="165" text-anchor="middle" font-weight="600">MCP servers</text>
-    <text x="630" y="185" text-anchor="middle" opacity="0.7">internal · 3rd party</text>
+  <rect x="330" y="170" width="240" height="80" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="450" y="200" text-anchor="middle" fill="#78350F" font-weight="700" font-size="16">Provider Tools</text>
+  <text x="450" y="222" text-anchor="middle" fill="#92400E" font-size="13">bash · file · code-interp</text>
+  <text x="450" y="240" text-anchor="middle" fill="#92400E" font-size="13">vendor-implemented</text>
 
-    <rect x="30" y="240" width="200" height="50" rx="6" />
-    <text x="130" y="270" text-anchor="middle">your codebase</text>
-    <rect x="280" y="240" width="200" height="50" rx="6" />
-    <text x="380" y="270" text-anchor="middle">platform sandbox</text>
-    <rect x="530" y="240" width="200" height="50" rx="6" />
-    <text x="630" y="270" text-anchor="middle">remote services</text>
+  <rect x="620" y="170" width="240" height="80" rx="10" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="740" y="200" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="16">MCP Servers</text>
+  <text x="740" y="222" text-anchor="middle" fill="#5B21B6" font-size="13">internal · 3rd party</text>
+  <text x="740" y="240" text-anchor="middle" fill="#5B21B6" font-size="13">JSON-RPC / SSE</text>
 
-    <line x1="330" y1="80" x2="160" y2="135" marker-end="url(#arr7)" />
-    <line x1="380" y1="80" x2="380" y2="135" marker-end="url(#arr7)" />
-    <line x1="430" y1="80" x2="600" y2="135" marker-end="url(#arr7)" />
+  <rect x="40" y="310" width="240" height="70" rx="10" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2"/>
+  <text x="160" y="340" text-anchor="middle" fill="#164E63" font-weight="600" font-size="14">your codebase</text>
+  <text x="160" y="360" text-anchor="middle" fill="#155E75" font-size="12">Python · TypeScript</text>
 
-    <line x1="130" y1="200" x2="130" y2="235" marker-end="url(#arr7)" />
-    <line x1="380" y1="200" x2="380" y2="235" marker-end="url(#arr7)" />
-    <line x1="630" y1="200" x2="630" y2="235" marker-end="url(#arr7)" />
+  <rect x="330" y="310" width="240" height="70" rx="10" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2"/>
+  <text x="450" y="340" text-anchor="middle" fill="#164E63" font-weight="600" font-size="14">platform sandbox</text>
+  <text x="450" y="360" text-anchor="middle" fill="#155E75" font-size="12">Anthropic · AgentCore</text>
+
+  <rect x="620" y="310" width="240" height="70" rx="10" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2"/>
+  <text x="740" y="340" text-anchor="middle" fill="#164E63" font-weight="600" font-size="14">remote services</text>
+  <text x="740" y="360" text-anchor="middle" fill="#155E75" font-size="12">billing · CMS · search</text>
+
+  <g stroke="#475569" stroke-width="2.5" fill="none">
+    <line x1="380" y1="110" x2="200" y2="165" marker-end="url(#a9)"/>
+    <line x1="450" y1="110" x2="450" y2="165" marker-end="url(#a9)"/>
+    <line x1="520" y1="110" x2="700" y2="165" marker-end="url(#a9)"/>
+    <line x1="160" y1="250" x2="160" y2="305" marker-end="url(#a9)" stroke-dasharray="4,4"/>
+    <line x1="450" y1="250" x2="450" y2="305" marker-end="url(#a9)" stroke-dasharray="4,4"/>
+    <line x1="740" y1="250" x2="740" y2="305" marker-end="url(#a9)" stroke-dasharray="4,4"/>
   </g>
 </svg>
 </div>
