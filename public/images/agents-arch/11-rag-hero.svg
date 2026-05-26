@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f9a8d4"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arr11h" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="#f9a8d4"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">AGENTS  ARCH  ·  11</text>
+    <text x="80" y="200" font-size="60" font-weight="800" fill="#f8fafc">RAG, but for</text>
+    <text x="80" y="270" font-size="60" font-weight="800" fill="url(#pinkGrad)">agentic loops</text>
+    <text x="80" y="324" font-size="22" font-weight="400" fill="#cbd5e1">Hybrid retrieval · rewriting · reranking</text>
+  </g>
+
+  <g transform="translate(720, 180)" filter="url(#softShadow)" font-family="Inter, sans-serif">
+    <rect x="0" y="0" width="100" height="56" rx="12" fill="#1e293b" stroke="#f9a8d4" stroke-width="2"/>
+    <text x="50" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#f9a8d4">QUERY</text>
+
+    <rect x="0" y="86" width="80" height="50" rx="10" fill="#1e293b" stroke="#db2777" stroke-width="2"/>
+    <text x="40" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#db2777">vector</text>
+
+    <rect x="100" y="86" width="80" height="50" rx="10" fill="#1e293b" stroke="#db2777" stroke-width="2"/>
+    <text x="140" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#db2777">BM25</text>
+
+    <rect x="200" y="86" width="80" height="50" rx="10" fill="#1e293b" stroke="#db2777" stroke-width="2"/>
+    <text x="240" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#db2777">graph</text>
+
+    <rect x="60" y="166" width="200" height="50" rx="10" fill="#1e293b" stroke="#f9a8d4" stroke-width="2"/>
+    <text x="160" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#f9a8d4">RRF fusion</text>
+    <text x="160" y="208" text-anchor="middle" font-size="11" fill="#94a3b8">+ reranker top-k</text>
+
+    <rect x="40" y="246" width="240" height="56" rx="12" fill="#1e293b" stroke="#f9a8d4" stroke-width="2"/>
+    <text x="160" y="278" text-anchor="middle" font-size="13" font-weight="700" fill="#f9a8d4">CONTEXT → AGENT</text>
+
+    <line x1="50" y1="56" x2="40" y2="84" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="50" y1="56" x2="140" y2="84" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="50" y1="56" x2="240" y2="84" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="40" y1="136" x2="160" y2="164" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="140" y1="136" x2="160" y2="164" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="240" y1="136" x2="160" y2="164" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+    <line x1="160" y1="216" x2="160" y2="244" stroke="#475569" stroke-width="1.5" marker-end="url(#arr11h)"/>
+  </g>
+
+  <g transform="translate(80, 590)" font-family="Inter, sans-serif">
+    <circle cx="0" cy="-6" r="5" fill="url(#pinkGrad)"/>
+    <text x="14" y="0" font-size="14" fill="#64748b">bvsbharat.com  ·  Mar 16, 2026</text>
+  </g>
+</svg>

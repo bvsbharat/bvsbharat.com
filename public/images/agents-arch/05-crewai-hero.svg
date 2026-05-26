@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">AGENTS  ARCH  ·  05</text>
+    <text x="80" y="200" font-size="56" font-weight="800" fill="#f8fafc">Crews, Flows,</text>
+    <text x="80" y="262" font-size="56" font-weight="800" fill="url(#amberGrad)">and role agents</text>
+    <text x="80" y="316" font-size="20" font-weight="400" fill="#cbd5e1">When role-based composition is the right abstraction</text>
+  </g>
+
+  <g transform="translate(720, 170)" filter="url(#softShadow)" font-family="Inter, sans-serif">
+    <rect x="0" y="0" width="380" height="68" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="20" y="30" font-size="11" font-weight="700" fill="#fbbf24" letter-spacing="2">FLOW</text>
+    <text x="20" y="52" font-size="13" fill="#cbd5e1">event-driven orchestration</text>
+
+    <g transform="translate(0, 88)">
+      <rect x="0" y="0" width="180" height="160" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+      <text x="90" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24" letter-spacing="2">CREW A</text>
+      <circle cx="50" cy="70" r="20" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+      <text x="50" y="76" text-anchor="middle" font-size="11" fill="#fbbf24">R</text>
+      <circle cx="130" cy="70" r="20" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+      <text x="130" y="76" text-anchor="middle" font-size="11" fill="#fbbf24">A</text>
+      <text x="90" y="120" text-anchor="middle" font-size="12" fill="#cbd5e1">Researcher · Analyst</text>
+      <text x="90" y="142" text-anchor="middle" font-size="11" fill="#94a3b8">→ brief.md</text>
+    </g>
+
+    <g transform="translate(200, 88)">
+      <rect x="0" y="0" width="180" height="160" rx="14" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+      <text x="90" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="#f59e0b" letter-spacing="2">CREW B</text>
+      <circle cx="50" cy="70" r="20" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+      <text x="50" y="76" text-anchor="middle" font-size="11" fill="#f59e0b">W</text>
+      <circle cx="130" cy="70" r="20" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+      <text x="130" y="76" text-anchor="middle" font-size="11" fill="#f59e0b">E</text>
+      <text x="90" y="120" text-anchor="middle" font-size="12" fill="#cbd5e1">Writer · Editor</text>
+      <text x="90" y="142" text-anchor="middle" font-size="11" fill="#94a3b8">→ post.md</text>
+    </g>
+  </g>
+
+  <g transform="translate(80, 590)" font-family="Inter, sans-serif">
+    <circle cx="0" cy="-6" r="5" fill="url(#amberGrad)"/>
+    <text x="14" y="0" font-size="14" fill="#64748b">bvsbharat.com  ·  Feb 2, 2026</text>
+  </g>
+</svg>

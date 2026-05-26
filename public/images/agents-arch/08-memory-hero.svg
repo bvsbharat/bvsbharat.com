@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="violetGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">AGENTS  ARCH  ·  08</text>
+    <text x="80" y="200" font-size="60" font-weight="800" fill="#f8fafc">Memory becomes</text>
+    <text x="80" y="270" font-size="60" font-weight="800" fill="url(#violetGrad)">infrastructure</text>
+    <text x="80" y="324" font-size="22" font-weight="400" fill="#cbd5e1">Working → Episodic → Semantic → Procedural</text>
+  </g>
+
+  <g transform="translate(720, 160)" filter="url(#softShadow)" font-family="Inter, sans-serif">
+    <rect x="0" y="0" width="380" height="58" rx="12" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+    <circle cx="28" cy="29" r="14" fill="#a78bfa"/>
+    <text x="28" y="34" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">1</text>
+    <text x="58" y="26" font-size="14" font-weight="700" fill="#f8fafc">Working</text>
+    <text x="58" y="46" font-size="11" fill="#94a3b8">turn-scoped scratchpad · ms</text>
+
+    <rect x="0" y="70" width="380" height="58" rx="12" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+    <circle cx="28" cy="99" r="14" fill="#a78bfa"/>
+    <text x="28" y="104" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">2</text>
+    <text x="58" y="96" font-size="14" font-weight="700" fill="#f8fafc">Episodic</text>
+    <text x="58" y="116" font-size="11" fill="#94a3b8">session events · minutes – hours</text>
+
+    <rect x="0" y="140" width="380" height="58" rx="12" fill="#1e293b" stroke="#7c3aed" stroke-width="2"/>
+    <circle cx="28" cy="169" r="14" fill="#7c3aed"/>
+    <text x="28" y="174" text-anchor="middle" font-size="12" font-weight="700" fill="#f8fafc">3</text>
+    <text x="58" y="166" font-size="14" font-weight="700" fill="#f8fafc">Semantic</text>
+    <text x="58" y="186" font-size="11" fill="#94a3b8">facts · vector + graph · days – years</text>
+
+    <rect x="0" y="210" width="380" height="58" rx="12" fill="#1e293b" stroke="#7c3aed" stroke-width="2"/>
+    <circle cx="28" cy="239" r="14" fill="#7c3aed"/>
+    <text x="28" y="244" text-anchor="middle" font-size="12" font-weight="700" fill="#f8fafc">4</text>
+    <text x="58" y="236" font-size="14" font-weight="700" fill="#f8fafc">Procedural</text>
+    <text x="58" y="256" font-size="11" fill="#94a3b8">"how we do X" · durable</text>
+  </g>
+
+  <g transform="translate(80, 590)" font-family="Inter, sans-serif">
+    <circle cx="0" cy="-6" r="5" fill="url(#violetGrad)"/>
+    <text x="14" y="0" font-size="14" fill="#64748b">bvsbharat.com  ·  Feb 23, 2026</text>
+  </g>
+</svg>
