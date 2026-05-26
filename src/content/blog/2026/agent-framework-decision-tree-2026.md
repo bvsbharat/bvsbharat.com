@@ -3,6 +3,7 @@ title: "Choosing an Agent Framework in 2026: A Decision Tree"
 description: "Six serious frameworks, four orchestration styles, and one tired question I keep getting asked. Here's the decision tree I actually use."
 pubDatetime: 2026-01-22T09:00:00-08:00
 tags:
+  - agent-tools
   - agents
   - frameworks
   - langgraph

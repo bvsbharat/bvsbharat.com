@@ -3,6 +3,7 @@ title: "Cost-Optimized Agent Architectures: Cutting Spend 10x Without Losing Qua
 description: "Caching, routing, distillation, and per-task model selection. The four moves that take a $0.40/task agent to $0.04/task without anyone noticing the difference."
 pubDatetime: 2026-03-26T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - architecture
   - cost-optimization

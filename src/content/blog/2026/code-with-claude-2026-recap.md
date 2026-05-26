@@ -3,6 +3,7 @@ title: "Code with Claude 2026: Five Things That Actually Matter"
 description: "Anthropic shipped a lot on May 6 — Managed Agents updates, Dreaming, Outcomes, Multi-agent Orchestration, and a SpaceX partnership. The signal-to-noise filtered down to five things that change how you build."
 pubDatetime: 2026-05-07T08:00:00-07:00
 tags:
+  - agent-tools
   - anthropic
   - claude
   - agents

@@ -3,6 +3,7 @@ title: "Sub-Agents Are the New Microservices"
 description: "The orchestrator-worker pattern that took over agent design in late 2025 is the same pattern that took over backend design in 2014. The wins are real. So are the failure modes."
 pubDatetime: 2026-02-05T08:00:00-08:00
 tags:
+  - agent-tools
   - agents
   - architecture
   - sub-agents

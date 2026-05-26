@@ -3,6 +3,7 @@ title: "Sandbox Execution: Code Interpreters Grew Up"
 description: "Firecracker microVMs, gVisor containers, persistent workspaces, and the $24M Series A nobody quite expected. The sandbox layer beneath every serious agent — and how to pick the right one."
 pubDatetime: 2026-04-10T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - sandbox
   - infrastructure

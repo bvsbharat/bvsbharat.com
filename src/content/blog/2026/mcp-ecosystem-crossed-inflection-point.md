@@ -3,6 +3,7 @@ title: "MCP Just Crossed the Inflection Point"
 description: "Fourteen months in, the Model Context Protocol stopped being a curiosity and started being plumbing. Here's what changed over the holidays — registries, governance, and the first scaling pains."
 pubDatetime: 2026-01-15T08:00:00-08:00
 tags:
+  - agent-tools
   - mcp
   - agents
   - protocols

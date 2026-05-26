@@ -3,6 +3,7 @@ title: "Web Research Agents: The State of the Art, March 2026"
 description: "Operator died, Browser Use became the default substrate, Manus shipped at scale, and the gap between demo and reliable production narrowed considerably. A field report."
 pubDatetime: 2026-03-19T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - web-agents
   - browser-use

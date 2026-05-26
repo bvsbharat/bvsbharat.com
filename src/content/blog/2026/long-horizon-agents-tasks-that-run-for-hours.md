@@ -3,6 +3,7 @@ title: "Long-Horizon Agents: When Tasks Take Hours"
 description: "Six-hour agent runs are now real. The harness — checkpoints, durable state, recovery — matters more than the model. A field guide to the long-running pattern."
 pubDatetime: 2026-05-21T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - long-horizon
   - architecture

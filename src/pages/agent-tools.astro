@@ -1,0 +1,36 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Hr from "@/components/Hr.astro";
+import Card from "@/components/Card.astro";
+import { getCollection } from "astro:content";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+
+const posts = await getCollection("blog");
+const sortedPosts = getSortedPosts(posts, { excludeHackathons: false });
+const agentToolsPosts = sortedPosts.filter((p) => p.data.tags.includes("agent-tools"));
+---
+
+<Layout title="Agent Tools" description="Weekly field reports on the agent tooling stack — MCP, skills, sub-agents, context management, sandboxes, evals, observability, and the patterns that actually ship.">
+  <Header />
+  <main id="main-content" class="mx-auto w-full flex-1 px-6 pb-12" style="max-width:1020px">
+    <section class="mt-8">
+      <h1 class="text-2xl font-semibold tracking-wide sm:text-3xl">
+        Agent Tools
+      </h1>
+      <p class="mt-2 opacity-70">
+        Weekly field reports on the agent tooling stack — MCP, skills, sub-agents, context management, sandboxes, evals, observability, and the patterns that actually ship.
+      </p>
+    </section>
+
+    <Hr />
+
+    <section class="pt-8 pb-4">
+      <ul>
+        {agentToolsPosts.map((post) => <Card post={post} enableTransition />)}
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>

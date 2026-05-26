@@ -3,6 +3,7 @@ title: "Agent Evals in 2026: Beyond LLM-as-Judge"
 description: "Vibes-based scoring is finally dying. Trajectory eval, rubric eval, golden replay, and the test pyramid that production agent teams actually run."
 pubDatetime: 2026-04-24T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - evals
   - testing

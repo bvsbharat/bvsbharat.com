@@ -1,6 +1,7 @@
 export const NAVIGATION = [
   { name: "Blog", href: "/posts" },
   { name: "Agents Arch", href: "/agents-arch" },
+  { name: "Agent Tools", href: "/agent-tools" },
   { name: "About", href: "/about" },
 ] as const;
 

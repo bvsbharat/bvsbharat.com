@@ -114,40 +114,56 @@ const sparkTransition = {
 <script>
   // Lazy-render mermaid diagrams. Shiki turns ```mermaid``` fences into
   // <pre data-language="mermaid"><code>…</code></pre> — we swap those for
-  // mermaid-rendered SVGs only on pages that contain one.
+  // mermaid-rendered SVGs only on pages that contain one. Re-runs on every
+  // astro:page-load so it works across ClientRouter view-transition navigation,
+  // not only on hard refresh.
   // Force light theme + white panel background in both color schemes so the
   // diagrams are always legible (mermaid's dark theme drops stroke contrast
   // against this site's dark surface).
-  const mermaidBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
-  if (mermaidBlocks.length > 0) {
-    const mermaid = (
-      await import(
-        "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
-      )
-    ).default;
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: "default",
-      securityLevel: "loose",
-      themeVariables: {
-        background: "#ffffff",
-        fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-        fontSize: "14px",
-      },
-      flowchart: { curve: "basis", htmlLabels: true, padding: 12 },
-      sequence: { useMaxWidth: true, mirrorActors: false, boxMargin: 8 },
-    });
+  let mermaidModule: any = null;
+
+  async function renderMermaid() {
+    const mermaidBlocks = document.querySelectorAll(
+      'pre[data-language="mermaid"]'
+    );
+    if (mermaidBlocks.length === 0) return;
+
+    if (!mermaidModule) {
+      mermaidModule = (
+        await import(
+          "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"
+        )
+      ).default;
+      mermaidModule.initialize({
+        startOnLoad: false,
+        theme: "default",
+        securityLevel: "loose",
+        themeVariables: {
+          background: "#ffffff",
+          fontFamily:
+            "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          fontSize: "14px",
+        },
+        flowchart: { curve: "basis", htmlLabels: true, padding: 12 },
+        sequence: { useMaxWidth: true, mirrorActors: false, boxMargin: 8 },
+      });
+    }
+
     mermaidBlocks.forEach((block, i) => {
       const source = (block.textContent || "").trim();
       const wrapper = document.createElement("div");
       wrapper.className =
         "mermaid not-prose my-6 flex justify-center bg-white rounded-lg p-4 overflow-x-auto border border-slate-200";
-      wrapper.id = `mermaid-${i}`;
+      wrapper.id = `mermaid-${Date.now()}-${i}`;
       wrapper.style.colorScheme = "light";
       wrapper.textContent = source;
       block.replaceWith(wrapper);
     });
-    await mermaid.run({ querySelector: ".mermaid" });
+    await mermaidModule.run({ querySelector: ".mermaid:not([data-processed])" });
   }
+
+  // Initial load (hard refresh / direct navigation).
+  renderMermaid();
+  // Subsequent client-side navigations through Astro's ClientRouter.
+  document.addEventListener("astro:page-load", renderMermaid);
 </script>

@@ -3,6 +3,7 @@ title: "Deep Agents: Planner / Executor / Critic Becomes the Default"
 description: "The three-role pattern that powered Manus, then LangChain Deep Agents, then half the production agents shipping in early 2026. Why it works, when it doesn't, and how to actually build one."
 pubDatetime: 2026-03-12T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - architecture
   - deep-agents

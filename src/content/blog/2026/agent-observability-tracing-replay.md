@@ -3,6 +3,7 @@ title: "Agent Observability in 2026: Tracing, Replay, and Why OTel Won"
 description: "Langfuse got acquired by ClickHouse. Helicone hit maintenance mode. OpenTelemetry standardized LLM tracing. The observability stack for agents reshuffled in three months. Here's what it looks like now."
 pubDatetime: 2026-05-01T08:00:00-07:00
 tags:
+  - agent-tools
   - agents
   - observability
   - opentelemetry

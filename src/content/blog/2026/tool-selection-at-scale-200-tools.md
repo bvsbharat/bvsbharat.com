@@ -3,6 +3,7 @@ title: "Tool Selection at Scale: When Your Agent Has 200 Tools"
 description: "Past ~30 tools, agent reliability falls off a cliff. Past ~100, it's chaos. Here's the actual engineering — RAG-over-tools, semantic routing, dynamic loading, and namespacing — that production teams ship to stay sane."
 pubDatetime: 2026-02-12T08:00:00-08:00
 tags:
+  - agent-tools
   - agents
   - mcp
   - tools
