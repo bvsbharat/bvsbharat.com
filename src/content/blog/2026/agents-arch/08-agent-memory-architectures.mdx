@@ -1,0 +1,191 @@
+---
+title: "Agent Memory Architectures: Short-Term, Long-Term, and Episodic"
+description: "Three kinds of memory, four-tier consolidation pipelines, hybrid retrieval that beat pure vector search, and the unsolved staleness problem. The 2026 state of the art for agents that learn over time."
+pubDatetime: 2026-02-23T09:00:00-08:00
+tags:
+  - agents-arch
+  - memory
+  - architecture
+  - rag
+featured: false
+draft: false
+---
+
+Memory turned into the most important agent problem of 2026. Through 2024 and 2025 most production agents treated memory as "we'll RAG the chat history later." That worked until the moment users expected the agent to remember the decision they made two weeks ago, not re-explain the project context every Monday morning, and notice when their preferences had changed.
+
+The state of the art shifted fast. Anthropic shipped offline reflection inside Claude Managed Agents in May 2026 (the "Dreaming" feature from Code with Claude). MCP-based memory servers like `agentmemory` v0.9.21 hit GitHub trending. The Mem0 *State of AI Agent Memory 2026* survey laid out the new benchmark stack (LoCoMo, LongMemEval, BEAM). And a paper called STALE turned memory staleness into a measurable problem with a number attached — the best frontier model scored 55.2%, slightly better than a coin flip.
+
+This post is the architecture: the three kinds of memory, the consolidation pipeline that's becoming standard, the hybrid retrieval that beats pure vectors, and the gap that doesn't have a product fix yet.
+
+## Three kinds of memory
+
+Conflating these is the most common source of bugs. They have different lifespans, different storage, and different access patterns:
+
+| Kind | Lifespan | Purpose | Typical store |
+|------|----------|---------|---------------|
+| **Working** | One reasoning loop | Scratchpad inside the agent | In-process variables, agent state |
+| **Session** | One conversation / job | What we said and did this run | Postgres / Redis checkpointer |
+| **Long-term** | Forever | User preferences, prior decisions, learned facts | Vector + KV + graph + reflection store |
+
+Working memory is just the state inside your LangGraph node, ADK session state, or CrewAI flow. Session memory is the checkpointer that survives crashes and resumes runs. Long-term memory is the hard one, and it's where 2026's interesting work lives.
+
+## The four-tier consolidation pipeline
+
+The pattern that's becoming standard, popularized by `agentmemory` and adapted from cognitive psychology, is a **four-tier consolidation pipeline**:
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Four-tier memory consolidation pipeline">
+  <defs>
+    <marker id="arr6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="30" width="160" height="120" rx="6" />
+    <text x="110" y="55" text-anchor="middle" font-weight="700">Working</text>
+    <text x="110" y="80" text-anchor="middle" opacity="0.8">turn-scoped</text>
+    <text x="110" y="100" text-anchor="middle" opacity="0.8">scratchpad</text>
+    <text x="110" y="125" text-anchor="middle" opacity="0.7" font-size="11">milliseconds</text>
+
+    <rect x="210" y="30" width="160" height="120" rx="6" />
+    <text x="290" y="55" text-anchor="middle" font-weight="700">Episodic</text>
+    <text x="290" y="80" text-anchor="middle" opacity="0.8">session events</text>
+    <text x="290" y="100" text-anchor="middle" opacity="0.8">interactions</text>
+    <text x="290" y="125" text-anchor="middle" opacity="0.7" font-size="11">minutes–hours</text>
+
+    <rect x="390" y="30" width="160" height="120" rx="6" />
+    <text x="470" y="55" text-anchor="middle" font-weight="700">Semantic</text>
+    <text x="470" y="80" text-anchor="middle" opacity="0.8">facts &amp; concepts</text>
+    <text x="470" y="100" text-anchor="middle" opacity="0.8">deduped, indexed</text>
+    <text x="470" y="125" text-anchor="middle" opacity="0.7" font-size="11">days–years</text>
+
+    <rect x="570" y="30" width="160" height="120" rx="6" />
+    <text x="650" y="55" text-anchor="middle" font-weight="700">Procedural</text>
+    <text x="650" y="80" text-anchor="middle" opacity="0.8">workflows &amp; habits</text>
+    <text x="650" y="100" text-anchor="middle" opacity="0.8">"how we do X"</text>
+    <text x="650" y="125" text-anchor="middle" opacity="0.7" font-size="11">durable</text>
+
+    <line x1="190" y1="90" x2="205" y2="90" marker-end="url(#arr6)" />
+    <line x1="370" y1="90" x2="385" y2="90" marker-end="url(#arr6)" />
+    <line x1="550" y1="90" x2="565" y2="90" marker-end="url(#arr6)" />
+
+    <rect x="30" y="200" width="700" height="80" rx="6" stroke-dasharray="3,3" />
+    <text x="380" y="227" text-anchor="middle" font-weight="700">Reflection / consolidation</text>
+    <text x="380" y="248" text-anchor="middle" opacity="0.8">offline pass: condense, dedupe, promote, retire</text>
+    <text x="380" y="268" text-anchor="middle" opacity="0.7" font-size="11">e.g. Claude "Dreaming" — runs between jobs</text>
+
+    <line x1="110" y1="150" x2="110" y2="195" marker-end="url(#arr6)" />
+    <line x1="290" y1="150" x2="290" y2="195" marker-end="url(#arr6)" />
+    <line x1="470" y1="150" x2="470" y2="195" marker-end="url(#arr6)" />
+    <line x1="650" y1="150" x2="650" y2="195" marker-end="url(#arr6)" />
+  </g>
+</svg>
+</div>
+
+Working memory feeds episodic memory at session close. Episodic memory is mined during reflection to extract durable facts that go into semantic memory. Recurring patterns of action become procedural memory — "every time we close a ticket, we tag it with X." Reflection is the offline pass that does the consolidating; it reads the recent traces, condenses what's stable, retires what's superseded, and rewrites the index.
+
+This is exactly what Anthropic's Dreaming feature does inside Managed Agents: between jobs, the system reviews session traces, identifies recurring mistakes and converged workflows, and rewrites the memory store. Harvey reported roughly 6x lift in task completion rates after enabling it — a striking number that's also exactly what you'd expect of any human professional on day five versus day one.
+
+## Hybrid retrieval ate pure vector search
+
+The other shift in 2026 is that pure vector similarity stopped being the default. The new benchmarks — **LoCoMo**, **LongMemEval**, and **BEAM** (which runs at 1M and 10M tokens, where context-window cosplay falls apart) — make clear that the systems winning are all hybrid: semantic embeddings + BM25 keyword + entity-aware graph traversal, fused via Reciprocal Rank Fusion (RRF).
+
+The biggest gains show up where they should: **+29.6 points on temporal reasoning, +23.1 points on multi-hop questions**. Pure embeddings were never going to win the cases where the right answer is "find the exact function name" or "follow this chain of edits across three sessions."
+
+A minimal hybrid retriever:
+
+```python
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_postgres import PGVector
+
+vector = PGVector(connection=PG_URL, collection="long_term_mem", embeddings=embed).as_retriever(
+    search_kwargs={"k": 20}
+)
+bm25 = BM25Retriever.from_documents(documents, k=20)
+
+retriever = EnsembleRetriever(
+    retrievers=[vector, bm25],
+    weights=[0.6, 0.4],
+)
+
+memories = await retriever.ainvoke("what did the user decide about Postgres last week?")
+```
+
+For agents that handle entities (people, projects, accounts), add a third leg — a graph retriever that walks entity relationships. This is the leg that catches "who reports to whom" and "what tickets are linked to this incident."
+
+## Writes are the dangerous operation
+
+The intuition flip that's recent is this: **writes are the place memory systems break, not reads.** It seems backwards — surely retrieval is the hard part — but the STALE benchmark shows otherwise.
+
+STALE constructs 400 scenarios where an earlier observation in a stored memory becomes invalid because of a later observation that doesn't explicitly negate it. The agent has to *infer* the contradiction. The best frontier model scored 55.2%. Agents will happily act on stale preferences, outdated tool signatures, and abandoned conventions because nobody told them the world changed.
+
+This means the write path needs more rigor than most teams give it. Concretely:
+
+- **Version every fact you store.** A memory record is `(content, written_at, supersedes?, source_run_id)`. When a contradicting record arrives, mark the old one as superseded; don't silently overwrite.
+- **Consolidate at write time, not just read time.** When the writer's confidence is high and the new fact contradicts an existing one, do the consolidation now — propose the retraction explicitly. Retrieval-time conflict resolution is too late.
+- **Decay confidence over time for retrievable memories.** A user preference set 18 months ago should not be retrieved with the same weight as one set yesterday.
+- **Make the agent ask before storing.** For load-bearing facts ("the user prefers Postgres over MySQL for this project"), explicitly confirm before promoting to long-term memory. The 30 seconds you spend confirming saves hours of debugging stale preferences later.
+
+The prototype fix in STALE — CUPMem — does structured state consolidation at write time. It's not in any product yet, but the principle is: treat the write as the place to enforce coherence, not the read.
+
+## A reference shape
+
+For most agent systems in 2026, this shape works:
+
+```
+on_session_end(session_id):
+    events = load_session_events(session_id)
+    extracted = llm_extract_facts(events)           # episodic → semantic candidates
+    for fact in extracted:
+        existing = retriever.search(fact.entity)
+        if any(conflicts(fact, e) for e in existing):
+            consolidate(fact, existing)              # write-time resolution
+        else:
+            mem_store.put(fact)
+
+on_reflection_tick:                                  # offline / nightly
+    recent = mem_store.recent(window="7d")
+    promoted = llm_promote_recurring(recent)         # episodic → procedural
+    mem_store.put_many(promoted)
+    mem_store.decay_confidence(older_than="180d")
+    mem_store.retire_superseded()
+
+on_agent_turn:
+    query = compose_query(user_message, agent_state)
+    hits = hybrid_retriever.search(query, k=20)
+    context = pack(hits, budget=4000_tokens)
+    response = llm(prompt + context + user_message)
+```
+
+Three loops, not one. The session-end loop turns events into facts. The reflection tick is the nightly consolidator. The agent-turn loop is the read path. Each is testable in isolation.
+
+## Tools and references
+
+The 2026 memory stack you should know about:
+
+- **`agentmemory`** (MCP server, 53 tools, 4-tier pipeline) — plugs into Claude Code, Cursor, Codex, Gemini CLI, Cline, Windsurf, and others.
+- **Mem0** — open-source memory layer with strong benchmarks against LoCoMo/LongMemEval; supports hybrid retrieval out of the box.
+- **LangGraph's `Store`** — typed long-term memory layer that sits alongside the checkpointer.
+- **Vertex AI Memory** — managed long-term store used by ADK agents.
+- **AgentCore Memory** — AWS Bedrock's hosted memory primitive, integrates with the rest of AgentCore.
+
+Whichever one you pick, make sure it supports versioning, hybrid retrieval, and explicit consolidation hooks. "Vector store + cosine similarity" without those is the 2024 architecture.
+
+## What to do this quarter
+
+1. **Stand up cross-session memory before adding more tools.** Another tool is a 5% capability bump. Working memory across sessions changes the user's relationship with the agent.
+2. **Use hybrid retrieval from day one.** Don't ship pure-vector memory and migrate later. The benchmarks are unambiguous.
+3. **Treat memory writes as the dangerous operation, not reads.** Validate at write time, version your facts, prefer explicit state consolidation.
+4. **Add a reflection job, even a simple one.** A nightly LLM pass that condenses recent events and retires stale facts beats every read-time hack.
+
+The macro picture: agents stopped being amnesiac in 2026. The infrastructure exists in production for the first time. The interesting work shifts from "can the model do X" to "what does the agent remember about how it did X last time, and is that memory still true."
+
+Next week: **tools** — the surface where the agent meets the world. ReAct, function calling, MCP, and the patterns for keeping your tool list both small and useful.
+
+## References
+
+- [Anthropic Dreaming — offline reflection inside Managed Agents](https://letsdatascience.com/blog/anthropic-dreaming-claude-managed-agents-self-improving-may-6)
+- [Mem0 — State of AI Agent Memory 2026](https://mem0.ai/blog/state-of-ai-agent-memory-2026)
+- [STALE — benchmark for memory staleness (arXiv 2605.06527)](https://arxiv.org/abs/2605.06527)
+- [EvolveMem — self-evolving memory retrieval (arXiv 2605.13941)](https://arxiv.org/abs/2605.13941)
+- [`agentmemory` MCP server](https://github.com/rohitg00/agentmemory)
+- [Code with Claude 2026 — InfoQ recap](https://www.infoq.com/news/2026/05/code-with-claude/)

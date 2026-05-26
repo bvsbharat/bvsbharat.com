@@ -1,0 +1,156 @@
+---
+title: "Managed Agents: When Hosted Runtimes Beat DIY"
+description: "Claude Managed Agents and Amazon Bedrock AgentCore turned 'run an agent in production' from a months-long platform project into a credit-card decision. Here's how they differ and when each wins."
+pubDatetime: 2026-02-16T09:00:00-08:00
+tags:
+  - agents-arch
+  - managed-agents
+  - bedrock
+  - claude
+  - anthropic
+featured: false
+draft: false
+---
+
+The biggest shift in the agent platform market between 2025 and 2026 wasn't a model release or a framework — it was that the hyperscalers turned "run an agent in production" into a hosted service. Amazon Bedrock AgentCore hit general availability in late 2025 and crossed 2 million SDK downloads in its first five months. Anthropic launched Claude Managed Agents on April 8, 2026, and announced self-hosted sandboxes and MCP tunnels at Code with Claude on May 19, 2026.
+
+For most teams, this means the build-vs-buy line just moved. The infrastructure plumbing you would have spent a quarter on — sandboxed code execution, durable session state, credential isolation, container scaling — is now an API call. The question is which managed runtime fits which problem, and where the seams are.
+
+## What "managed" actually buys you
+
+A do-it-yourself agent platform looks something like this:
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="DIY vs managed agent platform">
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <text x="190" y="20" text-anchor="middle" font-weight="700">DIY agent platform</text>
+    <rect x="40" y="35" width="300" height="40" rx="6" />
+    <text x="190" y="60" text-anchor="middle">Your agent loop (LangGraph / ADK / custom)</text>
+    <rect x="40" y="85" width="300" height="40" rx="6" />
+    <text x="190" y="110" text-anchor="middle">Tool execution sandbox</text>
+    <rect x="40" y="135" width="300" height="40" rx="6" />
+    <text x="190" y="160" text-anchor="middle">Session state (Postgres / Redis)</text>
+    <rect x="40" y="185" width="300" height="40" rx="6" />
+    <text x="190" y="210" text-anchor="middle">Credential vault + IAM</text>
+    <rect x="40" y="235" width="300" height="40" rx="6" />
+    <text x="190" y="260" text-anchor="middle">Container orchestration (k8s / ECS)</text>
+    <rect x="40" y="285" width="300" height="25" rx="6" />
+    <text x="190" y="302" text-anchor="middle" opacity="0.8">Observability + autoscale</text>
+
+    <text x="570" y="20" text-anchor="middle" font-weight="700">Managed (Claude / AgentCore)</text>
+    <rect x="420" y="35" width="300" height="40" rx="6" />
+    <text x="570" y="60" text-anchor="middle">Your agent loop (your code)</text>
+    <rect x="420" y="85" width="300" height="190" rx="6" stroke-dasharray="3,3" />
+    <text x="570" y="115" text-anchor="middle" font-weight="600">Managed runtime</text>
+    <text x="570" y="138" text-anchor="middle" opacity="0.8">sandboxed exec</text>
+    <text x="570" y="158" text-anchor="middle" opacity="0.8">durable sessions</text>
+    <text x="570" y="178" text-anchor="middle" opacity="0.8">scoped credentials</text>
+    <text x="570" y="198" text-anchor="middle" opacity="0.8">container scheduling</text>
+    <text x="570" y="218" text-anchor="middle" opacity="0.8">autoscale</text>
+    <text x="570" y="238" text-anchor="middle" opacity="0.8">observability hooks</text>
+    <rect x="420" y="285" width="300" height="25" rx="6" />
+    <text x="570" y="302" text-anchor="middle" opacity="0.8">Per-session billing</text>
+  </g>
+</svg>
+</div>
+
+In the DIY column, each box is a real team-quarter of work. In the managed column, all of those boxes are *the vendor's problem*, and you write the agent loop. The trade is a vendor lock, a per-session price, and less control over the dirty internals.
+
+## Claude Managed Agents
+
+Anthropic's pitch is "managed runtime for a Claude-based agent." You define the agent — system prompt, tool list, allowed model, resource caps. Anthropic runs it. The platform gives you:
+
+- **Disposable, isolated Linux containers per session.** Each agent invocation gets a fresh container with `bash`, file system, and network egress policies. No cross-tenant leakage.
+- **Sandboxed bash, file read/write, and code execution.** The tools that get most agents in trouble are the ones Anthropic implements correctly for you.
+- **Durable sessions that survive disconnects.** A long-running task doesn't die because the user's tab closed.
+- **Scoped credential injection.** Secrets are passed to the agent at the boundary, never persisted in the context window or in logs.
+
+The pricing model is simple: normal Claude token rates plus $0.08 per active session-hour. The session is "active" only when the agent is actually executing — idle waits don't count.
+
+A Managed Agent definition is roughly:
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+
+agent = client.agents.create(
+    name="ticket-resolver",
+    model="claude-opus-4-7",
+    system="You are a customer support specialist. Resolve tickets safely.",
+    tools=[
+        {"type": "bash"},
+        {"type": "file_read"},
+        {"type": "file_write"},
+        {"type": "mcp_server", "url": "https://mcp.acme.internal/tickets",
+         "auth": {"type": "credential_ref", "ref": "ticket_db_token"}},
+    ],
+    resource_limits={"max_session_hours": 4, "max_tokens": 500_000},
+)
+
+session = client.agents.sessions.create(agent_id=agent.id, input={
+    "ticket_id": "T-9421",
+    "context": "Customer reports duplicate charge",
+})
+```
+
+The `credential_ref` is the bit that makes this enterprise-acceptable. Tokens, API keys, and DB credentials live in Anthropic's credential store, are injected only at the tool-call boundary, and are never visible to the LLM or to the trace logs.
+
+**Self-hosted sandboxes** (public beta as of May 19, 2026) move the execution container inside *your* VPC while keeping the orchestration on Anthropic's side. This is the answer for regulated workloads — the agent's bash, files, and network calls happen on your infrastructure; only the control plane is shared.
+
+**MCP tunnels** (research preview) let the managed agent reach MCP servers inside your perimeter without exposing them publicly.
+
+## Amazon Bedrock AgentCore
+
+AWS took a different shape. Instead of a single managed agent service, AgentCore is a **collection of building blocks** — each separately useful, designed to compose:
+
+- **AgentCore Runtime** — managed compute for agent loops (your code, their containers).
+- **AgentCore Memory** — long-term memory store with retrieval primitives.
+- **AgentCore Identity** — per-agent IAM, including the credential-injection pattern.
+- **AgentCore Gateway** — a managed front door that exposes agents as APIs with rate limiting and observability.
+- **AgentCore Code Interpreter** and **Browser Tool** — sandboxed tools you can attach without writing.
+- **AgentCore Observability** — traces, metrics, and replay backed by CloudWatch.
+
+The mental model is **platform substrate, not turnkey product**. AgentCore exposes the moving parts; you assemble them. It plays especially well with the Claude Agent SDK — published guidance shows the SDK driving the loop and AgentCore providing the infrastructure pieces underneath. AWS's own case studies (BGL, Anthropic + the AgentCore team) lean on this combination.
+
+The trade vs. Managed Agents is more flexibility for more configuration. You pick the runtime parameters, the memory store, the identity policies, the gateway behavior. The cost story is correspondingly more itemized — you pay separately for each AgentCore service plus the underlying compute and storage.
+
+## The honest comparison
+
+| Dimension | Claude Managed Agents | Bedrock AgentCore |
+|-----------|----------------------|-------------------|
+| Shape | Turnkey runtime per agent | Building blocks you assemble |
+| Models | Claude only | Claude, Llama, Titan, Mistral, others on Bedrock |
+| Sandbox | Anthropic-managed or self-hosted | AWS-managed via Code Interpreter / Browser Tool |
+| Credentials | Credential refs injected at tool boundary | AgentCore Identity, per-agent IAM roles |
+| Pricing | Token + $0.08/active session-hour | Per-component, more granular |
+| Lock-in | Anthropic | AWS |
+| Best for | Teams that want the fastest path from prompt to production | Teams already on AWS who want fine-grained control |
+
+A team building a Claude-only agent with bash and MCP tools, and no strong AWS preference, will ship faster on Managed Agents. A team running multi-model agents inside an existing AWS estate gets more leverage from AgentCore — and can still use the Claude Agent SDK to drive the loop.
+
+## When DIY still wins
+
+Managed runtimes are not the right answer for every workload:
+
+- **Hard egress requirements.** If the agent must talk only to systems with no internet route, self-hosted sandboxes help but adding the managed control plane may still be more than you want. A LangGraph deployment inside your VPC is sometimes simpler.
+- **Custom scheduling constraints.** GPU-pinned tools, priority queues, custom retry policies — easier to express in your own runtime than to wedge into a managed service.
+- **Cost at extreme scale.** At very high session volumes, the per-session overhead of a managed runtime can exceed what you'd pay for your own k8s cluster. Run the math at your scale; defaults are not always cheapest.
+- **Strict on-prem.** No cloud egress, no exceptions. Bedrock has some private-link stories; Managed Agents has self-hosted sandboxes. Beyond that, you're building it.
+
+## A pragmatic rule
+
+Default to managed for the first 90 days. The point of a managed runtime is to compress months of platform work into an afternoon, validate the agent works in production, and discover what actually matters about your workload. If after 90 days you have specific, measured constraints the managed service can't meet — egress, scheduling, cost at scale — *then* invest in your own runtime, with eyes open.
+
+The pattern that surprised me through 2026 is how many teams expected to "graduate" off the managed runtime and ended up staying. The combination of "we shipped in two weeks" and "the vendor handles container security" turns out to be very sticky.
+
+Next week we go inside the agent and look at **memory architectures** — short-term, long-term, the new state-of-the-art around offline reflection, and the unsolved staleness problem.
+
+## References
+
+- [Claude Managed Agents — Anthropic launch coverage](https://claudeapi.com/en/blog/news/claude-platform-aws-launch/)
+- [Code with Claude 2026 — Managed Agents, Dreaming, Proactive Workflows](https://www.infoq.com/news/2026/05/code-with-claude/)
+- [Self-hosted sandboxes + MCP tunnels — Anthropic May 2026 announcement](https://business-news-today.com/anthropic-moves-claude-agents-inside-the-customer-perimeter-with-self-hosted-sandboxes-and-mcp-tunnels/)
+- [Agent-as-a-Service: Managed Agents vs AgentCore](https://dev.to/aws-builders/agent-as-a-service-comparing-claude-managed-agents-and-amazon-bedrock-agentcore-22eb)
+- [AWS — Claude Agent SDK + Bedrock AgentCore case study](https://aws.amazon.com/blogs/machine-learning/democratizing-business-intelligence-bgls-journey-with-claude-agent-sdk-and-amazon-bedrock-agentcore/)
+- [Claude Platform on AWS — architecture decision guide](https://caylent.com/blog/claude-platform-on-aws-an-architecture-decision-guide-for-aws-teams)

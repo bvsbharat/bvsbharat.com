@@ -1,0 +1,261 @@
+---
+title: "Reference Architecture: A Real-World Enterprise Agent Platform"
+description: "Eighteen weeks of patterns combined into one production-shaped architecture. The full diagram, the repo layout, the contracts between components, and the migration sequence."
+pubDatetime: 2026-05-18T09:00:00-07:00
+tags:
+  - agents-arch
+  - reference-architecture
+  - enterprise
+  - production
+featured: false
+draft: false
+---
+
+After eighteen weeks of pieces — agent anatomy, frameworks, memory, tools, observability, deploy, cost, security, governance, multi-agent — this post puts them together. One architecture, one repo layout, the contracts between components. Not the "right" architecture, but *a* coherent one that draws on everything the series covered.
+
+The shape is what a thoughtful organization actually builds in 2026. Real teams will diverge on specific choices (managed vs DIY runtime, framework selection, queue technology). The skeleton is the same.
+
+## The diagram
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 880 540" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Reference enterprise agent architecture">
+  <defs>
+    <marker id="arr13" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="11">
+    <rect x="20" y="20" width="840" height="50" rx="6" />
+    <text x="60" y="45" font-weight="700">Client surfaces</text>
+    <text x="200" y="45" opacity="0.8">Web UI · Slack · API · CLI · Mobile · Workflow triggers</text>
+
+    <rect x="20" y="90" width="840" height="60" rx="6" />
+    <text x="60" y="115" font-weight="700">Gateway</text>
+    <text x="60" y="135" opacity="0.7">Auth · rate-limit · tenant scope · request shaping</text>
+
+    <rect x="20" y="170" width="270" height="120" rx="6" />
+    <text x="40" y="195" font-weight="700">Foreground agents</text>
+    <text x="40" y="215" opacity="0.7">request/response</text>
+    <text x="40" y="240" opacity="0.8">LangGraph runtime</text>
+    <text x="40" y="258" opacity="0.8">streaming chat</text>
+    <text x="40" y="276" opacity="0.8">latency-tuned</text>
+
+    <rect x="305" y="170" width="270" height="120" rx="6" />
+    <text x="325" y="195" font-weight="700">Background workers</text>
+    <text x="325" y="215" opacity="0.7">queue-driven</text>
+    <text x="325" y="240" opacity="0.8">durable bus (SQS/NATS)</text>
+    <text x="325" y="258" opacity="0.8">worker pool</text>
+    <text x="325" y="276" opacity="0.8">retry · DLQ</text>
+
+    <rect x="590" y="170" width="270" height="120" rx="6" />
+    <text x="610" y="195" font-weight="700">Long-running stateful</text>
+    <text x="610" y="215" opacity="0.7">multi-step · HITL</text>
+    <text x="610" y="240" opacity="0.8">Managed Agents</text>
+    <text x="610" y="258" opacity="0.8">durable sessions</text>
+    <text x="610" y="276" opacity="0.8">approval queue</text>
+
+    <rect x="20" y="310" width="840" height="90" rx="6" />
+    <text x="60" y="335" font-weight="700">Shared platform services</text>
+    <rect x="40" y="350" width="160" height="40" rx="6" />
+    <text x="120" y="375" text-anchor="middle">MCP servers</text>
+    <rect x="220" y="350" width="160" height="40" rx="6" />
+    <text x="300" y="375" text-anchor="middle">Memory store</text>
+    <rect x="400" y="350" width="160" height="40" rx="6" />
+    <text x="480" y="375" text-anchor="middle">Vector + BM25 + graph</text>
+    <rect x="580" y="350" width="160" height="40" rx="6" />
+    <text x="660" y="375" text-anchor="middle">Eval pipeline</text>
+    <rect x="760" y="350" width="80" height="40" rx="6" />
+    <text x="800" y="375" text-anchor="middle">Registry</text>
+
+    <rect x="20" y="420" width="840" height="60" rx="6" />
+    <text x="60" y="445" font-weight="700">Cross-cutting</text>
+    <text x="60" y="465" opacity="0.7">OTel tracing · LangSmith/Langfuse · OPA policy · credential vault · audit log</text>
+
+    <rect x="20" y="500" width="840" height="30" rx="6" />
+    <text x="440" y="520" text-anchor="middle" opacity="0.8">LLM providers (Anthropic · OpenAI · Google · Bedrock) — failover-capable</text>
+
+    <line x1="440" y1="70" x2="440" y2="85" marker-end="url(#arr13)" />
+    <line x1="155" y1="150" x2="155" y2="165" marker-end="url(#arr13)" />
+    <line x1="440" y1="150" x2="440" y2="165" marker-end="url(#arr13)" />
+    <line x1="725" y1="150" x2="725" y2="165" marker-end="url(#arr13)" />
+    <line x1="155" y1="290" x2="155" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+    <line x1="440" y1="290" x2="440" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+    <line x1="725" y1="290" x2="725" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+    <line x1="440" y1="400" x2="440" y2="415" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+    <line x1="440" y1="480" x2="440" y2="495" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+  </g>
+</svg>
+</div>
+
+Top to bottom:
+
+- **Client surfaces** — wherever agents get invoked. Web, Slack, API, CLI, internal workflows.
+- **Gateway** — authn/authz, rate limiting, tenant scoping, request shaping. The boundary where actor identity is established.
+- **Three agent lanes** — foreground (request/response), background (queue-driven workers), long-running stateful (multi-step / HITL). Each lane has its own deployment shape and autoscale signal.
+- **Shared platform services** — MCP servers (tools), memory store, retrieval (hybrid), eval pipeline, agent registry.
+- **Cross-cutting** — tracing, policy, credentials, audit. Touches every other component.
+- **LLM providers** — at the bottom because they're a dependency, not a product surface. Multi-provider failover.
+
+## The repo layout
+
+What the monorepo for this looks like:
+
+```
+/agents-platform
+├── /agents                          # one folder per agent
+│   ├── /billing-resolver
+│   │   ├── agent.py                 # LangGraph or CrewAI definition
+│   │   ├── agent_card.yaml          # A2A capability card
+│   │   ├── policy.rego              # OPA policy
+│   │   ├── tools.py                 # tool implementations
+│   │   ├── prompts/
+│   │   ├── evals/
+│   │   │   ├── golden.jsonl
+│   │   │   └── trajectory_specs.yaml
+│   │   └── README.md
+│   ├── /research-writer-crew        # multi-agent crew
+│   └── /...
+│
+├── /mcp-servers                     # shared tool surfaces
+│   ├── /billing
+│   ├── /knowledge-base
+│   └── /...
+│
+├── /platform
+│   ├── /gateway                     # FastAPI app for entry points
+│   ├── /runtime                     # shared agent runtime helpers
+│   │   ├── tracing.py
+│   │   ├── policy.py
+│   │   └── credentials.py
+│   ├── /memory                      # memory store client
+│   ├── /retrieval                   # hybrid retriever
+│   └── /eval                        # eval harness
+│
+├── /infra
+│   ├── /terraform
+│   ├── /helm                        # k8s charts
+│   └── /managed-agents              # Anthropic / AgentCore configs
+│
+├── /docs
+│   ├── architecture.md
+│   ├── runbooks/
+│   └── decision-records/
+│
+└── /.github
+    └── /workflows
+        ├── agent-eval.yml
+        ├── policy-test.yml
+        └── deploy.yml
+```
+
+Two patterns this layout enforces:
+
+- **One agent per directory, self-contained.** Definition, policy, tools, evals, README all colocated. A new engineer can open `/agents/billing-resolver` and understand the agent from one folder.
+- **Shared infrastructure in `/platform`.** Tracing, policy enforcement, credential injection — used by every agent, owned by the platform team, not duplicated per agent.
+
+## The contracts
+
+The interfaces that keep the system maintainable:
+
+### Agent ↔ Runtime
+
+Every agent exposes:
+
+```python
+class AgentInterface:
+    name: str
+    version: str
+    agent_card: AgentCard
+
+    async def invoke(input: AgentInput, context: AgentContext) -> AgentOutput: ...
+    async def resume(thread_id: str, signal: Any) -> AgentOutput: ...
+```
+
+The runtime can run any agent that implements this; the agent doesn't know what runtime is calling it.
+
+### Agent ↔ Tool
+
+Tools are MCP-shaped or LangChain-shaped (both are loadable). Tool schemas live with the tool, not in the agent. The agent imports tools by name from the registry.
+
+### Agent ↔ Memory
+
+A typed memory API that wraps the hybrid retriever and the long-term store:
+
+```python
+class MemoryAPI:
+    async def remember(content: str, kind: MemoryKind, owner: str, **meta) -> str
+    async def recall(query: str, owner: str, k: int = 8, kind: MemoryKind | None = None) -> list[Memory]
+    async def consolidate(owner: str, window: timedelta) -> ConsolidationResult
+```
+
+Same API across agents; backed by the platform's memory store.
+
+### Agent ↔ Policy
+
+Every tool call passes through the policy check:
+
+```python
+decision = await policy.check(
+    agent=self.name,
+    tool=tool_name,
+    args=tool_args,
+    actor=context.actor,
+)
+match decision:
+    case PolicyAllow():
+        result = await tool.invoke(**tool_args)
+    case PolicyRequireApproval(reason):
+        return await self.request_approval(tool_name, tool_args, reason)
+    case PolicyDeny(reason):
+        raise PolicyDenied(reason)
+```
+
+The policy is rego; the runtime helper does the call. Every agent uses the same helper; nobody bypasses it.
+
+### Agent ↔ Observability
+
+Tracing is automatic — the framework's spans plus OTel context propagated through tools. The audit log is *not* the same as the trace; tool executions that mutate state write a separate audit event.
+
+## The migration sequence
+
+If you're building this from scratch, the sequence that maps to where the value lands:
+
+1. **Week 1–2: one foreground agent, traced.** LangGraph or Managed Agents. Tracing on. Simple golden eval set.
+2. **Week 3–4: MCP server for the first real tool surface.** Move tool definitions out of the agent into a server. Connect from the agent.
+3. **Week 5–6: memory store.** Hybrid retriever, session+long-term shapes. Cross-session continuity is the first user-visible quality leap.
+4. **Week 7–8: policy and audit.** OPA, audit log table, gateway plumbs actor identity through. This is the first "safe for sensitive data" milestone.
+5. **Week 9–10: background lane.** Queue, worker pool, retry/DLQ. Now you can ship batch use cases.
+6. **Week 11–12: HITL.** Long-running stateful lane, interrupt/resume, approval workflow.
+7. **Week 13–14: eval gate.** Layer the trajectory grading on PR checks. Cost/latency dashboards. Regression gates.
+8. **Week 15–16: second agent, reusing platform.** Validate the platform scales beyond one agent.
+
+A team of 3–4 engineers can hit this sequence in a quarter, plus or minus. The "magic" comes from steps 5–8; the foundation comes from steps 1–4.
+
+## Where teams get this wrong
+
+The failure patterns I see most often:
+
+- **Building the platform before the first agent.** You don't know what the platform needs until one agent is in production. Build for the agent in front of you; refactor when the second one comes along.
+- **No actor identity plumbing.** Adding "who is this on behalf of" late is painful. Plumb actor through from day one even if your first agent doesn't need it.
+- **Trace and audit conflated.** Operational tracing is sampled and ephemeral. Audit is immutable and complete. Use different stores.
+- **Per-agent reinvention.** Every team writes their own retry logic, their own credential injection, their own context truncation. Put it in `/platform`.
+- **Skipping evals.** "We'll add evals later." You won't, and you'll ship regressions in the meantime.
+
+## What this architecture is not
+
+It's not a perfect architecture — it's a coherent one. Specific trade-offs to be aware of:
+
+- **It's framework-pluralist by design.** Some teams will prefer a single-framework house and gain simplicity at the cost of flexibility.
+- **It's eventually consistent in audit.** Audit events emit asynchronously to the audit log; if the audit log is unreachable, the action still happens. Adjust if your compliance regime requires synchronous audit.
+- **It's biased toward managed runtimes.** A team with strong platform engineering may prefer everything on k8s. The shape is the same; the lanes swap implementations.
+- **The retriever is shared across agents.** Some workloads need per-tenant retrievers; partition accordingly.
+
+## What's next
+
+Twenty weeks in, the architecture is largely a known quantity. Next week, the last post in the series: **where agent architectures go from here.** What 2026 didn't solve, what the research is suggesting, and the bets that look most promising for the next year of agent engineering.
+
+## References
+
+- [Series Post 1 — Anatomy of an AI Agent](/posts/2026/agents-arch/01-anatomy-of-an-ai-agent)
+- [Series Post 12 — Observability](/posts/2026/agents-arch/12-agent-observability)
+- [Series Post 17 — Governance](/posts/2026/agents-arch/17-enterprise-governance)
+- [Code with Claude 2026 — InfoQ recap](https://www.infoq.com/news/2026/05/code-with-claude/)
+- [Scale Agents Codelab](https://codelabs.developers.google.com/next26/scale-agents)

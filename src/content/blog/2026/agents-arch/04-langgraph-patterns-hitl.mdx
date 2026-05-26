@@ -1,0 +1,274 @@
+---
+title: "LangGraph Patterns: Cycles, Branches, and Human-in-the-Loop"
+description: "The three control-flow patterns that turn a toy LangGraph agent into a production system — bounded cycles, parallel fan-out/merge branches, and interrupt-resume human approval gates."
+pubDatetime: 2026-01-26T09:00:00-08:00
+tags:
+  - agents-arch
+  - langgraph
+  - patterns
+  - human-in-the-loop
+featured: false
+draft: false
+---
+
+The basic LangGraph loop from last week is the smallest useful agent. The next three patterns — **bounded cycles**, **fan-out / fan-in branches**, and **human-in-the-loop interrupts** — are what separate a demo from a system you'd let touch production data.
+
+This post walks each one with the code, the failure modes, and the rule of thumb for when to reach for it.
+
+## Pattern 1: Bounded cycles
+
+Every agent loops. The question is when it stops. Three conditions deserve explicit treatment in the graph:
+
+1. **The model says it's done** — emitted a final answer, no tool calls.
+2. **Step budget exceeded** — total node executions exceeded the cap.
+3. **Cost budget exceeded** — total tokens or dollars exceeded the cap.
+
+The mistake is checking only (1) and discovering (2) and (3) on the bill.
+
+```python
+from langgraph.errors import GraphRecursionError
+
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+    step_count: int
+    tokens_used: int
+
+MAX_STEPS = 12
+MAX_TOKENS = 200_000
+
+async def plan(state):
+    response = await llm.ainvoke(state["messages"])
+    tokens = response.usage_metadata["total_tokens"]
+    return {
+        "messages": [response],
+        "step_count": state["step_count"] + 1,
+        "tokens_used": state["tokens_used"] + tokens,
+    }
+
+def route(state):
+    if state["step_count"] >= MAX_STEPS:
+        return "force_finish"
+    if state["tokens_used"] >= MAX_TOKENS:
+        return "force_finish"
+    last = state["messages"][-1]
+    return "call_tool" if getattr(last, "tool_calls", None) else END
+
+async def force_finish(state):
+    """Last-ditch summarization when budget is exhausted."""
+    summary = await llm.ainvoke(state["messages"] + [
+        {"role": "user", "content": "Summarize progress and stop. Be honest if incomplete."}
+    ])
+    return {"messages": [summary]}
+
+graph.add_node("force_finish", force_finish)
+graph.add_conditional_edges("plan", route, ["call_tool", "force_finish", END])
+graph.add_edge("force_finish", END)
+```
+
+Two design choices worth calling out. **`force_finish` is its own node**, not a silent kill — the user gets a coherent (if incomplete) answer instead of a timeout. And **`MAX_STEPS` and `MAX_TOKENS` live in state**, not as global constants — different agent personas get different caps, and the cap travels with the run.
+
+The LangGraph runtime also enforces a recursion limit (default 25) that throws `GraphRecursionError`. Treat that as your *safety net*, not your stop condition; it exists to catch graph bugs (an edge that points back to itself), not to manage budget.
+
+## Pattern 2: Fan-out / fan-in
+
+Some tasks are embarrassingly parallel. Summarizing five documents, scoring a candidate against ten criteria, querying three data sources — each work item is independent. A serial loop wastes wall-clock time; fan-out runs them concurrently and merges results back.
+
+LangGraph expresses this with the **`Send` API**:
+
+```python
+from langgraph.constants import Send
+
+class State(TypedDict):
+    documents: list[str]
+    summaries: Annotated[list[str], operator.add]   # reducer is critical
+
+async def summarize_one(state: dict) -> dict:
+    """Runs once per document, in parallel."""
+    summary = await llm.ainvoke([
+        {"role": "user", "content": f"Summarize:\n\n{state['document']}"}
+    ])
+    return {"summaries": [summary.content]}
+
+def fan_out(state: State):
+    """Conditional edge that emits one Send per document."""
+    return [Send("summarize_one", {"document": doc}) for doc in state["documents"]]
+
+graph.add_node("summarize_one", summarize_one)
+graph.add_conditional_edges("__start__", fan_out, ["summarize_one"])
+graph.add_edge("summarize_one", "aggregate")
+```
+
+Two things make this pattern work:
+
+- **The reducer on `summaries`** (`operator.add` for list concat) is what lets every parallel branch's return value get merged without overwriting the others. Without it, the last branch to finish wins and the rest of the work is silently dropped.
+- **The `Send` object carries only what that branch needs** — the document, not the whole document list. The branch runs as if it were its own tiny graph; the merge happens automatically.
+
+When you also need a fan-in node that synthesizes the parallel results, add it as the destination of the fan-out node:
+
+```python
+async def aggregate(state: State):
+    combined = "\n\n".join(state["summaries"])
+    final = await llm.ainvoke([
+        {"role": "user", "content": f"Write an overview from these summaries:\n{combined}"}
+    ])
+    return {"messages": [final]}
+
+graph.add_node("aggregate", aggregate)
+graph.add_edge("aggregate", END)
+```
+
+Failure modes worth knowing. Parallel branches that mutate shared external state (the same DB row, the same file) need explicit locking — LangGraph has no idea your tools aren't independent. And the *cost* of fan-out scales linearly with the number of branches; cap the fan-out width in code, not in the prompt.
+
+## Pattern 3: Human-in-the-Loop
+
+This is the pattern that pays for adopting a graph framework in the first place. A node calls `interrupt()`, the runtime persists state to the checkpointer, the function returns control to your application, and a human-supplied value resumes the graph from exactly that point — possibly hours later, possibly from a different process.
+
+The shape:
+
+```python
+from langgraph.types import interrupt, Command
+
+async def propose_action(state: State):
+    """Agent has decided to do something destructive. Ask a human first."""
+    proposed = state["pending_action"]
+    decision = interrupt({
+        "kind": "approval_required",
+        "action": proposed,
+        "context": state["reasoning_trace"][-3:],
+    })
+    return {"approval": decision, "messages": [{"role": "system",
+              "content": f"Human {decision['outcome']} the action."}]}
+
+def gate(state):
+    if state["approval"]["outcome"] == "approved":
+        return "execute"
+    return "explain_decline"
+
+graph.add_node("propose_action", propose_action)
+graph.add_conditional_edges("propose_action", gate, ["execute", "explain_decline"])
+```
+
+In your application, the flow is two phases:
+
+```python
+config = {"configurable": {"thread_id": "ticket-9421"}}
+
+# Phase 1: run until interrupt
+result = await app.ainvoke({"messages": [user_input]}, config=config)
+if "__interrupt__" in result:
+    payload = result["__interrupt__"][0].value
+    await notify_approver(payload)             # Slack, email, dashboard...
+    return {"status": "awaiting_approval", "thread_id": "ticket-9421"}
+
+# Phase 2 (separate request, after human decides):
+decision = {"outcome": "approved", "approver": "alice@co.com"}
+result = await app.ainvoke(Command(resume=decision), config=config)
+```
+
+The interrupt does **not** block the process. The agent's full state is persisted by the checkpointer; the calling code returns; the human's reply comes in through whatever channel you wire up. When you re-invoke with `Command(resume=...)`, the runtime loads the checkpoint and continues from the interrupted node.
+
+Three rules that make this reliable in practice:
+
+1. **Make the interrupt payload self-contained.** The approver UI should not need to call your DB to render the request. Put the proposed action, the relevant context, and the trace excerpt in the payload.
+2. **Idempotent execute nodes.** If the human approves twice (race condition, retry, network hiccup), the action should run once. The simplest mechanism is a `request_id` derived from `(thread_id, step_count)`.
+3. **A timeout policy.** Interrupts can hang forever. Add a scheduled job that resumes long-paused threads with `decision = {"outcome": "timed_out"}` and routes them to a graceful explain-decline path.
+
+This is also where **dynamic breakpoints** belong — `interrupt_before=["execute"]` in the compile call makes every run pause before that node, useful for staging and for debugging.
+
+```python
+app = graph.compile(
+    checkpointer=PostgresSaver.from_conn_string(POSTGRES_URL),
+    interrupt_before=["execute"],
+)
+```
+
+## When to reach for which
+
+| Situation | Pattern |
+|-----------|---------|
+| Bounded ReAct loop | Cycle + step/token budget |
+| Parallel work over a list | Fan-out / fan-in with `Send` |
+| Destructive action behind approval | Interrupt + Command resume |
+| User can intervene mid-conversation | Interrupt at the top of the loop |
+| Conditional path based on early result | Conditional edge from the relevant node |
+| "Subagent" that may or may not run | Fan-out of size 0 or 1 |
+
+A real production agent uses all three. The triage agent in our running example: loops with a budget, fans out to summarize the user's last five tickets in parallel, and interrupts before issuing a refund. Each pattern is a few lines once you've internalized the primitives.
+
+## What the graph looks like when you're done
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="LangGraph patterns combined diagram">
+  <defs>
+    <marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <ellipse cx="60" cy="50" rx="40" ry="22" />
+    <text x="60" y="55" text-anchor="middle" font-weight="600">START</text>
+
+    <rect x="150" y="25" width="130" height="50" rx="6" />
+    <text x="215" y="55" text-anchor="middle" font-weight="600">plan</text>
+
+    <polygon points="320,50 380,25 440,50 380,75" />
+    <text x="380" y="55" text-anchor="middle" font-weight="600">route</text>
+
+    <rect x="490" y="25" width="120" height="50" rx="6" />
+    <text x="550" y="55" text-anchor="middle" font-weight="600">call_tool</text>
+
+    <rect x="660" y="25" width="80" height="50" rx="6" />
+    <text x="700" y="48" text-anchor="middle">force</text>
+    <text x="700" y="63" text-anchor="middle">finish</text>
+
+    <rect x="220" y="140" width="120" height="50" rx="6" />
+    <text x="280" y="170" text-anchor="middle" font-weight="600">summarize₁</text>
+    <rect x="370" y="140" width="120" height="50" rx="6" />
+    <text x="430" y="170" text-anchor="middle" font-weight="600">summarize₂</text>
+    <rect x="520" y="140" width="120" height="50" rx="6" />
+    <text x="580" y="170" text-anchor="middle" font-weight="600">summarize₃</text>
+
+    <rect x="340" y="220" width="180" height="50" rx="6" />
+    <text x="430" y="250" text-anchor="middle" font-weight="600">aggregate</text>
+
+    <rect x="220" y="295" width="180" height="50" rx="6" stroke-dasharray="4,3" />
+    <text x="310" y="318" text-anchor="middle" font-weight="600">propose_action</text>
+    <text x="310" y="335" text-anchor="middle" opacity="0.7">interrupt → human</text>
+
+    <rect x="450" y="295" width="120" height="50" rx="6" />
+    <text x="510" y="325" text-anchor="middle" font-weight="600">execute</text>
+
+    <ellipse cx="700" cy="320" rx="40" ry="22" />
+    <text x="700" y="325" text-anchor="middle" font-weight="600">END</text>
+
+    <line x1="100" y1="50" x2="145" y2="50" marker-end="url(#arr3)" />
+    <line x1="280" y1="50" x2="315" y2="50" marker-end="url(#arr3)" />
+    <line x1="440" y1="50" x2="485" y2="50" marker-end="url(#arr3)" />
+    <line x1="610" y1="50" x2="655" y2="50" marker-end="url(#arr3)" />
+
+    <line x1="610" y1="50" x2="610" y2="100" />
+    <line x1="610" y1="100" x2="280" y2="100" />
+    <line x1="280" y1="100" x2="280" y2="135" marker-end="url(#arr3)" />
+    <line x1="430" y1="100" x2="430" y2="135" marker-end="url(#arr3)" />
+    <line x1="580" y1="100" x2="580" y2="135" marker-end="url(#arr3)" />
+
+    <line x1="280" y1="190" x2="380" y2="215" marker-end="url(#arr3)" />
+    <line x1="430" y1="190" x2="430" y2="215" marker-end="url(#arr3)" />
+    <line x1="580" y1="190" x2="480" y2="215" marker-end="url(#arr3)" />
+
+    <line x1="430" y1="270" x2="310" y2="290" marker-end="url(#arr3)" />
+    <line x1="400" y1="320" x2="445" y2="320" marker-end="url(#arr3)" />
+    <line x1="570" y1="320" x2="660" y2="320" marker-end="url(#arr3)" />
+    <line x1="700" y1="75" x2="700" y2="295" marker-end="url(#arr3)" stroke-dasharray="3,3" />
+  </g>
+</svg>
+</div>
+
+Dashed lines are the budget escape (force_finish) and the interrupt edge (human approval). Solid lines are the happy path. The whole graph is a couple hundred lines of code, fully typed, fully traced, and resumable from any node. That's the production shape.
+
+Next week we move to multi-agent orchestration with CrewAI, where the unit of composition stops being the node and starts being the role.
+
+## References
+
+- [LangGraph human-in-the-loop](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/)
+- [LangGraph `Send` API for fan-out](https://langchain-ai.github.io/langgraph/how-tos/map-reduce/)
+- [LangGraph in production: architecture, costs, outcomes](https://www.alphabold.com/langgraph-agents-in-production/)
+- [Building production AI agents with LangGraph (2026)](https://ortemtech.com/blog/how-to-build-production-ai-agent-langgraph-2026)

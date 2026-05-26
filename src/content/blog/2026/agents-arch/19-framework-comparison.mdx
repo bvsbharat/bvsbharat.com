@@ -1,0 +1,155 @@
+---
+title: "Framework Showdown: LangGraph vs CrewAI vs Google ADK vs Managed Agents"
+description: "Four agent frameworks, four different bets. The honest comparison — what each gets right, where each leaks, and the decision tree for picking one (or composing several)."
+pubDatetime: 2026-05-11T09:00:00-07:00
+tags:
+  - agents-arch
+  - frameworks
+  - comparison
+  - langgraph
+  - crewai
+featured: false
+draft: false
+---
+
+Eighteen weeks into this series and we've gone deep on four agent frameworks — LangGraph (Post 3–4), CrewAI (Post 5), Google ADK (Post 6), and Claude Managed Agents / Bedrock AgentCore (Post 7). Each made different architectural bets. None is "the winner." This post is the side-by-side: what each gets right, where each leaks, and how to actually choose.
+
+## The bets, in one line each
+
+- **LangGraph** bet on **state machines as the right abstraction** — primitives for nodes, edges, reducers, checkpointers; control flow you write yourself.
+- **CrewAI** bet on **roles and crews as the right abstraction** — agents with goals and backstories, crews that collaborate, Flows that orchestrate.
+- **Google ADK** bet on **the runtime as the right abstraction** — event-driven engine, multi-language SDKs, Cloud Run / GKE deploy story.
+- **Claude Managed Agents** bet on **the operator running the agent for you** — managed runtime, sandboxed containers, simple billing.
+
+Each abstraction is right for some workloads and wrong for others. The choice is matching the workload to the bet.
+
+## The honest comparison
+
+| Dimension | LangGraph | CrewAI | Google ADK | Managed Agents |
+|-----------|-----------|--------|------------|---------------|
+| **Primary abstraction** | State graph | Role + crew | Workflow agent + runtime | Hosted agent |
+| **Control flow** | Explicit, code | Implicit, role-based | Mixed (workflow + LLM-routed) | Inside the runtime |
+| **State** | Typed graph state + checkpointer | Pydantic flow state | Session state + memory | Managed by Anthropic |
+| **Languages** | Python, TS | Python | Python, TS, Go, Java | API (any language) |
+| **HITL** | First-class (interrupt + resume) | Via Flows | Supported | Built-in |
+| **Multi-agent** | Subgraphs + supervisor | Hierarchical or sequential crews | Sub-agents + LLM routing | Single agent (compose via A2A) |
+| **Tool standard** | LangChain tools + MCP | CrewAI tools + MCP | FunctionTool + MCP + Vertex Extensions | Native + MCP + MCP tunnels |
+| **Deploy story** | DIY (k8s, Cloud Run, LangGraph Cloud) | DIY + CrewAI Enterprise | First-class (`adk deploy`) | Vendor-managed |
+| **Observability** | LangSmith + OTel | Verbose + OTel | Cloud Trace + OTel | Built-in dashboard |
+| **Lock-in** | Provider-agnostic | Provider-agnostic | GCP-leaning, provider-agnostic | Claude only |
+| **Best at** | Complex control flow | People-shaped workflows | Multi-language platform | Fastest path to prod |
+| **Worst at** | Steeper learning curve | Conditional branching inside crew | Provider neutrality breadth | Customization beyond hosted model |
+
+This table is opinionated. Each row has caveats. The dimensions that matter most for your decision depend on your constraints; the matrix gives you a place to start.
+
+## The decision tree
+
+Strip the comparison down to the few questions that actually drive choice:
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Framework selection decision tree">
+  <defs>
+    <marker id="arr12" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="280" y="20" width="200" height="50" rx="6" />
+    <text x="380" y="42" text-anchor="middle" font-weight="600">Want fastest path to prod?</text>
+    <text x="380" y="60" text-anchor="middle" opacity="0.7">(skip building infra)</text>
+
+    <rect x="40" y="120" width="200" height="50" rx="6" />
+    <text x="140" y="150" text-anchor="middle" font-weight="600">Managed Agents</text>
+
+    <rect x="280" y="120" width="200" height="50" rx="6" />
+    <text x="380" y="142" text-anchor="middle" font-weight="600">Need multi-language?</text>
+    <text x="380" y="160" text-anchor="middle" opacity="0.7">(TS, Go, Java)</text>
+
+    <rect x="520" y="120" width="200" height="50" rx="6" />
+    <text x="620" y="150" text-anchor="middle" font-weight="600">Google ADK</text>
+
+    <rect x="280" y="220" width="200" height="50" rx="6" />
+    <text x="380" y="242" text-anchor="middle" font-weight="600">Roles-and-handoffs fit?</text>
+    <text x="380" y="260" text-anchor="middle" opacity="0.7">(specialists collaborating)</text>
+
+    <rect x="40" y="220" width="200" height="50" rx="6" />
+    <text x="140" y="250" text-anchor="middle" font-weight="600">CrewAI</text>
+
+    <rect x="280" y="310" width="200" height="50" rx="6" />
+    <text x="380" y="340" text-anchor="middle" font-weight="600">LangGraph</text>
+
+    <line x1="280" y1="40" x2="160" y2="115" marker-end="url(#arr12)" />
+    <text x="200" y="80" font-size="10" opacity="0.8">yes</text>
+    <line x1="380" y1="70" x2="380" y2="115" marker-end="url(#arr12)" />
+    <text x="395" y="95" font-size="10" opacity="0.8">no</text>
+
+    <line x1="480" y1="145" x2="515" y2="145" marker-end="url(#arr12)" />
+    <text x="495" y="135" font-size="10" opacity="0.8">yes</text>
+
+    <line x1="380" y1="170" x2="380" y2="215" marker-end="url(#arr12)" />
+    <text x="395" y="195" font-size="10" opacity="0.8">no</text>
+
+    <line x1="280" y1="245" x2="240" y2="245" marker-end="url(#arr12)" />
+    <text x="260" y="240" font-size="10" opacity="0.8">yes</text>
+
+    <line x1="380" y1="270" x2="380" y2="305" marker-end="url(#arr12)" />
+    <text x="395" y="290" font-size="10" opacity="0.8">no</text>
+  </g>
+</svg>
+</div>
+
+That tree gets most teams to the right answer. The question it doesn't ask, but should: *do you actually need the framework you're picking, or would a thin wrapper over the provider's function-calling API do?* For very simple agents (one tool, one loop), the answer is sometimes "no framework." The frameworks earn their keep when state, multi-step planning, or multi-agent coordination is involved.
+
+## Composing frameworks
+
+The interesting 2026 shift is that you don't have to pick one. A few combinations that show up in production:
+
+### LangGraph supervisor + Managed Agent workers
+
+The supervisor runs in LangGraph (because you want explicit state and HITL). The workers are individual Claude Managed Agents called via A2A (because you don't want to operate their containers). Best of both — control flow you own, infrastructure they own.
+
+### CrewAI inside a LangGraph node
+
+The outer orchestration is a LangGraph state machine (because you need conditional branches, retries, checkpointing). One of the nodes invokes a CrewAI crew (because that particular sub-task is genuinely a roles-and-handoffs workflow). The crew's `kickoff()` returns a string the LangGraph state absorbs.
+
+### ADK + LangChain tools
+
+ADK is the runtime. LangChain provides the tool primitives. The Python SDKs interoperate; ADK can call LangChain tools and vice versa. Common when the team already has LangChain tooling but wants ADK's deploy story.
+
+### Managed Agents + AgentCore Identity
+
+Claude Managed Agents for the runtime, AWS AgentCore Identity for the credential/IAM layer. Most useful for teams that want Anthropic's container model but with AWS's IAM ecosystem for credential management.
+
+The point: the frameworks aren't mutually exclusive. They share enough protocol (MCP for tools, A2A for inter-agent, OpenTelemetry for traces) that hybrid stacks work.
+
+## What's worth migrating between
+
+Some honest migration advice for teams who picked a framework and want to move:
+
+- **LangGraph → CrewAI**: rare. People go the other way.
+- **CrewAI → LangGraph**: common when you outgrow the role abstraction. You'll keep your tools and prompts; you'll rewrite the orchestration. Plan one to two weeks per non-trivial flow.
+- **DIY → Managed Agents**: common when the operational burden of your platform exceeds the cost of the managed runtime. Surprisingly fast — the agent logic is portable; the runtime is the work.
+- **Managed Agents → DIY**: rare. Usually triggered by a specific constraint (custom scheduling, on-prem requirement) the managed runtime can't satisfy.
+
+The migration that *isn't* worth it: changing frameworks because of a perceived feature gap that's actually a configuration question. Read the docs first; ask your team second; migrate third.
+
+## The 2026 honest take
+
+If I were starting a new production agent today, with no prior commitments:
+
+- **Default for a single-agent workload**: Claude Managed Agents. Two weeks to production, vendor handles infra.
+- **Default for a multi-agent workload with complex control flow**: LangGraph.
+- **Default for a multi-agent workload that's primarily role-based collaboration**: CrewAI.
+- **Default for a GCP-heavy organization**: Google ADK.
+- **Default for a research-mode prototype**: whatever your team knows. Switch later if needed.
+
+None of these is wrong. The picks differ on what you're optimizing for: time-to-prod, control, ergonomics, or platform fit.
+
+Next week: a **full reference architecture** — putting eight months of pieces into one diagram and one repo layout for an enterprise agent platform.
+
+## References
+
+- [LangGraph documentation](https://langchain-ai.github.io/langgraph/)
+- [CrewAI documentation](https://docs.crewai.com/)
+- [Google ADK documentation](https://google.github.io/adk-docs/)
+- [Claude Managed Agents](https://claudeapi.com/en/blog/news/claude-platform-aws-launch/)
+- [Scale Agents with CrewAI, LangGraph, A2A, and ADK — Google Codelab](https://codelabs.developers.google.com/next26/scale-agents)
+- [Best multi-agent frameworks (2026)](https://gurusup.com/blog/best-multi-agent-frameworks-2026)

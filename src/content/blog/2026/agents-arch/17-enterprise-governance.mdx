@@ -1,0 +1,251 @@
+---
+title: "Enterprise Governance for AI Agents: Policy, Audit, and Compliance"
+description: "Who decides what agents are allowed to do, how those decisions get enforced at runtime, and how to prove it later. The 2026 governance stack — policy as code, audit trails, and the EU AI Act bit."
+pubDatetime: 2026-04-27T09:00:00-07:00
+tags:
+  - agents-arch
+  - governance
+  - compliance
+  - audit
+featured: false
+draft: false
+---
+
+By 2026, "we have an AI agent in production" is no longer interesting; "how do you govern it" is. Regulators (EU AI Act phased enforcement, US sectoral guidance, growing state-level rules) and internal stakeholders (legal, risk, security, compliance) want answers to four questions about every agent that touches production data:
+
+1. **Who decided this agent is allowed to do what it does?**
+2. **How is that decision enforced at runtime?**
+3. **What did this specific agent do, and when, and on whose behalf?**
+4. **What happens when something goes wrong?**
+
+This post is the governance stack that answers them — policy as code, audit trails, agent inventory, and the discipline that ages well.
+
+## The four artifacts
+
+A governable agent has four pieces of documentation that travel with the system, not in a wiki nobody reads:
+
+- **Agent card** — what this agent is, who owns it, what it's allowed to do.
+- **Policy** — machine-readable rules enforced at runtime.
+- **Audit log** — what the agent actually did, queryable, immutable.
+- **Incident runbook** — what to do when the agent misbehaves.
+
+The card and the policy are *prospective*: they say what is allowed. The audit log and runbook are *retrospective*: they say what happened and how we respond. You need both.
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Governance artifacts and enforcement points">
+  <defs>
+    <marker id="arr10" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="20" width="200" height="80" rx="6" />
+    <text x="130" y="45" text-anchor="middle" font-weight="700">Agent card</text>
+    <text x="130" y="65" text-anchor="middle" opacity="0.8">owner, purpose, scope</text>
+    <text x="130" y="83" text-anchor="middle" opacity="0.8">risk class, data class</text>
+
+    <rect x="270" y="20" width="200" height="80" rx="6" />
+    <text x="370" y="45" text-anchor="middle" font-weight="700">Policy (as code)</text>
+    <text x="370" y="65" text-anchor="middle" opacity="0.8">OPA / Cedar / IAM</text>
+    <text x="370" y="83" text-anchor="middle" opacity="0.8">allow / deny / approve</text>
+
+    <rect x="510" y="20" width="220" height="80" rx="6" />
+    <text x="620" y="45" text-anchor="middle" font-weight="700">Audit log</text>
+    <text x="620" y="65" text-anchor="middle" opacity="0.8">immutable, append-only</text>
+    <text x="620" y="83" text-anchor="middle" opacity="0.8">actor + action + result</text>
+
+    <rect x="30" y="160" width="700" height="60" rx="6" />
+    <text x="380" y="185" text-anchor="middle" font-weight="700">Runtime — enforces policy, emits audit events</text>
+    <text x="380" y="205" text-anchor="middle" opacity="0.7">every tool call: actor check, scope check, policy check, log, execute</text>
+
+    <rect x="30" y="245" width="700" height="50" rx="6" />
+    <text x="380" y="275" text-anchor="middle" font-weight="600">Incident runbook · review board · risk register</text>
+
+    <line x1="130" y1="100" x2="200" y2="155" marker-end="url(#arr10)" />
+    <line x1="370" y1="100" x2="380" y2="155" marker-end="url(#arr10)" />
+    <line x1="620" y1="100" x2="560" y2="155" marker-end="url(#arr10)" />
+    <line x1="380" y1="220" x2="380" y2="240" marker-end="url(#arr10)" stroke-dasharray="3,3" />
+  </g>
+</svg>
+</div>
+
+## Agent inventory
+
+You cannot govern what you can't enumerate. The first artifact is a **central registry of every agent the organization runs**:
+
+- A unique agent ID.
+- Owner team and primary contact.
+- Purpose and scope (one paragraph).
+- Risk classification (low / medium / high) and data sensitivity class.
+- Linked policies, eval results, audit destination.
+- Lifecycle status (pilot, production, deprecated, retired).
+
+In small organizations this is a markdown file. In larger ones it's a database with a UI — sometimes a row in your existing service catalog, sometimes a dedicated AI registry. The point is *one canonical list*. Shadow agents that don't appear in the registry are governance failures.
+
+The EU AI Act's risk classification is the version of this that's becoming the default in 2026. If your organization touches EU operations, classify agents using the Act's categories (minimal, limited, high, unacceptable). Even if it doesn't, the four-level scale forces useful conversations about which agents need extra scrutiny.
+
+## Policy as code
+
+The runtime needs machine-readable rules. The 2026 stack converges on **OPA (Open Policy Agent)** or **Cedar** for the policy DSL, called from a runtime checkpoint that gates every tool invocation.
+
+A simplified policy:
+
+```rego
+# agent: billing-resolver
+# Allow: read tools always
+# Allow: propose_refund up to $500 without approval
+# Require approval: propose_refund > $500 or any to non-VIP customer
+# Deny: any direct refund (must use propose_refund)
+
+package agents.billing_resolver
+
+default allow = false
+
+allow {
+    input.tool in {"get_invoice", "list_invoices", "get_customer"}
+}
+
+allow {
+    input.tool == "propose_refund"
+    input.args.amount_cents <= 50000
+    input.actor.scope[_] == "billing:propose-refund"
+}
+
+require_approval {
+    input.tool == "propose_refund"
+    input.args.amount_cents > 50000
+}
+
+deny {
+    input.tool == "issue_refund"
+}
+```
+
+The runtime calls this policy before every tool execution. The call is fast (single-digit milliseconds) and structured. The output is one of three results: **allow**, **require approval**, or **deny**.
+
+Three reasons policy-as-code beats "we trust the prompt":
+
+- **Auditable.** The policy is in git; the policy change is in a PR; the reviewer is identified.
+- **Independent of the model.** A prompt change can't accidentally widen permissions because the runtime check is outside the model.
+- **Testable.** You can unit-test policy decisions against expected inputs.
+
+## The audit log
+
+Every tool execution generates an audit event. Append-only, immutable, retained for the period your compliance regime requires (commonly 1–7 years for financial workloads).
+
+The schema worth committing to:
+
+```json
+{
+  "event_id": "ev_2c9a...",
+  "timestamp": "2026-04-27T17:42:11.420Z",
+  "agent_id": "billing-resolver:v2.3.1",
+  "agent_session_id": "ticket-9421",
+  "trace_id": "tr_8f10...",
+  "actor": {
+    "user_id": "user_92",
+    "auth_method": "oauth2_pkce",
+    "scopes": ["billing:read", "billing:propose-refund"]
+  },
+  "action": {
+    "tool": "propose_refund",
+    "args": {"invoice_id": "INV-2026-0042", "amount_cents": 24000, "reason": "..."}
+  },
+  "policy": {
+    "decision": "require_approval",
+    "policy_id": "agents.billing_resolver:v17",
+    "rationale": "amount above threshold"
+  },
+  "outcome": {
+    "status": "approved",
+    "approver": "alice@co.com",
+    "executed_at": "2026-04-27T17:48:33.110Z"
+  }
+}
+```
+
+The fields that earn their keep:
+
+- **`agent_id` with version.** Investigating an incident two months later, you need to know which version of the agent was running.
+- **`actor` block with scopes.** Forensics depends on knowing what the user was authorized for, not just who they were.
+- **`policy.decision` and `policy_id`.** "Why did we let this happen" is answerable by reading the policy that was active.
+- **`outcome.approver`** when require_approval fires. The human accountability chain ends here; make it explicit.
+
+Store these in something immutable: an append-only log with cryptographic chaining, or a write-once-read-many bucket with retention policies. Operational logs and audit logs are not the same artifact; don't conflate them.
+
+## Approval workflows
+
+For actions requiring approval, the workflow needs a deliberate UX. The patterns that work:
+
+- **In-channel approval** — Slack or Teams interactive messages. Fast, but the audit trail depends on the channel; capture it explicitly.
+- **Ticket-based approval** — every approval is a ticket with state, assignee, SLA. Slow, but durable; right for high-risk decisions.
+- **Tiered approval** — fast lane (one approver, minor decisions) and slow lane (two approvers + risk review, major ones).
+
+Three properties to enforce:
+
+- **No self-approval.** The actor and the approver must be different identities.
+- **Reasoned approvals.** Approver must enter a justification; it lands in the audit log.
+- **Time-bounded.** Pending approvals that age out get routed to a default (commonly: explain-decline and escalate).
+
+## The risk register
+
+A risk register is a list of *known ways the agent can fail*, with mitigations and residual risk noted. It's not a security document; it's a product document, owned jointly by the agent team and the risk/compliance partner.
+
+Entries look like:
+
+```
+RISK-014: Indirect prompt injection via retrieved web content
+  Likelihood:  Medium (we retrieve from open web for one tool)
+  Impact:     High (could exfiltrate customer data via outbound URLs)
+  Mitigations:
+    - Outbound URL allowlist on web_fetch tool
+    - Per-task tool scoping
+    - Trace audit alert on unusual outbound payloads
+  Residual:   Low
+  Owner:      ai-platform-team
+  Last review: 2026-04-15
+```
+
+The register is reviewed quarterly. New risks get added; old ones with mitigations that proved durable can be downgraded or closed. The point is *not* perfection — it's *visibility*. A risk you wrote down and reviewed is a risk you'll respond to faster than one that wasn't on anyone's mind.
+
+## The review board
+
+For high-risk agents, a cross-functional review board (engineering, security, legal, risk, product) reviews:
+
+- New agent proposals before they reach production.
+- Major policy changes.
+- Post-incident reports.
+- Quarterly aggregate risk.
+
+The board's purpose isn't to slow things down — it's to spread the decision among the people who own different parts of the consequences. Smaller orgs combine this with their existing change-advisory or architecture-review process; that's fine. The principle is "no agent ships to high-stakes use without people outside the building team understanding what it's allowed to do."
+
+## Compliance regimes that mattered in 2026
+
+The ones that affect agent design directly:
+
+- **EU AI Act.** Phased enforcement through 2026; risk classification, transparency requirements, human oversight for high-risk systems. If you touch EU operations, you're in scope.
+- **GDPR and CCPA.** Personal-data handling, the right to explanation for automated decisions, audit obligations. Pre-existing; agents are a new way to trip the same rules.
+- **Sectoral regulation.** HIPAA for healthcare, PCI-DSS for payments, sector-specific banking rules. Agents that touch these systems inherit the rules.
+
+The pragmatic move is to design for the strictest regime you're plausibly subject to. The audit log, policy-as-code, and approval workflow shapes above are roughly what EU AI Act high-risk systems require — adopt them once and you're covered for most of the others.
+
+## What "good" looks like
+
+A 2026 enterprise governance posture worth presenting to your CISO:
+
+- Central agent inventory with owners and risk class.
+- Policy-as-code enforced at every tool call.
+- Immutable audit log with actor, action, policy decision, outcome.
+- Approval workflow for high-risk actions, with no-self-approval and reasoned justifications.
+- Risk register reviewed quarterly.
+- Review board for new high-risk agents.
+- Eval gate that includes policy-violation tests.
+
+Governance feels like overhead until the first incident. After the first incident, the teams that had it find the postmortem easy; the teams that didn't spend a quarter recovering trust.
+
+Next week we move to **multi-agent topologies** — supervisor/worker hierarchies and the patterns for systems made of many cooperating agents.
+
+## References
+
+- [EU AI Act overview](https://artificialintelligenceact.eu/)
+- [Open Policy Agent](https://www.openpolicyagent.org/)
+- [Cedar policy language](https://www.cedarpolicy.com/)
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)

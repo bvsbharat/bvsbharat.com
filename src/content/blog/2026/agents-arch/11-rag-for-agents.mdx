@@ -1,0 +1,203 @@
+---
+title: "RAG for Agents: Retrieval Strategies that Actually Work"
+description: "RAG for agents is not RAG for chatbots. Hybrid retrieval, query rewriting, retrieval-as-tool, and the patterns that beat 'top-k from a vector store' in 2026."
+pubDatetime: 2026-03-16T09:00:00-08:00
+tags:
+  - agents-arch
+  - rag
+  - retrieval
+  - vector-search
+featured: false
+draft: false
+---
+
+The 2023-era RAG stack — "embed the docs, vector-search the user's question, stuff results into context" — is a tutorial pattern, not a production one. Agents made it more obvious. An agent asks dozens of small retrieval queries per task, each shaped by what it just learned, and the answers feed *back* into the next step of reasoning. Top-k from a vector store breaks in interesting new ways at that scale.
+
+This post is what the 2026 retrieval stack looks like inside agents — hybrid retrieval that beat pure vectors on every recent benchmark, retrieval-as-tool that puts the agent in charge of when and what to fetch, and the failure modes you don't see until you serve a real workload.
+
+## The two retrieval shapes
+
+Two distinct architectures show up in production agents. Don't conflate them.
+
+**Pre-retrieval (classical RAG):** before the agent runs, fetch context relevant to the user's input and stuff it into the system prompt or the first message. One retrieval call per turn. Cheap, predictable, good for FAQ-style interactions.
+
+**Retrieval-as-tool (agentic RAG):** retrieval is an explicit tool the agent calls. The agent decides *when* to retrieve, *what* query to run, and *how* to use the result. Many retrieval calls per task, dynamic.
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Pre-retrieval vs retrieval-as-tool">
+  <defs>
+    <marker id="arr9" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <text x="190" y="22" text-anchor="middle" font-weight="700">Pre-retrieval (classical RAG)</text>
+
+    <rect x="40" y="40" width="100" height="40" rx="6" />
+    <text x="90" y="65" text-anchor="middle">user input</text>
+    <rect x="170" y="40" width="100" height="40" rx="6" />
+    <text x="220" y="65" text-anchor="middle">retrieve</text>
+    <rect x="300" y="40" width="100" height="40" rx="6" />
+    <text x="350" y="65" text-anchor="middle">LLM</text>
+    <line x1="140" y1="60" x2="165" y2="60" marker-end="url(#arr9)" />
+    <line x1="270" y1="60" x2="295" y2="60" marker-end="url(#arr9)" />
+
+    <text x="190" y="130" text-anchor="middle" opacity="0.7" font-size="11">one retrieval per turn</text>
+
+    <text x="560" y="22" text-anchor="middle" font-weight="700">Retrieval-as-tool (agentic)</text>
+
+    <rect x="440" y="40" width="100" height="40" rx="6" />
+    <text x="490" y="65" text-anchor="middle">user input</text>
+    <rect x="570" y="40" width="100" height="40" rx="6" />
+    <text x="620" y="65" text-anchor="middle">plan</text>
+    <polygon points="700,60 720,40 740,60 720,80" />
+    <text x="720" y="65" text-anchor="middle" font-size="10">act?</text>
+
+    <rect x="440" y="120" width="100" height="40" rx="6" />
+    <text x="490" y="145" text-anchor="middle">retrieve₁</text>
+    <rect x="570" y="120" width="100" height="40" rx="6" />
+    <text x="620" y="145" text-anchor="middle">retrieve₂</text>
+
+    <rect x="500" y="200" width="140" height="40" rx="6" />
+    <text x="570" y="225" text-anchor="middle">LLM (answer)</text>
+
+    <line x1="540" y1="60" x2="565" y2="60" marker-end="url(#arr9)" />
+    <line x1="670" y1="60" x2="695" y2="60" marker-end="url(#arr9)" />
+    <line x1="720" y1="80" x2="490" y2="115" marker-end="url(#arr9)" />
+    <line x1="720" y1="80" x2="620" y2="115" marker-end="url(#arr9)" />
+    <line x1="490" y1="160" x2="540" y2="195" marker-end="url(#arr9)" />
+    <line x1="620" y1="160" x2="600" y2="195" marker-end="url(#arr9)" />
+
+    <text x="560" y="280" text-anchor="middle" opacity="0.7" font-size="11">many retrievals, decided by the agent</text>
+  </g>
+</svg>
+</div>
+
+Agents do both. The agent's first turn is often pre-retrieval (load context for the user's input), then the loop becomes retrieval-as-tool as it digs into specific facts. The architecture has to support both shapes; the patterns below apply across them.
+
+## Hybrid retrieval is the 2026 default
+
+Pure vector similarity got displaced. Every serious 2026 benchmark — LoCoMo, LongMemEval, BEAM, the agent-RAG variants — shows the same thing: **hybrid retrieval (vector + BM25 + graph) fused via Reciprocal Rank Fusion beats pure vector by big margins**, especially on the queries agents actually generate.
+
+The intuition: agents ask three shapes of question:
+
+- **Fuzzy / conceptual** — "policies about customer refund timelines." Vector search wins.
+- **Exact / lexical** — "what does function `IssueRefundV2` do?" BM25 wins.
+- **Relational** — "which incidents was Alice oncall for?" Graph traversal wins.
+
+Pick one engine and you optimize for one shape. Combine all three and the retriever stops being the bottleneck.
+
+A production hybrid retriever in 2026:
+
+```python
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_postgres import PGVector
+
+vector = PGVector(connection=PG_URL, collection="docs", embeddings=embed)\
+    .as_retriever(search_kwargs={"k": 30})
+
+bm25 = BM25Retriever.from_documents(docs_corpus, k=30)
+
+graph_retriever = GraphRetriever(graph=knowledge_graph, k=10)
+
+retriever = EnsembleRetriever(
+    retrievers=[vector, bm25, graph_retriever],
+    weights=[0.5, 0.3, 0.2],
+)
+```
+
+Three retrievers, three weights, RRF for the merge. The weights are tunable per workload — for a code corpus you'd weight BM25 higher; for prose with lots of paraphrase, weight vectors higher.
+
+## Query rewriting earns its keep
+
+The user's question is rarely the right query for the index. The agent's first action when retrieval is needed should often be to *rewrite the query* — sometimes into several. Three rewriting patterns that pay for themselves:
+
+1. **Hypothetical document embeddings (HyDE).** Ask the LLM "imagine a paragraph that answers this question," embed that, search with it. The hypothetical is closer to the indexed documents than the user's terse question is.
+2. **Multi-query expansion.** Generate three or five paraphrases of the question, retrieve for each, union and re-rank. Wider recall, only marginally more cost.
+3. **Step-back queries.** "Before retrieving for `X`, retrieve for the broader category that contains `X`." Useful when the answer is in a section whose title doesn't mention `X` by name.
+
+```python
+async def retrieve_with_rewriting(question: str) -> list[Document]:
+    paraphrases = await llm.ainvoke([
+        {"role": "user", "content": f"Generate 3 alternate paraphrases of:\n{question}"}
+    ])
+    queries = [question] + parse_lines(paraphrases.content)
+    all_hits = []
+    for q in queries:
+        all_hits.extend(await retriever.ainvoke(q))
+    return rerank(all_hits, original_query=question, k=8)
+```
+
+The reranker (a cross-encoder model or an LLM-as-judge call) is what keeps the union from drowning the result list in near-duplicates.
+
+## Reranking is the cheap quality win
+
+The output of the retriever is rarely the right order. A reranker reads each candidate alongside the query and scores it. Two flavors are common:
+
+- **Cross-encoder rerankers** (Cohere Rerank, Voyage Rerank, bge-reranker-v2) — small, fast, very effective. ~50ms for a few dozen candidates, big gains in precision.
+- **LLM-as-judge rerankers** — the model itself reads candidate snippets and reorders them. Slower and more expensive, but uses context the cross-encoder doesn't have. Useful for complex domains.
+
+The 2026 stack: retriever returns ~30 candidates, reranker promotes the top 8. The 8 go into the agent's context. The reranker is the single most cost-effective place to spend optimization effort after getting hybrid retrieval right.
+
+## Retrieval-as-tool: how the agent does it
+
+In agentic RAG, the agent decides when to retrieve. The tool surface looks like:
+
+```python
+@tool
+async def search_knowledge_base(query: str, k: int = 5,
+                                 doctype: str | None = None) -> list[dict]:
+    """Search the knowledge base. Use precise queries; the corpus is large.
+
+    Args:
+        query: A focused question or claim. Avoid run-on questions.
+        k: Number of results to return (default 5, max 20).
+        doctype: Filter to one of: 'runbook', 'policy', 'incident', 'design'.
+    """
+    hits = await hybrid_retriever.ainvoke(query, filters={"doctype": doctype}, k=k)
+    return [{"source": h.metadata["source"], "snippet": h.page_content[:600],
+             "score": h.score} for h in hits]
+```
+
+Three details that matter at production scale:
+
+- **Return snippets, not full documents.** A 600-character snippet plus source link is what fits in the agent's context window. Full documents blow the budget on one call.
+- **Include the source.** The agent should cite where it got facts; the tool surface should make that easy.
+- **Expose filters.** `doctype="runbook"` is the difference between an agent that finds the right answer and one that finds 12 plausible ones.
+
+## Failure modes specific to agentic RAG
+
+The ones that don't show up in chatbot RAG:
+
+- **Context dilution from many retrievals.** Each retrieve adds noise. Cap the number of retrievals per task; force the agent to summarize before adding more.
+- **Confirmation bias retrieval.** The agent retrieves snippets that match its current hypothesis and ignores ones that don't. Mitigation: explicitly retrieve for the *opposite* claim periodically; let the agent face the counter-evidence.
+- **Retrieval forgetting.** Snippets retrieved early get pushed out of context by later messages. Either summarize aggressively or use a separate working-memory store for retrieved facts.
+- **Cite-but-don't-read.** The agent cites a source but doesn't use the snippet's content. Trace this in observability; flag when retrieved snippets aren't substring-present in the final answer.
+
+## Evals for RAG that are worth running
+
+Two evals separate the "looks fine in demo" agent from one you'd ship:
+
+1. **Retrieval precision @ k.** For a labeled set of (question, correct-source) pairs, what fraction of top-k results includes the correct source? Independent of the model — measures the retriever alone.
+2. **Answer faithfulness with citations.** For each answer the agent produces, can a judge model verify that the cited sources support the claims? This catches the "looks right, isn't right" failure mode that pure precision misses.
+
+Run both on a frozen test set. Re-run them after every retriever change, reranker change, or prompt change. The agent's perceived quality is mostly the retriever's quality.
+
+## What "good" looks like
+
+A 2026 production agent's RAG stack:
+
+- Hybrid retrieval (vector + BM25 + graph), RRF-merged.
+- Query rewriting on the retrieval-as-tool path (HyDE + multi-query).
+- Cross-encoder reranker between retriever and context.
+- Retrieval exposed as a typed tool with filters.
+- Retrieval traces captured in observability (query, hits, scores, what made it to context).
+- Frozen eval set with precision@k and answer-faithfulness checks; rerun on every change.
+
+Next week: **observability** — how to actually see what your agents are doing, debug at scale, and not lose sleep at 2 AM.
+
+## References
+
+- [Mem0 — State of AI Agent Memory 2026 (benchmarks and hybrid retrieval)](https://mem0.ai/blog/state-of-ai-agent-memory-2026)
+- [LangChain — Ensemble retriever for hybrid search](https://python.langchain.com/docs/how_to/ensemble_retriever/)
+- [Cohere Rerank](https://docs.cohere.com/docs/rerank-overview)
+- [LangGraph long-term memory + RAG](https://langchain-ai.github.io/langgraph/concepts/memory/)

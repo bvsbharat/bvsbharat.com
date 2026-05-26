@@ -1,0 +1,182 @@
+---
+title: "LangChain in Production: Composability and the Parts That Survived"
+description: "LangChain is no longer the agent framework — LangGraph is. But its primitives (runnables, retrievers, callbacks) became the connective tissue underneath. Here's what to keep and what to drop in 2026."
+pubDatetime: 2026-01-12T09:00:00-08:00
+tags:
+  - agents-arch
+  - langchain
+  - architecture
+  - production
+featured: false
+draft: false
+---
+
+LangChain's reputation has been on a rollercoaster: hottest framework of 2023, "is LangChain even good?" of 2024, then quietly reborn in 2025 as the layer underneath LangGraph, LangSmith, and a dozen production stacks. By 2026 the question is no longer *whether* you use LangChain — most production agent stacks pull it in transitively — but *which primitives to use directly and which to ignore*.
+
+This post is the honest map of LangChain in 2026: what's load-bearing, what's deprecated, and how to compose the survivors into something maintainable.
+
+## The new mental model: LangChain as primitives, LangGraph as control flow
+
+For two years the framework tried to be both the building blocks *and* the agent runtime. The agent runtime piece — `AgentExecutor`, `initialize_agent`, the function-calling agent variants — was the wobbly part. LangGraph subsumed it. What remains in LangChain proper is what was always strong: **a typed, composable interface over models, tools, retrievers, parsers, and prompts**.
+
+The mental model that works:
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 740 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="LangChain layered architecture">
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="40" y="20" width="660" height="50" rx="6" />
+    <text x="370" y="50" text-anchor="middle" font-size="13" font-weight="600">Your Application (FastAPI, queue worker, Slack bot, ...)</text>
+
+    <rect x="40" y="90" width="660" height="50" rx="6" stroke-dasharray="0" />
+    <text x="370" y="120" text-anchor="middle" font-size="13" font-weight="600">LangGraph — state graphs, checkpoints, control flow</text>
+
+    <rect x="40" y="160" width="660" height="70" rx="6" />
+    <text x="370" y="185" text-anchor="middle" font-size="13" font-weight="600">LangChain Core — Runnables, Tools, Retrievers, Parsers</text>
+    <text x="370" y="205" text-anchor="middle" opacity="0.7">composable, typed, async-native</text>
+    <text x="370" y="222" text-anchor="middle" opacity="0.7">callbacks → LangSmith / Langfuse</text>
+
+    <rect x="40" y="250" width="200" height="50" rx="6" />
+    <text x="140" y="280" text-anchor="middle">LLM Providers</text>
+    <rect x="270" y="250" width="200" height="50" rx="6" />
+    <text x="370" y="280" text-anchor="middle">Vector Stores</text>
+    <rect x="500" y="250" width="200" height="50" rx="6" />
+    <text x="600" y="280" text-anchor="middle">External Tools / APIs</text>
+  </g>
+</svg>
+</div>
+
+LangGraph sits on top of LangChain Core. Your agent's *control flow* lives in LangGraph (Post 3 covers this in detail). Its *building blocks* — model wrappers, retrievers, parsers, the LCEL composition primitives — come from LangChain.
+
+## The four primitives worth knowing
+
+### 1. Runnables and LCEL
+
+`Runnable` is the single interface every LangChain object implements. It has `invoke`, `batch`, `stream`, and async variants, and it composes with `|`. LCEL (LangChain Expression Language) is just operator overloading on `Runnable`, but it's what makes the rest of the library readable:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_anthropic import ChatAnthropic
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You extract the SQL intent from a user question. Be terse."),
+    ("user", "{question}"),
+])
+
+chain = prompt | ChatAnthropic(model="claude-opus-4-7") | StrOutputParser()
+
+intent = await chain.ainvoke({"question": "show me Q4 revenue by region"})
+```
+
+Three things to notice. The chain is typed end-to-end. It streams without code changes (`async for token in chain.astream(...)`). And it's a single `Runnable` that you can wrap inside a LangGraph node, expose as a tool, or compose into a larger chain. This is the part of LangChain that aged well.
+
+### 2. Tools
+
+The `@tool` decorator turns a Python function into a callable the LLM can invoke. The signature and docstring become the JSON schema. Modern LangChain (>=0.3) generates tool schemas that match the function-calling APIs of Anthropic, OpenAI, Google, and Bedrock without manual translation:
+
+```python
+from langchain_core.tools import tool
+from pydantic import BaseModel, Field
+
+class LookupArgs(BaseModel):
+    customer_id: str = Field(description="UUID of the customer")
+    since: str = Field(description="ISO date, lower bound for invoice query")
+
+@tool(args_schema=LookupArgs)
+def list_invoices(customer_id: str, since: str) -> list[dict]:
+    """List invoices for a customer since a given date. Returns at most 50."""
+    return billing.list_invoices(customer_id, since=since)
+```
+
+The Pydantic model is the contract the LLM reads. The body is your business logic. Bind a list of tools to a model with `.bind_tools([...])` and you have a function-calling agent — but don't *run* it with `AgentExecutor`; run it inside a LangGraph node where you control the loop.
+
+### 3. Retrievers
+
+A retriever is anything that implements `BaseRetriever`: given a query, return a list of `Document`s. The interface is intentionally narrow so you can plug in vector stores, BM25 indexes, knowledge graphs, web search, or a hybrid that fuses several. The 2026 winner pattern is **EnsembleRetriever** wrapping a vector store and a BM25 retriever with Reciprocal Rank Fusion — exactly the hybrid retrieval the memory benchmarks reward:
+
+```python
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_postgres import PGVector
+
+vector = PGVector(...).as_retriever(search_kwargs={"k": 10})
+bm25 = BM25Retriever.from_documents(docs, k=10)
+retriever = EnsembleRetriever(retrievers=[vector, bm25], weights=[0.6, 0.4])
+```
+
+We'll go deep on retrieval for agents in Post 11.
+
+### 4. Callbacks → tracing
+
+Callbacks are the side-channel that emits structured events for every model call, tool call, and chain step. They are the reason LangSmith and Langfuse can show you a trace tree with zero application changes — every `Runnable` already emits the events. Turn on tracing by setting environment variables; the spans land in your observability backend automatically:
+
+```bash
+export LANGSMITH_TRACING=true
+export LANGSMITH_API_KEY=...
+export LANGSMITH_PROJECT=agents-arch-prod
+```
+
+If you build your own observability stack, implement `BaseCallbackHandler` and you have a hook for every event. Post 12 covers observability end to end.
+
+## What to drop
+
+Three categories of LangChain code show up in old tutorials and should not be in new agents:
+
+- **`AgentExecutor` and `initialize_agent`** — replaced by LangGraph. They worked for demos and fell apart at production scale because the loop, the state, and the error handling were all hidden inside the executor.
+- **Untyped chains using `LLMChain` / `SimpleSequentialChain`** — replaced by LCEL pipelines and `Runnable.with_structured_output()`. The old chains had no streaming, no batching, no async, and no typed I/O.
+- **Memory classes inside chains** (`ConversationBufferMemory`, `ConversationSummaryMemory`, etc.) — moved into LangGraph's checkpointing system. Chain-local memory was always a leak; agent-level state is where conversation history belongs.
+
+If you inherit a codebase using these, the migration path is straightforward: wrap the existing prompt-and-model pieces as a `Runnable`, put them inside a LangGraph node, and move history into the graph state. Don't rewrite the world; replace one node at a time.
+
+## A minimal production-shaped composition
+
+Here's what a small but real LangChain composition looks like in 2026 — typed, async, traced, and embeddable inside a LangGraph node:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_anthropic import ChatAnthropic
+from langchain_core.tools import tool
+from pydantic import BaseModel
+
+class Resolution(BaseModel):
+    summary: str
+    action: str
+    confidence: float
+
+@tool
+def lookup_order(order_id: str) -> dict:
+    """Fetch order details by ID."""
+    return orders.get(order_id)
+
+llm = ChatAnthropic(model="claude-opus-4-7", temperature=0.1).bind_tools([lookup_order])
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You triage support tickets. Use lookup_order when an ID appears."),
+    ("placeholder", "{messages}"),
+])
+
+triage = prompt | llm
+
+structured = ChatAnthropic(model="claude-opus-4-7").with_structured_output(Resolution)
+```
+
+Two `Runnable`s. One does the tool-using triage. The other turns the result into a typed `Resolution`. Both stream, both batch, both emit traces. The LangGraph node that calls them is twenty lines (next post).
+
+## Decision rules
+
+If you're starting a new agent in 2026, the defaults that age well:
+
+1. **LangChain for primitives, LangGraph for control.** Don't run the loop in LangChain; let LangGraph do it.
+2. **LCEL over imperative chains.** If you're calling `.invoke()` more than two or three times in a row, you wanted a pipe.
+3. **`with_structured_output()` over manual JSON parsing.** It uses the provider's native structured-output mode and falls back to function calling automatically.
+4. **Tracing on from day one.** A trace you didn't have during the incident is the most expensive thing in agent engineering.
+5. **Pin minor versions.** LangChain still moves fast; lock `langchain`, `langchain-core`, and provider packages to a known-good set in your lockfile.
+
+Next week we put all of this inside a LangGraph state machine and watch the agent get reliable.
+
+## References
+
+- [LangChain documentation — Runnables](https://python.langchain.com/docs/concepts/runnables/)
+- [LangSmith tracing](https://docs.smith.langchain.com/)
+- [Ensemble retriever — hybrid search](https://python.langchain.com/docs/how_to/ensemble_retriever/)
+- [LangChain & LangGraph guide](https://aishwaryasrinivasan.substack.com/p/the-complete-guide-for-langchain)
