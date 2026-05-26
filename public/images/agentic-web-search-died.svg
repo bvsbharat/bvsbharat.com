@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" fill="none" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="hexesEmerald" x="0" y="0" width="120" height="104" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.22">
+        <polygon points="60,4 116,36 116,100 60,132 4,100 4,36"/>
+        <polygon points="0,-48 56,-16 56,48 0,80 -56,48 -56,-16"/>
+        <polygon points="120,-48 176,-16 176,48 120,80 64,48 64,-16"/>
+      </g>
+    </pattern>
+    <linearGradient id="emeraldBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#04402f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left panel: emerald with hex pattern -->
+  <rect x="0" y="0" width="600" height="420" fill="url(#emeraldBg)"/>
+  <rect x="0" y="0" width="600" height="420" fill="url(#hexesEmerald)"/>
+
+  <!-- Mark: search ring on the left morphing into a chat bubble on the right, joined by an arrow -->
+  <g stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Magnifier -->
+    <circle cx="200" cy="195" r="44" stroke-width="14"/>
+    <line x1="232" y1="227" x2="252" y2="247" stroke-width="14"/>
+    <!-- Arrow body -->
+    <line x1="278" y1="205" x2="362" y2="205" stroke-width="12"/>
+    <polyline points="350,190 368,205 350,220" stroke-width="12"/>
+    <!-- Chat bubble -->
+    <path d="M 400 158 L 510 158 Q 528 158 528 176 L 528 232 Q 528 250 510 250 L 432 250 L 412 270 L 412 250 L 400 250 Q 388 250 388 232 L 388 176 Q 388 158 400 158 Z"
+          stroke-width="12"/>
+    <!-- Three dots inside bubble -->
+    <circle cx="420" cy="205" r="5" fill="#ffffff" stroke="none"/>
+    <circle cx="458" cy="205" r="5" fill="#ffffff" stroke="none"/>
+    <circle cx="496" cy="205" r="5" fill="#ffffff" stroke="none"/>
+  </g>
+
+  <!-- URL bottom-left -->
+  <text x="60" y="385" fill="#ffffff" font-size="15" font-weight="500" letter-spacing="0.5" opacity="0.95">www.bvsbharat.com</text>
+
+  <!-- Right panel: white with headline -->
+  <rect x="600" y="0" width="600" height="420" fill="#ffffff"/>
+
+  <g fill="#0f172a" font-weight="800" letter-spacing="-1">
+    <text x="660" y="160" font-size="56">Search died.</text>
+    <text x="660" y="225" font-size="56">Intent took</text>
+    <text x="660" y="290" font-size="56">over.</text>
+  </g>
+
+  <g fill="#475569" font-size="15" font-weight="400">
+    <text x="660" y="338">You never typed a query. You described an</text>
+    <text x="660" y="360">outcome. The agent figured out the search.</text>
+  </g>
+</svg>
