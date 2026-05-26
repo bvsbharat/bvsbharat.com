@@ -1,0 +1,221 @@
+---
+title: "Multi-Agent Communication: A2A, MCP, and Message Buses"
+description: "When one agent isn't enough, how do they talk? A2A for peer-to-peer delegation, MCP for tools, and the durable message-bus patterns underneath multi-agent systems in 2026."
+pubDatetime: 2026-03-09T09:00:00-08:00
+tags:
+  - agents-arch
+  - multi-agent
+  - a2a
+  - mcp
+  - protocols
+featured: false
+draft: false
+---
+
+The big architectural question that goes from "I have an agent" to "I have an agent system" is **how agents talk to each other**. By 2026 the answer crystallized into two protocols stacked on top of a familiar pattern:
+
+- **MCP (Model Context Protocol)** — how an agent talks to *tools*. Standardized in late 2025; the de-facto vocabulary for tool surfaces.
+- **A2A (Agent-to-Agent Protocol)** — how an agent talks to *other agents*. Capability-based, peer-to-peer, transport-agnostic.
+- **Message buses** — the durable infrastructure underneath everything multi-agent that needs to survive process restarts.
+
+This post is the map of how they fit, with the patterns that hold up in production.
+
+## MCP vs A2A in one paragraph
+
+MCP connects a single agent to external **tools, databases, and APIs**. A2A enables multiple agents to **communicate and delegate tasks to each other**. They are not competitors; most production deployments use both. The pithy framing from the 2026 protocol surveys: *MCP is the universal adapter for tools; A2A is the standard for structured, secure communication between autonomous agents.*
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="MCP vs A2A topology">
+  <defs>
+    <marker id="arr8" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <text x="380" y="22" text-anchor="middle" font-weight="700">Two protocols, one system</text>
+
+    <rect x="120" y="60" width="160" height="60" rx="6" />
+    <text x="200" y="85" text-anchor="middle" font-weight="600">Agent A</text>
+    <text x="200" y="105" text-anchor="middle" opacity="0.7">researcher</text>
+
+    <rect x="480" y="60" width="160" height="60" rx="6" />
+    <text x="560" y="85" text-anchor="middle" font-weight="600">Agent B</text>
+    <text x="560" y="105" text-anchor="middle" opacity="0.7">writer</text>
+
+    <line x1="280" y1="90" x2="480" y2="90" marker-end="url(#arr8)" />
+    <line x1="480" y1="100" x2="280" y2="100" marker-end="url(#arr8)" stroke-dasharray="3,3" />
+    <text x="380" y="78" text-anchor="middle" font-size="11" font-weight="600">A2A</text>
+    <text x="380" y="118" text-anchor="middle" font-size="11" opacity="0.7">delegate · receive · respond</text>
+
+    <rect x="60" y="200" width="160" height="60" rx="6" />
+    <text x="140" y="225" text-anchor="middle">MCP server</text>
+    <text x="140" y="245" text-anchor="middle" opacity="0.7">web_search</text>
+
+    <rect x="270" y="200" width="160" height="60" rx="6" />
+    <text x="350" y="225" text-anchor="middle">MCP server</text>
+    <text x="350" y="245" text-anchor="middle" opacity="0.7">billing</text>
+
+    <rect x="480" y="200" width="160" height="60" rx="6" />
+    <text x="560" y="225" text-anchor="middle">MCP server</text>
+    <text x="560" y="245" text-anchor="middle" opacity="0.7">cms</text>
+
+    <line x1="180" y1="120" x2="140" y2="195" marker-end="url(#arr8)" />
+    <line x1="220" y1="120" x2="320" y2="195" marker-end="url(#arr8)" />
+    <line x1="560" y1="120" x2="560" y2="195" marker-end="url(#arr8)" />
+
+    <rect x="120" y="300" width="520" height="50" rx="6" stroke-dasharray="3,3" />
+    <text x="380" y="330" text-anchor="middle" font-weight="600">Durable bus — Kafka · Redis Streams · NATS (optional, for long-running)</text>
+  </g>
+</svg>
+</div>
+
+Solid arrows are direct calls. Dashed are responses (A2A is bidirectional). The dashed bottom box is the optional layer underneath: for long-running multi-agent workflows, you do not let two agents talk over an ephemeral HTTP socket — you persist the message on a durable bus.
+
+## A2A: the protocol
+
+A2A's core idea is **capability-based representation**. Each agent publishes an **Agent Card** — a structured JSON document that describes:
+
+- The agent's identity (name, version, owner).
+- The capabilities it offers (named methods with schemas).
+- How to invoke them (transport URL, auth requirements).
+- Policy metadata (cost hints, latency expectations).
+
+An Agent Card is the equivalent of an OpenAPI spec for an agent. A consumer reads the card, decides what to call, and invokes the capability. The transport in 2026's reference implementation is HTTP plus Server-Sent Events for streaming, with WebSockets for fully duplex when needed.
+
+A minimal Agent Card:
+
+```json
+{
+  "agent_id": "writer-v3",
+  "version": "3.2.1",
+  "owner": "content-platform",
+  "capabilities": [
+    {
+      "name": "draft_article",
+      "description": "Write a 1200-word article from a research brief.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "brief": { "type": "string" },
+          "style": { "type": "string", "enum": ["news", "explainer", "opinion"] }
+        },
+        "required": ["brief"]
+      },
+      "output_schema": { "type": "object", "properties": { "article": { "type": "string" } } }
+    }
+  ],
+  "invocation": {
+    "url": "https://agents.acme.internal/writer-v3",
+    "auth": { "type": "oauth2", "scope": "agent:invoke" }
+  }
+}
+```
+
+A delegating agent reads the card, builds a request matching `input_schema`, calls the URL with the required auth, and reads back the response. Streaming intermediate updates flow over SSE.
+
+What A2A gives you that ad-hoc agent-calls-agent doesn't:
+
+- **Discovery.** An agent registry lists cards; agents find each other at runtime.
+- **Versioning.** Cards include version; consumers pin or accept ranges.
+- **Auth surface.** OAuth scopes are part of the card; you can't accidentally call a capability you're not authorized for.
+- **Streaming.** Long-running delegations stream progress instead of blocking.
+- **Cross-framework portability.** A LangGraph agent can call a CrewAI agent through A2A without either side knowing or caring.
+
+## When to use A2A vs subgraphs
+
+The decision tree, in practice:
+
+| Pattern | Use |
+|---------|-----|
+| Same process, same framework | LangGraph subgraph / CrewAI sub-crew / ADK sub-agent |
+| Same team, separate processes | A2A or internal RPC |
+| Different teams, same org | A2A with auth, internal registry |
+| External vendor agents | A2A with strict input validation |
+
+The mistake is using A2A when a subgraph would do. Network calls, even on a local mesh, add latency and failure modes. If the "other agent" is in the same repo and run by the same team, make it a node in your graph and skip the protocol overhead.
+
+The complementary mistake is using a subgraph when A2A is needed. If the other agent is owned by another team, has its own deployment lifecycle, or might be in a different framework, you want the protocol boundary. The transport is a feature, not a tax.
+
+## The durable bus underneath
+
+For long-running multi-agent systems — anything that crosses minutes or sessions — synchronous A2A calls are not enough. The pattern that holds up:
+
+```
+producer agent → durable message bus → consumer agent
+                                     ↓
+                          dead-letter queue + retry
+```
+
+The bus is Kafka, Redis Streams, NATS, AWS SQS/SNS, or GCP Pub/Sub — pick one. The bus owns three responsibilities the protocol doesn't:
+
+- **Persistence.** A message survives the producer crashing before the consumer reads it.
+- **Replay.** When a consumer fails after acknowledging, you can re-deliver from a snapshot.
+- **Backpressure.** Consumers that are slow don't take down producers.
+
+A LangGraph agent that emits work for another agent looks like:
+
+```python
+async def dispatch_to_writer(state: State):
+    payload = {
+        "trace_id": state["trace_id"],
+        "brief": state["brief"],
+        "style": "explainer",
+        "callback_topic": "agent.writer.results",
+    }
+    await bus.publish("agent.writer.requests", payload)
+    return {"pending_writer_request": payload}
+```
+
+The consumer is a worker (its own LangGraph app, or another framework's runtime) subscribed to `agent.writer.requests`. It picks up the message, calls `draft_article`, and publishes the result to `agent.writer.results`. The original agent listens on the callback topic and resumes when the result arrives — using LangGraph's `Command(resume=...)` pattern from post 4, or the equivalent in other frameworks.
+
+This shape **eats latency** but **survives outages**. Choose it for workflows where the user is not waiting in real time. Don't use it for foreground chat where every 200ms matters.
+
+## Orchestration patterns
+
+Three multi-agent topologies dominate:
+
+### Supervisor / workers
+
+One supervisor agent delegates to N worker agents. The supervisor decides which worker runs and merges results. CrewAI's hierarchical process, LangGraph's standard supervisor pattern, ADK's LLM-routed agents are all variants.
+
+Use when: tasks vary in shape and a router is genuinely needed.
+
+### Pipeline
+
+Agents arranged in a fixed sequence. Each agent's output is the next agent's input. CrewAI's sequential process, ADK's `SequentialAgent`, LangGraph's straight edges are variants.
+
+Use when: the steps are stable and the value is in specialization, not routing.
+
+### Mesh / market
+
+Agents publish what they need; matching agents bid or auto-pick the work. Rare in production today (too much variance), common in research. Some early enterprise mesh deployments exist, mostly behind the scenes at large platforms.
+
+Use when: you have many independent agents with overlapping capabilities and want load balancing. Otherwise, supervisor or pipeline.
+
+## Failure modes specific to multi-agent
+
+The new ones beyond single-agent debugging:
+
+- **Cascading failures.** Agent A timed out, Agent B retried, Agent C is now flooded with stale requests. Add per-edge timeouts and circuit breakers.
+- **Identity confusion.** Two agents using the same `thread_id` for unrelated work clobber each other's state. Make `thread_id`s scoped (`agent:writer:thread:42`).
+- **Authorization drift.** Agent A can read what Agent B can't, but B is asking A to read it. The authorization boundary is the agent's identity, not the user's. Plumb actor context through A2A calls.
+- **Trace fragmentation.** Each agent has its own trace tree; the cross-agent flow is invisible. Use OpenTelemetry context propagation across A2A calls so the parent trace stitches sub-traces together.
+- **Coordination overhead exceeds value.** Two agents talking to each other can be slower than one agent doing both jobs. Measure before adopting multi-agent for its own sake.
+
+## What to build in 2026
+
+If you're starting a multi-agent system today, the defaults that don't burn you:
+
+1. **MCP for tools, A2A for inter-agent.** Don't invent your own protocols. The standards exist and the ecosystem rewards using them.
+2. **Subgraphs first.** Reach for A2A only when you need a protocol boundary — separate team, separate process, separate lifecycle.
+3. **Durable bus for anything async.** SQS, NATS, Redis Streams. Don't ship async multi-agent on plain HTTP.
+4. **Trace propagation from day one.** OpenTelemetry context across A2A calls is the only way to debug what happened.
+5. **Per-agent step and budget caps.** A worker agent that loops forever takes down the supervisor's budget too.
+
+Next week: **RAG for agents** — hybrid retrieval, the patterns that work, and how this is different from "RAG for chatbots."
+
+## References
+
+- [A2A protocol — official spec](https://a2a-protocol.org/latest/)
+- [MCP vs A2A: protocol comparison (2026)](https://www.intuz.com/blog/mcp-vs-a2a)
+- [MCP vs A2A: complete guide to AI agent protocols (2026)](https://dev.to/pockit_tools/mcp-vs-a2a-the-complete-guide-to-ai-agent-protocols-in-2026-30li)
+- [MCP vs A2A: protocols for multi-agent collaboration (2026)](https://onereach.ai/blog/guide-choosing-mcp-vs-a2a-protocols/)
+- [Survey of agent interoperability protocols (arXiv)](https://arxiv.org/pdf/2505.02279)

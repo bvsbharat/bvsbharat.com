@@ -1,0 +1,210 @@
+---
+title: "Google ADK: An Architectural Tour of the Agent Development Kit"
+description: "Google's Agent Development Kit isn't another agent loop. It's an event-driven runtime, a multi-language SDK, and a deploy target that lines up with Cloud Run and GKE. Here's how the pieces fit."
+pubDatetime: 2026-02-09T09:00:00-08:00
+tags:
+  - agents-arch
+  - google-adk
+  - architecture
+  - gcp
+featured: false
+draft: false
+---
+
+Google's Agent Development Kit (ADK) entered the conversation in 2025 and consolidated in 2026 as the framework Google ships against when it wants to compete with LangGraph and CrewAI on the same axes — but with a deliberately different architectural pitch. Where LangGraph hands you primitives and CrewAI hands you a role abstraction, ADK hands you a **runtime**: an event-driven engine that orchestrates agents, tools, and persistent state, deployable on Cloud Run, GKE, or your laptop, with bindings in Python, TypeScript, Go, and Java.
+
+This post is the architectural tour. Not "how do I build my first ADK agent" — that's a quickstart. The question here is *what shape of system are you actually adopting* when you pick it.
+
+## The pitch in one paragraph
+
+ADK is a **code-first agent framework** with an event-driven runtime, multi-language SDKs, and a tight integration story with Google Cloud (Gemini models, Vertex AI, Cloud Run, GKE, BigQuery, Spanner). The framework treats workflow agents and LLM-driven agents as first-class peers — you can mix deterministic pipelines with adaptive routing, and the runtime owns persistence, tool execution, and observability.
+
+## The runtime
+
+The thing to internalize is that ADK is a runtime first, an SDK second. The runtime knows how to:
+
+- Receive an event (HTTP, gRPC, queue message, scheduled trigger).
+- Look up the agent definition and its workflow.
+- Execute nodes in the workflow, calling LLMs and tools.
+- Persist state to a configurable store.
+- Emit telemetry to a configurable sink.
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Google ADK runtime architecture">
+  <defs>
+    <marker id="arr5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="20" width="160" height="60" rx="6" />
+    <text x="110" y="48" text-anchor="middle" font-weight="600">Triggers</text>
+    <text x="110" y="66" text-anchor="middle" opacity="0.7">HTTP · PubSub · Cron</text>
+
+    <rect x="220" y="20" width="500" height="60" rx="6" />
+    <text x="470" y="42" text-anchor="middle" font-weight="600">ADK Runtime — event loop, state, telemetry</text>
+    <text x="470" y="62" text-anchor="middle" opacity="0.7">Cloud Run · GKE · local</text>
+
+    <rect x="30" y="120" width="220" height="100" rx="6" />
+    <text x="140" y="148" text-anchor="middle" font-weight="600">Agents</text>
+    <text x="140" y="170" text-anchor="middle" opacity="0.8">LlmAgent</text>
+    <text x="140" y="188" text-anchor="middle" opacity="0.8">SequentialAgent</text>
+    <text x="140" y="206" text-anchor="middle" opacity="0.8">ParallelAgent · LoopAgent</text>
+
+    <rect x="270" y="120" width="220" height="100" rx="6" />
+    <text x="380" y="148" text-anchor="middle" font-weight="600">Session State</text>
+    <text x="380" y="170" text-anchor="middle" opacity="0.8">memory · scratchpad</text>
+    <text x="380" y="188" text-anchor="middle" opacity="0.8">Vertex Memory · GCS</text>
+    <text x="380" y="206" text-anchor="middle" opacity="0.8">checkpoints</text>
+
+    <rect x="510" y="120" width="220" height="100" rx="6" />
+    <text x="620" y="148" text-anchor="middle" font-weight="600">Tool Surface</text>
+    <text x="620" y="170" text-anchor="middle" opacity="0.8">BuiltInTool · FunctionTool</text>
+    <text x="620" y="188" text-anchor="middle" opacity="0.8">MCP · A2A peers</text>
+    <text x="620" y="206" text-anchor="middle" opacity="0.8">Vertex Extensions</text>
+
+    <rect x="30" y="260" width="700" height="60" rx="6" />
+    <text x="60" y="285" font-weight="600">Telemetry</text>
+    <text x="60" y="305" opacity="0.7">OpenTelemetry · Cloud Trace · Cloud Logging</text>
+
+    <line x1="190" y1="50" x2="215" y2="50" marker-end="url(#arr5)" />
+    <line x1="140" y1="80" x2="140" y2="115" marker-end="url(#arr5)" />
+    <line x1="380" y1="80" x2="380" y2="115" marker-end="url(#arr5)" />
+    <line x1="620" y1="80" x2="620" y2="115" marker-end="url(#arr5)" />
+    <line x1="140" y1="220" x2="140" y2="255" marker-end="url(#arr5)" stroke-dasharray="3,3" />
+    <line x1="380" y1="220" x2="380" y2="255" marker-end="url(#arr5)" stroke-dasharray="3,3" />
+    <line x1="620" y1="220" x2="620" y2="255" marker-end="url(#arr5)" stroke-dasharray="3,3" />
+  </g>
+</svg>
+</div>
+
+The deploy story is the part that's underweight in most LangGraph and CrewAI tutorials. ADK was designed assuming you'll deploy to Cloud Run or GKE. The same agent definition runs locally for dev, and you `gcloud run deploy` for prod. No separate adapter layer.
+
+## Agent kinds
+
+ADK ships several built-in agent classes that compose:
+
+- **`LlmAgent`** — the basic ReAct-style agent. Has a model, a system prompt, a tool list, and produces output. This is the workhorse.
+- **`SequentialAgent`** — runs sub-agents in order; the output of one is the input to the next. Equivalent to a CrewAI sequential crew.
+- **`ParallelAgent`** — fans out work to sub-agents concurrently; the runtime collects their results. Equivalent to LangGraph fan-out.
+- **`LoopAgent`** — repeats a sub-agent until a condition is met. The condition can be a function or an LLM judge.
+
+```python
+from google.adk.agents import LlmAgent, SequentialAgent, ParallelAgent
+
+researcher = LlmAgent(
+    name="researcher",
+    model="gemini-pro-2.0",
+    instruction="Find 5 primary sources on the topic. Cite each.",
+    tools=[web_search, arxiv_lookup],
+    output_key="brief",
+)
+
+writer = LlmAgent(
+    name="writer",
+    model="gemini-pro-2.0",
+    instruction="Using the brief in state['brief'], write a 1200-word article.",
+    output_key="article",
+)
+
+pipeline = SequentialAgent(
+    name="content_pipeline",
+    sub_agents=[researcher, writer],
+)
+```
+
+`output_key="brief"` is the small but important detail: the runtime stores the agent's output in session state under that key, and downstream agents reference it via `state["brief"]`. State is the contract between agents, not message-passing. (LangGraph users will recognize this as the same idea — typed state shared across nodes — with a different surface.)
+
+## Workflow agents vs. routed agents
+
+ADK distinguishes two execution philosophies, and you can mix them inside one system:
+
+- **Workflow agents** — `SequentialAgent`, `ParallelAgent`, `LoopAgent`. Deterministic structure. You know exactly what runs in what order.
+- **LLM-routed agents** — an `LlmAgent` whose tools include other agents. The LLM decides which child to delegate to. Equivalent to CrewAI's hierarchical process.
+
+```python
+triage = LlmAgent(
+    name="triage",
+    model="gemini-pro-2.0",
+    instruction="Read the user request. Delegate to the right specialist.",
+    sub_agents=[billing_agent, technical_agent, account_agent],
+)
+```
+
+The pattern that ages well is **deterministic outer, adaptive inner** — a `SequentialAgent` at the top with three steps (intake → process → finalize), where the middle step is the LLM-routed triage. Predictable shape, flexible content.
+
+## Tools and the surface to the rest of the world
+
+ADK exposes three flavors of tools:
+
+- **`FunctionTool`** — a Python/TypeScript function with a docstring. Same shape every other framework uses.
+- **`BuiltInTool`** — things the runtime provides out of the box: search, code interpreter, Vertex AI extensions.
+- **MCP and A2A** — ADK natively speaks Model Context Protocol (for tools) and Agent-to-Agent (for peer agents). Connect to an MCP server and its tools appear; connect to an A2A peer and you can delegate to an agent in another process.
+
+```python
+from google.adk.tools.mcp import MCPToolset
+
+toolset = MCPToolset.from_url("https://mcp.acme.internal/billing")
+agent = LlmAgent(name="finance", model="gemini-pro-2.0", tools=[*toolset])
+```
+
+The MCP and A2A story is Google's bet on interoperability. The same agent should be able to consume tools that LangGraph or CrewAI agents expose, and other frameworks should be able to delegate to ADK agents. By 2026 this isn't aspirational; it's working in production deployments documented in the joint codelab Google published with Anthropic, LangChain, and CrewAI.
+
+## Sessions, state, and memory
+
+ADK manages three layers of agent memory:
+
+- **Session state** — keyed by a session ID, persisted to the configured store (in-memory for dev, Vertex AI Memory or your own GCS/Spanner backing for prod). Survives across runs of the same session.
+- **Memory** — longer-lived facts about the user/entity, stored via the Vertex AI Memory service or a custom backend.
+- **Scratchpad** — per-turn working memory, ephemeral.
+
+You access state from inside an agent's `instruction` template:
+
+```python
+instruction = """
+You are a billing specialist. The user's account ID is {user_id}.
+The pending invoice list is in {invoices}.
+"""
+```
+
+The runtime renders the template with the current session state. This is the cleanest way to thread information from one agent to the next — you don't pass it manually; you write it to state, you reference it in the instruction.
+
+## Deployment
+
+This is where ADK earns its keep relative to "framework only" peers. The deployment commands are real:
+
+```bash
+adk deploy cloud_run --project=my-project --region=us-central1 ./my_agent
+```
+
+That command containerizes the agent (Dockerfile is generated if you don't have one), pushes the image to Artifact Registry, creates a Cloud Run service, configures session state to use the Vertex AI Memory service, and wires telemetry to Cloud Trace and Cloud Logging. Five minutes from `adk init` to a public HTTPS endpoint. GKE follows the same pattern with `adk deploy gke`.
+
+The reason this matters: most agent frameworks treat deployment as the user's problem. ADK treats it as a first-class capability. That alone is a reason to pick it if you're a Google Cloud shop.
+
+## Observability
+
+Spans and logs land in Cloud Trace and Cloud Logging by default, with OpenTelemetry semantics so you can also point them at Datadog, Honeycomb, or Langfuse. The traces are agent-aware — you see per-agent spans, per-tool spans, and per-LLM spans, with token counts and latencies attached.
+
+## When to pick ADK
+
+The honest decision matrix:
+
+| You want... | Use ADK |
+|-------------|---------|
+| First-class deploy to Cloud Run / GKE | ✅ |
+| TypeScript or Go or Java agents (not just Python) | ✅ |
+| Strong default for MCP and A2A interop | ✅ |
+| Tight integration with Gemini, Vertex AI, BigQuery | ✅ |
+| Provider neutrality with multiple LLMs out of the box | ⚠️ supports it; LangGraph/LangChain has more breadth |
+| The richest checkpoint and human-in-the-loop story | ⚠️ LangGraph is more mature |
+| Lightest-weight role-based prototype | ⚠️ CrewAI is faster to first draft |
+
+ADK is the framework I'd reach for if I were building a multi-language agent platform inside a GCP-heavy organization. It's the framework I'd skip if my world is AWS + Anthropic and I already have LangGraph fluency.
+
+Next week we go the other direction on the build-vs-buy spectrum — Claude Managed Agents and Amazon Bedrock AgentCore, where the runtime isn't a library, it's a managed service.
+
+## References
+
+- [Agent Development Kit official docs](https://google.github.io/adk-docs/)
+- [ADK Python on GitHub](https://github.com/google/adk-python)
+- [What is Google's Agent Development Kit? An architectural tour](https://thenewstack.io/what-is-googles-agent-development-kit-an-architectural-tour/)
+- [Gemini Enterprise Agent Platform — ADK docs](https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk)
+- [Building smart in 2026: hands-on first look at ADK](https://dev.to/njericodecraft/building-smart-in-2026-a-hands-on-first-look-at-googles-agent-development-kit-adk-3n0)

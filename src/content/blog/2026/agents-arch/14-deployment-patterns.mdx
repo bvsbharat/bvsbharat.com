@@ -1,0 +1,197 @@
+---
+title: "Agent Deployment Patterns: Containers, Serverless, and Stateful Workers"
+description: "Three deployment shapes for production agents — request/response, long-running stateful, and background batch — with the trade-offs around Cloud Run, Kubernetes, managed runtimes, and queue workers."
+pubDatetime: 2026-04-06T09:00:00-07:00
+tags:
+  - agents-arch
+  - deployment
+  - infrastructure
+  - production
+featured: false
+draft: false
+---
+
+The deployment story is what separates a working notebook from a system you can hand off to operations. Agents are unusual in three ways that affect deployment:
+
+- They are **long-running and stateful** when checkpoints are in use.
+- They make **many outbound calls** per turn (LLMs, tools, MCP servers).
+- Their **cost per request is non-trivial** and lumpy (one task: $0.02, another: $4.00).
+
+These three properties push you toward different infrastructure than a typical web service. This post is the three deployment shapes that fit, the trade-offs, and the operational details that bite.
+
+## The three shapes
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Three agent deployment shapes">
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="30" width="220" height="240" rx="8" />
+    <text x="140" y="55" text-anchor="middle" font-weight="700">Request / response</text>
+    <text x="140" y="80" text-anchor="middle" opacity="0.7">latency-sensitive chat</text>
+    <text x="140" y="115" text-anchor="middle">Cloud Run</text>
+    <text x="140" y="135" text-anchor="middle">Lambda / Functions</text>
+    <text x="140" y="155" text-anchor="middle">Fargate / k8s</text>
+    <text x="140" y="195" text-anchor="middle" opacity="0.8">no checkpoint</text>
+    <text x="140" y="215" text-anchor="middle" opacity="0.8">tight timeouts</text>
+    <text x="140" y="235" text-anchor="middle" opacity="0.8">autoscales on RPS</text>
+
+    <rect x="270" y="30" width="220" height="240" rx="8" />
+    <text x="380" y="55" text-anchor="middle" font-weight="700">Long-running stateful</text>
+    <text x="380" y="80" text-anchor="middle" opacity="0.7">multi-step / HITL</text>
+    <text x="380" y="115" text-anchor="middle">Managed runtimes</text>
+    <text x="380" y="135" text-anchor="middle">k8s with PVCs</text>
+    <text x="380" y="155" text-anchor="middle">VMs + checkpointer</text>
+    <text x="380" y="195" text-anchor="middle" opacity="0.8">durable session state</text>
+    <text x="380" y="215" text-anchor="middle" opacity="0.8">resume after restart</text>
+    <text x="380" y="235" text-anchor="middle" opacity="0.8">scales on session count</text>
+
+    <rect x="510" y="30" width="220" height="240" rx="8" />
+    <text x="620" y="55" text-anchor="middle" font-weight="700">Background batch</text>
+    <text x="620" y="80" text-anchor="middle" opacity="0.7">async, queue-driven</text>
+    <text x="620" y="115" text-anchor="middle">Queue worker pool</text>
+    <text x="620" y="135" text-anchor="middle">SQS / Pub/Sub / NATS</text>
+    <text x="620" y="155" text-anchor="middle">Step Functions / DAGs</text>
+    <text x="620" y="195" text-anchor="middle" opacity="0.8">at-least-once delivery</text>
+    <text x="620" y="215" text-anchor="middle" opacity="0.8">retries + DLQ</text>
+    <text x="620" y="235" text-anchor="middle" opacity="0.8">scales on queue depth</text>
+  </g>
+</svg>
+</div>
+
+Most production agent platforms run **two of the three** simultaneously. A foreground chat shape (request/response) plus a background batch shape (queue worker) is the common combination. Long-running stateful is the niche where it's the *whole* product (Anthropic's Managed Agents, AgentCore Runtime), or where workflows genuinely cross hours/days.
+
+## Shape 1: request / response
+
+The simplest. User sends a message, the agent runs to completion, responds. Latency budget: seconds to tens of seconds. State: lives in the request, possibly persisted to a session store between requests but not *during* one.
+
+Best fits: **Cloud Run, Lambda, AWS Fargate, App Runner, Vercel-style edge functions for the thin shell.** Containerize, point a load balancer at it, set autoscale on requests-per-second.
+
+Two configuration details that matter:
+
+- **Connection pooling for outbound LLM calls.** Cold connections to LLM providers add 100–300ms each. Pool them; keep TCP connections warm.
+- **Concurrency per container > 1.** Most LLM calls are I/O-bound. A container can serve 20–100 concurrent requests on a single core during LLM waits. Tune `WORKERS=1, MAX_CONCURRENT=50` rather than the web-service default of `WORKERS=cores`.
+
+Two failure modes:
+
+- **The 30-second invocation timeout.** Lambda's max is 15 minutes but defaults are tight. Cloud Run defaults to 5 minutes, configurable to 60. Set the timeout to your actual p99 latency × 1.5, not the platform default.
+- **Cold starts on rare paths.** A tool that's used once a day gets a fresh container; 4 seconds of cold start ruins the user experience. Either keep min instances > 0 or warm rarely-used paths with a heartbeat.
+
+## Shape 2: long-running stateful
+
+The agent runs for minutes to hours. It checkpoints state. It may pause for human approval. It survives container restarts. This is where the LangGraph checkpointer, ADK session state, and managed runtimes earn their keep.
+
+Three options:
+
+### Managed runtime
+
+Claude Managed Agents or Bedrock AgentCore Runtime. Vendor owns the container scheduling, the sandboxing, and the durable state. You write the agent loop. This is the lowest-overhead path for stateful workloads in 2026.
+
+### Self-hosted with checkpointer + Postgres/Redis
+
+A LangGraph or ADK agent in a container, behind a load balancer, with checkpointer state in Postgres. The container can die; the next container picks up the session. Works on k8s with a PVC for ephemeral disk, but the durable state is the database, not the container.
+
+```python
+# LangGraph with Postgres checkpointer — survives restart
+from langgraph.checkpoint.postgres import PostgresSaver
+
+app = graph.compile(checkpointer=PostgresSaver.from_conn_string(POSTGRES_URL))
+
+@router.post("/sessions/{session_id}/messages")
+async def post_message(session_id: str, message: Message):
+    config = {"configurable": {"thread_id": session_id}}
+    result = await app.ainvoke({"messages": [message]}, config=config)
+    if "__interrupt__" in result:
+        await schedule_approval_request(session_id, result["__interrupt__"][0].value)
+        return {"status": "awaiting_approval"}
+    return {"response": result["messages"][-1].content}
+```
+
+### Sticky-session worker pool
+
+If checkpoint persistence is expensive, you can keep sessions in-process and route subsequent requests for the same session back to the same worker. Adds complexity (sticky load balancing, graceful drain) but reduces state-store traffic.
+
+The first option is the default. The second is the right answer when managed runtimes don't fit. The third is rare and tends to bite teams that adopted it for performance reasons that didn't actually matter at their scale.
+
+## Shape 3: background batch
+
+The agent isn't waiting on a user. It's triggered by a webhook, a schedule, or a queue message. It runs to completion, writes results to a system of record, and dies. Examples: nightly account reconciliation, ticket triage, RAG document ingest, the "AI summarizer for every doc" use case.
+
+The shape:
+
+```
+event source → queue → worker pool → agent → results
+                  ↑                            ↓
+                  └────── retries / DLQ ──────┘
+```
+
+Pick a queue (SQS, NATS, Redis Streams, Pub/Sub). Pick a worker runtime (k8s deployment, ECS service, Cloud Run jobs). Each worker dequeues a message, runs the agent, acks. Failed runs go to the dead-letter queue with the trace ID.
+
+Operationally:
+
+- **Visibility timeouts longer than the longest expected run.** An agent that takes 20 minutes with a 10-minute visibility timeout creates duplicate work.
+- **Idempotency keys on results.** A retried task should produce the same result row, not a second one.
+- **DLQ is on-call's friend.** When you see N messages in the DLQ, you have a real problem. Wire it to a paging channel.
+- **Backpressure via consumer count.** A spike of 10k jobs shouldn't blow your LLM provider rate limit. Cap concurrent workers; let the queue grow rather than fail.
+
+## Sizing and autoscale
+
+The shape of "request" for an agent is different from a web service. A web request is 50ms and a few KB. An agent invocation is 5 seconds and a few MB of context. Autoscale on the right signal:
+
+| Shape | Best autoscale signal |
+|-------|---------------------|
+| Request/response | Concurrent requests, not RPS |
+| Long-running stateful | Active sessions |
+| Background batch | Queue depth + age of oldest message |
+
+The wrong signal autoscales late. Concurrent-request scaling for request/response agents has been the most-frequent fix I've seen in the field — RPS-based scaling doesn't react until requests are already queueing.
+
+## Secrets and identity
+
+Three credentials matter and each needs a different lifecycle:
+
+- **Model provider keys** (Anthropic, OpenAI, Google). High-value, rate-limited per key. Rotate quarterly; alert on anomalous usage.
+- **Tool credentials** (databases, internal APIs). Often per-environment, sometimes per-tenant. Inject at the tool boundary; never put them in the prompt or trace.
+- **Actor credentials** — the user the agent is acting on behalf of. Should be a scoped, short-lived token, not a long-lived service account. The agent's permissions are the actor's permissions intersected with the agent's policy.
+
+Managed runtimes solve credential injection cleanly with credential refs (Anthropic) or AgentCore Identity (AWS). DIY runtimes need to build it carefully — the worst incidents in agent deployments come from leaked credentials in traces or in LLM context.
+
+## Multi-region and failover
+
+For latency-sensitive deployments, put agent containers close to the LLM provider's region. Cross-region LLM calls add 50–200ms per call; in a multi-call agent that compounds.
+
+For availability, the LLM provider is your hardest dependency. Two patterns:
+
+- **Provider failover.** A primary (Anthropic) and a secondary (OpenAI, Bedrock). Detect provider error → retry on the secondary. Quality differs; calibrate with evals.
+- **Model failover.** Same provider, smaller model when the primary is overloaded. Lower quality but live.
+
+The cleanest implementation: a thin LLM-provider abstraction at the bottom of the stack, configurable failover behavior, instrumented with a "which provider/model handled this call" attribute on every span.
+
+## Cost levers at deploy time
+
+The deploy stage is where you choose your cost ceiling. Three levers:
+
+- **Model selection.** A smaller model where it suffices cuts cost 5–20×. Don't run Opus when Haiku passes the eval.
+- **Concurrency per worker.** Higher concurrency means more requests per container — fewer containers, lower fixed cost.
+- **Cache.** Prompt caching cuts repeated-context cost dramatically. Make sure your provider client uses it.
+
+Cost is the topic of next week's post in detail.
+
+## What "good" looks like
+
+A 2026 production agent deployment that ages well:
+
+- Choose the shape per workload; don't force chat ergonomics on a batch job.
+- Managed runtime first; self-host only when you need to.
+- Checkpointers wired to a real database, not in-memory.
+- Concurrency-based autoscale.
+- Credentials injected at the tool boundary; never in the prompt.
+- Tracing context propagated across all the network hops.
+- DLQ and runbook ready before the first job runs in prod.
+
+Next week: where the money goes in agent systems, and how to keep the bill in check without giving up quality.
+
+## References
+
+- [Cloud Run for AI agents — Google Cloud docs](https://cloud.google.com/run/docs/use-cases/ai-agents)
+- [AWS Bedrock AgentCore Runtime](https://aws.amazon.com/bedrock/agentcore/)
+- [LangGraph deployment guide](https://langchain-ai.github.io/langgraph/cloud/)
+- [Claude Managed Agents — Anthropic launch](https://claudeapi.com/en/blog/news/claude-platform-aws-launch/)

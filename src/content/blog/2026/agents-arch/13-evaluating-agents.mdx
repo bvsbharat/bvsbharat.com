@@ -1,0 +1,198 @@
+---
+title: "Evaluating Agents: From Unit Tests to LLM-as-Judge Pipelines"
+description: "You can't ship agents you can't measure. The 2026 eval stack — task-level scoring, trajectory grading, LLM-as-judge with calibration, and the regression gates that catch silent quality drops."
+pubDatetime: 2026-03-30T09:00:00-08:00
+tags:
+  - agents-arch
+  - evaluation
+  - testing
+  - llm-as-judge
+featured: false
+draft: false
+---
+
+The most common production failure for AI agents in 2026 isn't a crash, a timeout, or an exception. It's *silent quality drift* — a prompt change, a model swap, or a retriever tweak that ships clean and degrades behavior in ways the team only notices weeks later through user complaints. The fix is the same as it's always been for non-deterministic systems: **measure**.
+
+This post is the 2026 evaluation stack. Three layers — unit-level tests, trajectory-level grading, LLM-as-judge with calibration — and the regression gates that put them in front of every change.
+
+## What you're actually measuring
+
+Three orthogonal axes:
+
+- **Correctness** — did the agent do the right thing? (Outcome-based.)
+- **Faithfulness** — did the agent reason and cite accurately? (Process-based.)
+- **Cost / latency** — was it efficient about it? (Resource-based.)
+
+A change that improves correctness but blows up cost is not an improvement. A change that's faster but cites hallucinated sources is regression. Track all three; don't let one axis cannibalize another silently.
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Three-layer evaluation stack">
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="30" width="700" height="60" rx="6" />
+    <text x="60" y="55" font-weight="700">Layer 3 — LLM-as-judge / human review</text>
+    <text x="60" y="75" opacity="0.8">faithfulness, helpfulness, calibrated against humans</text>
+
+    <rect x="30" y="110" width="700" height="60" rx="6" />
+    <text x="60" y="135" font-weight="700">Layer 2 — Trajectory grading</text>
+    <text x="60" y="155" opacity="0.8">right tools, right order, right step count — replay-based</text>
+
+    <rect x="30" y="190" width="700" height="60" rx="6" />
+    <text x="60" y="215" font-weight="700">Layer 1 — Unit / golden-set tests</text>
+    <text x="60" y="235" opacity="0.8">deterministic assertions, fixtures, contract tests on tools</text>
+  </g>
+</svg>
+</div>
+
+Layer 1 is fast and cheap, runs on every PR. Layer 2 catches what unit tests miss. Layer 3 is the slowest and most expensive, runs nightly or on tagged candidates.
+
+## Layer 1: unit tests and golden sets
+
+Start here. A golden set is a labeled list of `(input, expected_output)` pairs. For agents, "expected output" is rarely an exact string — it's an assertion that *something* is true about the result.
+
+```python
+import pytest
+
+GOLDEN = [
+    {
+        "id": "duplicate-charge-refund",
+        "input": "Customer reports a duplicate charge on INV-2026-0042",
+        "assertions": [
+            ("tool_call_count", "<=", 4),
+            ("must_call", "get_invoice"),
+            ("must_call", "list_invoices"),
+            ("final_action", "==", "issue_refund"),
+            ("must_cite_invoice", "INV-2026-0042"),
+        ],
+    },
+    # ...50 more
+]
+
+@pytest.mark.parametrize("case", GOLDEN, ids=lambda c: c["id"])
+async def test_agent_case(case):
+    trace = await run_agent(case["input"], record_trace=True)
+    for assertion in case["assertions"]:
+        check(trace, assertion)
+```
+
+The fixture is the agent runner with tracing enabled. The assertions read the trace, not the final text response. This is the difference between brittle and useful — string-matching the final answer breaks on every prompt tweak; asserting "the agent called `get_invoice`" survives.
+
+Three rules for golden sets:
+
+1. **Curate, don't generate.** Hand-pick 30–100 cases that span the real distribution. Auto-generated synthetic data is rarely representative.
+2. **Refresh after incidents.** Every production bug becomes a golden case. The set grows; the bar rises.
+3. **Don't optimize *only* to the golden set.** Overfit to the test set and quality drifts in ways the set doesn't cover. Hold out a portion for sanity checks.
+
+## Layer 2: trajectory grading
+
+The trajectory is the sequence of (node, tool, args, result) tuples from the trace. Grading the trajectory means asking: *given the input, was this the right path?*
+
+```python
+@dataclass
+class TrajectoryGrade:
+    correct_tools_used: bool       # did it call the tools it should?
+    no_unnecessary_tools: bool     # did it avoid calls it shouldn't have made?
+    reasonable_step_count: bool    # within budget for this kind of task?
+    correct_final_action: bool     # final outcome aligns with input intent?
+
+def grade_trajectory(trace: AgentTrace, expected: ExpectedTrajectory) -> TrajectoryGrade:
+    actual_tools = [s.attributes["tool.name"] for s in trace.spans if s.kind == "tool"]
+    return TrajectoryGrade(
+        correct_tools_used=set(expected.required_tools).issubset(actual_tools),
+        no_unnecessary_tools=set(actual_tools).issubset(expected.allowed_tools),
+        reasonable_step_count=trace.step_count <= expected.max_steps,
+        correct_final_action=trace.final_action_kind == expected.final_action_kind,
+    )
+```
+
+Trajectory grading is the single most useful eval shape for agents. It's faster than LLM-judge, more nuanced than unit assertions, and it surfaces "the agent got the right answer for the wrong reason" — a model that reaches a correct conclusion via the wrong tools is one prompt change from giving wrong answers entirely.
+
+## Layer 3: LLM-as-judge
+
+The judge is another LLM call grading the agent's output on dimensions humans can't easily formalize: helpfulness, tone, faithfulness to sources. The pattern that holds up:
+
+```python
+JUDGE_PROMPT = """
+You are grading an AI agent's response to a customer support ticket.
+
+INPUT:
+{input}
+
+AGENT TRACE (summarized):
+{trace_summary}
+
+AGENT FINAL RESPONSE:
+{response}
+
+Rate on the following dimensions, integer 1-5. Cite specific evidence:
+
+- correctness: does the response correctly address the user's problem?
+- faithfulness: are all claims supported by the trace's retrieved sources?
+- helpfulness: would a senior CS rep approve this response?
+- safety: any unauthorized actions, leaked data, or policy violations?
+
+Return JSON: {{"correctness": int, "faithfulness": int, ...,
+              "evidence": "...", "overall": int}}
+"""
+
+async def judge(case, trace, response) -> dict:
+    grade = await judge_llm.ainvoke(JUDGE_PROMPT.format(
+        input=case["input"],
+        trace_summary=summarize(trace),
+        response=response,
+    ))
+    return parse_json(grade.content)
+```
+
+Three things make this work in 2026:
+
+- **Use a strong model for judging.** A weaker model than the one being graded gives noisy results. Frontier model judging frontier model is the realistic configuration.
+- **Calibrate against humans.** Have humans grade a few hundred cases. Compare to the LLM judge. Adjust the prompt or rubric until correlation is high. Re-calibrate after any model swap.
+- **Demand evidence.** The judge cites which span or which snippet justifies the score. Forces concrete reasoning and gives you a debug surface when scores are surprising.
+
+LLM-as-judge is the noisiest layer. Use it for trends, not single-run go/no-go decisions. Aggregate across the eval set; alert on score drift, not per-case scores.
+
+## Eval datasets that age
+
+A few patterns for keeping the eval set useful over time:
+
+- **Frozen test set.** A locked-down subset that never changes. Use it for cross-version comparisons. The numbers are only comparable when the set is.
+- **Rolling test set.** New cases added from production failures monthly. Keeps the bar rising as you find new failure modes.
+- **Adversarial set.** Hand-crafted cases designed to break the agent. Edge cases, ambiguous inputs, prompt-injection attempts. Should run on every meaningful change.
+- **Production replay.** Sample real user sessions, redact PII, re-run them with the new agent. The most representative signal you can get; expensive to set up, worth it.
+
+## Regression gates
+
+The whole point of having evals is making them block changes. A simple gate that holds up:
+
+```yaml
+# .github/workflows/agent-eval.yml
+- run: python -m evals.run --suite golden --max-cost-usd 5
+- run: python -m evals.run --suite trajectory --max-cost-usd 8
+- run: python -m evals.compare --baseline main --new HEAD
+  # fail if: success rate drops > 2pp, p95 latency rises > 25%,
+  # cost per task rises > 30%, judge faithfulness drops > 5%
+```
+
+The thresholds are choices. Tight thresholds mean false alarms; loose thresholds mean letting regressions through. Pick a number, calibrate from a month of data, adjust quarterly.
+
+For changes that the gates flag, the right response is rarely "override" — it's "explain in the PR description what you measured and why the regression is acceptable, or revert." The discipline of writing that explanation catches bad merges by itself.
+
+## What "good" looks like
+
+A 2026 agent eval stack worth its keep:
+
+- 30–100 curated golden cases, growing with incidents.
+- Trajectory grading on every PR; runs in under five minutes.
+- LLM-as-judge run nightly on a larger set, calibrated against a human-graded sample.
+- A regression gate that blocks merges on meaningful drops.
+- Dashboards for the three axes: correctness, faithfulness, cost/latency, plotted over time.
+- A monthly review where someone reads the bottom 10% of eval cases and asks why.
+
+The next four posts are the operational side of running agents in production — **deployment patterns** (next week), **cost and latency engineering**, **security**, and **enterprise governance**.
+
+## References
+
+- [LangSmith evaluations](https://docs.smith.langchain.com/evaluation)
+- [Langfuse evals](https://langfuse.com/docs/evals)
+- [Anthropic — building evals for agents](https://www.anthropic.com/news/evaluating-agentic-behavior)
+- [Mem0 — state of agent benchmarks 2026](https://mem0.ai/blog/state-of-ai-agent-memory-2026)

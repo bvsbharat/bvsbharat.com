@@ -1,0 +1,224 @@
+---
+title: "CrewAI: Role-Based Multi-Agent Orchestration in Production"
+description: "Crews, Flows, and the dual-layer architecture that lets CrewAI hold its own against LangGraph in 2026 — when role-based composition is the right abstraction and when it isn't."
+pubDatetime: 2026-02-02T09:00:00-08:00
+tags:
+  - agents-arch
+  - crewai
+  - multi-agent
+  - orchestration
+featured: false
+draft: false
+---
+
+CrewAI bet on a different abstraction than LangGraph. LangGraph models the agent as a state machine and asks you to write the control flow yourself. CrewAI models the agent system as a **set of roles collaborating on tasks** and hides the loop entirely. In 2024 that looked like a toy. In 2026, after the framework introduced **Flows** alongside Crews, it became one of the cleanest patterns for the class of agent systems that are genuinely about people-shaped collaboration: a researcher, a writer, a critic, a publisher, each with a clear job and a clear handoff.
+
+This post is how to use it well, when to choose it over LangGraph, and where the abstraction leaks.
+
+## The dual-layer architecture
+
+CrewAI today is two cooperating things, not one:
+
+- **Crews** — the *reasoning* layer. A group of agents (roles) execute a sequence of tasks. The agents share context, can ask each other for help, and an optional manager agent decides who does what.
+- **Flows** — the *orchestration* layer. Event-driven control flow that triggers crews, branches on state, persists across runs, and chains multiple crews together.
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="CrewAI Crews and Flows architecture">
+  <defs>
+    <marker id="arr4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="30" y="20" width="700" height="80" rx="6" />
+    <text x="60" y="45" font-weight="600">Flow</text>
+    <text x="60" y="63" opacity="0.7">event-driven, persistent</text>
+    <rect x="170" y="40" width="120" height="40" rx="6" />
+    <text x="230" y="65" text-anchor="middle">@start trigger</text>
+    <rect x="320" y="40" width="120" height="40" rx="6" />
+    <text x="380" y="65" text-anchor="middle">@listen branch</text>
+    <rect x="470" y="40" width="120" height="40" rx="6" />
+    <text x="530" y="65" text-anchor="middle">@listen merge</text>
+    <rect x="620" y="40" width="100" height="40" rx="6" />
+    <text x="670" y="65" text-anchor="middle">finalize</text>
+
+    <line x1="290" y1="60" x2="315" y2="60" marker-end="url(#arr4)" />
+    <line x1="440" y1="60" x2="465" y2="60" marker-end="url(#arr4)" />
+    <line x1="590" y1="60" x2="615" y2="60" marker-end="url(#arr4)" />
+
+    <rect x="30" y="140" width="340" height="190" rx="6" />
+    <text x="60" y="165" font-weight="600">Crew A — research</text>
+    <ellipse cx="120" cy="220" rx="55" ry="30" />
+    <text x="120" y="218" text-anchor="middle">Researcher</text>
+    <text x="120" y="234" text-anchor="middle" opacity="0.7" font-size="10">searches, cites</text>
+    <ellipse cx="280" cy="220" rx="55" ry="30" />
+    <text x="280" y="218" text-anchor="middle">Analyst</text>
+    <text x="280" y="234" text-anchor="middle" opacity="0.7" font-size="10">synthesizes</text>
+    <rect x="120" y="275" width="160" height="40" rx="6" />
+    <text x="200" y="300" text-anchor="middle">Task: brief.md</text>
+
+    <rect x="390" y="140" width="340" height="190" rx="6" />
+    <text x="420" y="165" font-weight="600">Crew B — publish</text>
+    <ellipse cx="480" cy="220" rx="55" ry="30" />
+    <text x="480" y="218" text-anchor="middle">Writer</text>
+    <text x="480" y="234" text-anchor="middle" opacity="0.7" font-size="10">drafts</text>
+    <ellipse cx="640" cy="220" rx="55" ry="30" />
+    <text x="640" y="218" text-anchor="middle">Editor</text>
+    <text x="640" y="234" text-anchor="middle" opacity="0.7" font-size="10">polishes</text>
+    <rect x="480" y="275" width="160" height="40" rx="6" />
+    <text x="560" y="300" text-anchor="middle">Task: post.md</text>
+
+    <line x1="200" y1="80" x2="200" y2="135" marker-end="url(#arr4)" stroke-dasharray="3,3" />
+    <line x1="560" y1="80" x2="560" y2="135" marker-end="url(#arr4)" stroke-dasharray="3,3" />
+    <line x1="370" y1="290" x2="385" y2="290" marker-end="url(#arr4)" />
+  </g>
+</svg>
+</div>
+
+Dashed lines are *flow kicks crew*. The flow is the conductor; the crews are the band. In CrewAI's enterprise deployments this separation is what makes the framework production-ready — the flow handles the boring deterministic state machine while the crews handle the messy creative reasoning.
+
+## Roles, goals, tasks
+
+The basic vocabulary:
+
+```python
+from crewai import Agent, Task, Crew, Process
+
+researcher = Agent(
+    role="Senior research analyst",
+    goal="Find primary sources on {topic} and cite them precisely",
+    backstory="Trained librarian who hates secondary sources.",
+    tools=[web_search_tool, arxiv_tool],
+    llm="anthropic/claude-opus-4-7",
+    memory=True,
+    verbose=True,
+)
+
+writer = Agent(
+    role="Technical writer",
+    goal="Turn the research brief into a 1200-word article in the house style",
+    backstory="Veteran of three engineering blogs. Allergic to fluff.",
+    llm="anthropic/claude-opus-4-7",
+)
+
+research_task = Task(
+    description="Compile a research brief on {topic} with 5+ primary sources.",
+    expected_output="A markdown brief with citations.",
+    agent=researcher,
+)
+
+write_task = Task(
+    description="Using the brief, write a 1200-word article.",
+    expected_output="A markdown article, no preamble.",
+    agent=writer,
+    context=[research_task],
+)
+
+crew = Crew(
+    agents=[researcher, writer],
+    tasks=[research_task, write_task],
+    process=Process.sequential,
+)
+```
+
+A few things to notice. `backstory` is not decoration — it goes into the system prompt and meaningfully shapes the agent's voice and judgment. `context=[research_task]` tells the writer task to receive the researcher's output as input; the framework wires the message-passing. `Process.sequential` runs the tasks in order. The other built-in is `Process.hierarchical`, which adds a manager agent that delegates tasks dynamically.
+
+## When hierarchical beats sequential
+
+Sequential is fine when the task list is fixed. Hierarchical is the right choice when:
+
+- The plan depends on the input (research a topic → if it's technical, use crew A; if it's regulatory, use crew B).
+- There are more workers than steps and you want load-balancing.
+- The manager should validate and re-route work the first agent did poorly.
+
+```python
+crew = Crew(
+    agents=[researcher, writer, fact_checker, editor],
+    tasks=[research_task, write_task, fact_check_task, edit_task],
+    process=Process.hierarchical,
+    manager_llm="anthropic/claude-opus-4-7",
+)
+```
+
+The manager agent is itself an LLM call per delegation. That's a real cost — not just tokens, but a layer of indirection that adds variance. Use hierarchical when the routing decision is genuinely non-trivial; don't use it as a default.
+
+## Flows: where the production logic lives
+
+A `Crew` is a single execution of a multi-agent collaboration. A `Flow` is the workflow that *invokes* crews, branches on results, persists state, and reacts to events. This is what makes CrewAI a peer to LangGraph for the orchestration tier:
+
+```python
+from crewai.flow.flow import Flow, listen, start
+from pydantic import BaseModel
+
+class PostState(BaseModel):
+    topic: str = ""
+    brief: str = ""
+    article: str = ""
+    approved: bool = False
+
+class ContentPipeline(Flow[PostState]):
+
+    @start()
+    def receive_topic(self):
+        self.state.topic = self.kickoff_inputs["topic"]
+        return self.state.topic
+
+    @listen(receive_topic)
+    def run_research(self, topic):
+        crew = research_crew()
+        self.state.brief = crew.kickoff(inputs={"topic": topic}).raw
+        return self.state.brief
+
+    @listen(run_research)
+    def run_writing(self, brief):
+        crew = writing_crew()
+        self.state.article = crew.kickoff(inputs={"brief": brief}).raw
+        return self.state.article
+
+    @listen(run_writing)
+    def request_approval(self, article):
+        # Pause and wait for human approval (post 4 covered the pattern).
+        self.state.approved = approval_gate(article)
+        if self.state.approved:
+            publish(article)
+
+flow = ContentPipeline()
+result = flow.kickoff(inputs={"topic": "agent observability"})
+```
+
+`@start` marks the entrypoint, `@listen` listens for the completion of another step. The state is a typed Pydantic model that persists across invocations — exactly what LangGraph's checkpointer does, with a different API. Flows can also branch (`@or_`), trigger on external events (webhooks), and run partially (`flow.kickoff_async` resumes from a stored checkpoint).
+
+## What CrewAI gets right
+
+- **The role abstraction reads like product requirements.** Stakeholders can read a Crew definition and understand it; they generally can't read a LangGraph.
+- **Sequential is the right default.** A surprising number of "multi-agent" systems are linear pipelines pretending otherwise. CrewAI doesn't penalize you for being honest about that.
+- **Built-in memory.** Setting `memory=True` on an agent gives you short-term, long-term, and entity memory with reasonable defaults. Sufficient for most use cases without writing your own memory layer.
+- **Output schemas via `output_json` / `output_pydantic`.** Every task can demand a typed result; the framework wraps the LLM call in the right structured-output mode.
+
+## Where the abstraction leaks
+
+- **Sub-tasks inside an agent are invisible.** CrewAI runs its own internal loop per task; the trace can be coarser than LangSmith's per-node spans. You can recover the detail with the verbose mode, but it's not as clean as LangGraph's checkpoints.
+- **Conditional branching inside a crew is awkward.** If `task_2` should sometimes run and sometimes not, you push that logic up into a flow. Don't try to express it inside the crew with cleverly-worded task descriptions.
+- **Manager agents can hallucinate plans.** Hierarchical crews where the manager re-routes work can land in loops where the manager keeps re-assigning the same task. The fix is a step cap on the manager and explicit `max_iter` on agents.
+- **Tool calling quality depends on the model.** Less-capable models can struggle with CrewAI's tool descriptions (they're terse). Bigger frontier models — Claude Opus, GPT, Gemini Pro — handle them well; older OSS models often need rewording.
+
+## Choosing between CrewAI and LangGraph
+
+The pragmatic rule:
+
+| You want... | Use |
+|-------------|-----|
+| Explicit state machine, dynamic branching, complex routing | LangGraph |
+| Roles that map cleanly to job titles, simple sequential or hierarchical handoffs | CrewAI Crews |
+| Long-running, event-driven workflow that triggers multiple crews | CrewAI Flows |
+| Maximum control, minimum framework opinion | LangGraph |
+| Fastest path from PRD to working multi-agent prototype | CrewAI |
+
+It's also legitimate to use both. A common production shape in 2026 is **LangGraph for the runtime control plane, CrewAI for individual "research-and-write" crews invoked as subgraphs.** The frameworks compose: a CrewAI crew's `kickoff()` is just a function call you can put inside a LangGraph node.
+
+Next week we look at Google's Agent Development Kit, which takes a third path — an event-driven runtime that's deliberately less prescriptive than either.
+
+## References
+
+- [CrewAI documentation](https://docs.crewai.com/)
+- [CrewAI GitHub](https://github.com/crewaiinc/crewai)
+- [Best multi-agent frameworks 2026](https://gurusup.com/blog/best-multi-agent-frameworks-2026)
+- [Scale agents with CrewAI, LangGraph, A2A, and ADK — Google Codelab](https://codelabs.developers.google.com/next26/scale-agents)

@@ -1,0 +1,36 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Hr from "@/components/Hr.astro";
+import Card from "@/components/Card.astro";
+import { getCollection } from "astro:content";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+
+const posts = await getCollection("blog");
+const sortedPosts = getSortedPosts(posts, { excludeHackathons: false });
+const agentsArchPosts = sortedPosts.filter((p) => p.data.tags.includes("agents-arch"));
+---
+
+<Layout title="Agents Arch" description="Deep architecture walkthroughs for building production AI agents — LangGraph, LangChain, CrewAI, Google ADK, Managed Agents, and enterprise patterns.">
+  <Header />
+  <main id="main-content" class="mx-auto w-full flex-1 px-6 pb-12" style="max-width:1020px">
+    <section class="mt-8">
+      <h1 class="text-2xl font-semibold tracking-wide sm:text-3xl">
+        Agents Arch
+      </h1>
+      <p class="mt-2 opacity-70">
+        Weekly deep dives on AI agent architecture — LangGraph, LangChain, CrewAI, Google ADK, Managed Agents, and the enterprise patterns that hold them together in production.
+      </p>
+    </section>
+
+    <Hr />
+
+    <section class="pt-8 pb-4">
+      <ul>
+        {agentsArchPosts.map((post) => <Card post={post} enableTransition />)}
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>

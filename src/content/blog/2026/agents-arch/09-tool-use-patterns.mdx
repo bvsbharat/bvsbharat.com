@@ -1,0 +1,204 @@
+---
+title: "Tool Use Patterns: ReAct, Function Calling, and MCP"
+description: "Tools are what turn a chatbot into an agent. The 2026 stack for tool design — small scoped tool sets, structured arguments, MCP servers, and the failure modes you only see in production."
+pubDatetime: 2026-03-02T09:00:00-08:00
+tags:
+  - agents-arch
+  - tools
+  - mcp
+  - function-calling
+featured: false
+draft: false
+---
+
+The single biggest lever on agent quality, after the model, is the tool layer. A good tool set with clear schemas and narrow contracts makes a mediocre model behave well. A sprawling tool set with overlapping, fuzzy schemas makes the best model misbehave. This post is the patterns that have settled out by 2026, the failure modes that show up only at production scale, and how MCP changed the shape of the whole problem.
+
+## The progression: ReAct → function calling → structured tools
+
+Three eras, each layered on the last.
+
+**ReAct** (2023): the model emits free-form `Thought: ... Action: ... Observation: ...` text. The orchestrator parses the text. Brittle, prompt-engineered, error-prone — but it worked, and the loop pattern stuck.
+
+**Function calling** (2024): providers added a typed API for tool use. The model emits a JSON object matching a schema you supplied; the provider parses it. Robust, fast, but tools were still defined ad-hoc per integration.
+
+**MCP and structured tool ecosystems** (2025–2026): Model Context Protocol standardized how tools are *advertised* and *invoked* across providers. MCP crossed 97 million downloads in 2026 and is supported by every major AI platform. Tools are now portable across LangGraph, CrewAI, ADK, Cursor, Claude Code, and the rest — write once, expose anywhere.
+
+The mental model that holds in 2026:
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Agent tool surface — local tools and MCP servers">
+  <defs>
+    <marker id="arr7" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="280" y="20" width="200" height="60" rx="6" />
+    <text x="380" y="45" text-anchor="middle" font-weight="700">Agent</text>
+    <text x="380" y="65" text-anchor="middle" opacity="0.7">function-calling API</text>
+
+    <rect x="30" y="140" width="200" height="60" rx="6" />
+    <text x="130" y="165" text-anchor="middle" font-weight="600">Local tools</text>
+    <text x="130" y="185" text-anchor="middle" opacity="0.7">@tool, FunctionTool</text>
+
+    <rect x="280" y="140" width="200" height="60" rx="6" />
+    <text x="380" y="165" text-anchor="middle" font-weight="600">Provider tools</text>
+    <text x="380" y="185" text-anchor="middle" opacity="0.7">bash, file, code interp</text>
+
+    <rect x="530" y="140" width="200" height="60" rx="6" />
+    <text x="630" y="165" text-anchor="middle" font-weight="600">MCP servers</text>
+    <text x="630" y="185" text-anchor="middle" opacity="0.7">internal · 3rd party</text>
+
+    <rect x="30" y="240" width="200" height="50" rx="6" />
+    <text x="130" y="270" text-anchor="middle">your codebase</text>
+    <rect x="280" y="240" width="200" height="50" rx="6" />
+    <text x="380" y="270" text-anchor="middle">platform sandbox</text>
+    <rect x="530" y="240" width="200" height="50" rx="6" />
+    <text x="630" y="270" text-anchor="middle">remote services</text>
+
+    <line x1="330" y1="80" x2="160" y2="135" marker-end="url(#arr7)" />
+    <line x1="380" y1="80" x2="380" y2="135" marker-end="url(#arr7)" />
+    <line x1="430" y1="80" x2="600" y2="135" marker-end="url(#arr7)" />
+
+    <line x1="130" y1="200" x2="130" y2="235" marker-end="url(#arr7)" />
+    <line x1="380" y1="200" x2="380" y2="235" marker-end="url(#arr7)" />
+    <line x1="630" y1="200" x2="630" y2="235" marker-end="url(#arr7)" />
+  </g>
+</svg>
+</div>
+
+Three lanes — local tools, provider tools, MCP servers — all surface the same way to the agent: a list of typed callables. The shape is unified; the implementation lives wherever it makes sense.
+
+## Designing one tool
+
+A tool is three things: a **schema** the model reads, an **implementation** that runs, and a **boundary** that enforces what's allowed. The schema is the contract; the body is yours; the boundary is where you say "yes, the model can call this, but only with these argument shapes from this caller."
+
+The canonical shape:
+
+```python
+from langchain_core.tools import tool
+from pydantic import BaseModel, Field
+
+class IssueRefundArgs(BaseModel):
+    invoice_id: str = Field(description="Invoice ID, format INV-YYYY-NNNN")
+    amount_cents: int = Field(ge=1, le=100_000_00,
+                              description="Refund amount in cents. Max $100,000.")
+    reason: str = Field(min_length=10, max_length=500,
+                        description="Why the refund is being issued.")
+
+@tool(args_schema=IssueRefundArgs)
+async def issue_refund(invoice_id: str, amount_cents: int, reason: str) -> dict:
+    """Issue a refund against an invoice. Requires approver scope. Idempotent by invoice_id."""
+    if not actor_has_scope("refund:write"):
+        raise PermissionError("Actor lacks refund:write scope.")
+    return await billing.refund(invoice_id=invoice_id,
+                                amount_cents=amount_cents, reason=reason,
+                                idempotency_key=f"refund:{invoice_id}")
+```
+
+Five things this gets right:
+
+- **The Pydantic class is the contract.** Constraints (`ge`, `le`, `min_length`) are emitted in the schema; the model sees them and stays in bounds.
+- **The docstring is one sentence per fact.** What it does, what it requires, what guarantees it gives. The model reads docstrings carefully — don't waste them.
+- **Idempotency is built in.** Tool calls retry. If the second call to `issue_refund` creates a second refund, you have an incident.
+- **The authorization check is inside the tool body**, not "trusted to be enforced by the model." The model is not in your security model.
+- **It's `async`.** Synchronous tool calls block the agent's loop and waste latency. Make them async unless the underlying API is genuinely sync.
+
+## Designing a tool *set*
+
+Two opposing failure modes pull tool-set design in opposite directions:
+
+- **Too few, too general** — one `run_sql` tool with a free-text query. The model can do anything, including things it shouldn't, and the schema gives no hints about what's safe.
+- **Too many, too narrow** — eighty CRUD tools that blow up the context window and confuse the model about which to pick.
+
+The 2026 answer is **scoped tool sets**. Define narrow tools, but only expose the subset the current task needs. LangGraph nodes load different tool bindings per step. ADK agents declare a `tools=[...]` list per agent. CrewAI agents have per-agent tool lists. The platform encourages narrow scopes; use the affordance.
+
+Some heuristics that hold up:
+
+- **5–12 tools per binding is a comfortable range.** Fewer than 5 and you're probably under-specifying. More than 15 and the model starts confusing them.
+- **Group by domain, not by CRUD operation.** `customer_lookup`, `customer_update_address`, `customer_close` is fine. `read_customer`, `update_customer`, `delete_customer` is too generic.
+- **Names matter; the model uses them as routing signals.** `get_invoice` and `list_invoices` are read shapes; `issue_refund` and `void_invoice` are write shapes. The verb is part of the schema.
+- **Read tools should never have side effects.** A tool named `get_*` that emits an audit log is fine. A tool named `get_*` that triggers a workflow is a footgun.
+
+## MCP: the standardization win
+
+Model Context Protocol turned tool definitions into a portable artifact. An MCP server exposes a list of tools over JSON-RPC (or SSE/streamable transport in newer versions). Any MCP client — Claude, LangChain, ADK, Cursor — can connect and call them. The agent code doesn't change when you swap the server.
+
+A trivial MCP server in Python:
+
+```python
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("billing")
+
+@mcp.tool()
+async def get_invoice(invoice_id: str) -> dict:
+    """Look up an invoice by ID. Returns amount, status, customer."""
+    return await billing.fetch(invoice_id)
+
+@mcp.tool()
+async def list_invoices(customer_id: str, since: str) -> list[dict]:
+    """List up to 50 invoices for a customer since an ISO date."""
+    return await billing.list(customer_id, since=since)
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+Mount it in your agent (LangChain example):
+
+```python
+from langchain_mcp_adapters import load_mcp_tools
+
+tools = await load_mcp_tools("https://mcp.acme.internal/billing")
+llm_with_tools = llm.bind_tools(tools)
+```
+
+Three things MCP gets architecturally right:
+
+- **Tool definitions live where the implementation lives.** The team that owns billing owns the billing MCP server. Other teams *consume* it; they don't redefine it.
+- **The transport is the boundary.** MCP servers run as separate processes; auth, rate-limiting, and observability happen at the transport layer, not buried inside the agent.
+- **Discovery is built in.** Clients can ask the server "what tools do you expose?" at runtime — no manual schema sync.
+
+The downside is that "too many tools" got easier to commit. When connecting to an MCP server makes 80 tools available with one line of code, the temptation is to expose all 80 to the agent. Don't. Filter at the boundary; expose the subset the current agent needs.
+
+## ReAct vs. structured tool use
+
+In 2026, structured function calling has won for production. ReAct (free-form thought/action text) shows up in two niches:
+
+- **Models that don't support native function calling.** Small OSS models, some local inference setups. Use ReAct prompts.
+- **Long-running agents where the planning step needs to be inspected.** A `Thought:` line in the trace is sometimes more readable than a function call argument. But this is a UX choice, not a capability one — you can also emit `thought` as a structured field.
+
+The standard production stack is function calling with one of two prompt patterns layered on top:
+
+1. **Plan-then-act.** First call: model produces a plan (no tool call), structured into bullet points. Second call: model executes the plan step by step. Better traces, slightly more tokens.
+2. **Act with reasoning fields.** Every tool call includes a `reasoning` field in the args schema. The model writes its rationale into the args; you log it. One LLM call, traceable reasoning.
+
+Pattern (2) is the default in 2026 for tools where rationale matters (compliance, financial actions). Pattern (1) is the default for genuinely multi-step plans.
+
+## Production failure modes
+
+The ones that don't show up in dev:
+
+- **Schema drift.** You change a tool's signature; an old agent run in flight calls it with the old args and fails. Version your schemas, accept both for a deprecation window.
+- **Tool selection collapse.** Under high temperature or with too-similar tool names, the model picks the wrong tool consistently. Lower temperature for tool selection (`temperature=0.0` on the planning call) helps; renaming the offending tool helps more.
+- **Hidden coupling.** Tool A's success depends on Tool B having been called first. The model can't infer this from schemas. Make the dependency explicit in the docstring or — better — combine them into one tool that does both.
+- **Latency cliffs.** A tool that took 200ms in dev takes 4s in prod under load. The agent's plan implicitly assumed fast responses; now it times out. Set per-tool budget; treat slow tools the same as failed tools.
+- **Cascade retries.** A retried tool call that retries because the model retried the whole step. Use idempotency keys at the tool boundary so retries are safe.
+
+## What "good" looks like
+
+A production agent's tool surface in 2026:
+
+- 5–12 tools per agent binding, each with a typed Pydantic schema and a one-sentence docstring.
+- All write tools are idempotent and emit audit events.
+- Read tools and write tools are clearly named; the model treats them differently.
+- MCP servers expose tools that span multiple agents; the agent imports only the tools it needs.
+- Tool traces are first-class in observability — every call shows args, result preview, latency, cost.
+
+The next post is about **how agents talk to each other** — A2A (the inter-agent protocol), MCP (which we just covered as a tool transport), and the message bus patterns underneath multi-agent systems.
+
+## References
+
+- [MCP vs A2A: AI Agent Protocol Comparison (2026)](https://www.intuz.com/blog/mcp-vs-a2a)
+- [MCP 2026 roadmap](https://a2a-mcp.org/blog/mcp-2026-roadmap)
+- [Survey of agent interoperability protocols (MCP, ACP, A2A, ANP) — arXiv](https://arxiv.org/pdf/2505.02279)
+- [LangChain MCP adapters](https://python.langchain.com/docs/integrations/tools/mcp/)

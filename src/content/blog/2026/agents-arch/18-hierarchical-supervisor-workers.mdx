@@ -1,0 +1,210 @@
+---
+title: "Hierarchical Agent Systems: Supervisors, Workers, and Routing"
+description: "When one agent isn't enough, hierarchy is usually the first answer. Supervisor agents, worker pools, and the patterns that keep multi-agent systems coherent at scale."
+pubDatetime: 2026-05-04T09:00:00-07:00
+tags:
+  - agents-arch
+  - multi-agent
+  - hierarchical
+  - patterns
+featured: false
+draft: false
+---
+
+The most common multi-agent topology in 2026 is **hierarchical**: one supervisor agent that decides what needs to happen, and a pool of worker agents specialized in particular kinds of work. It's not the only pattern, but it's the one that scales without falling over — and it matches how human teams organize the same kinds of work.
+
+This post is the supervisor/worker pattern in practice: the shape, the patterns that hold up, the failure modes, and the variants worth knowing.
+
+## The basic shape
+
+<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
+<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Supervisor and workers topology">
+  <defs>
+    <marker id="arr11" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
+    <rect x="280" y="20" width="200" height="60" rx="6" />
+    <text x="380" y="45" text-anchor="middle" font-weight="700">Supervisor</text>
+    <text x="380" y="65" text-anchor="middle" opacity="0.7">routes · aggregates · re-tries</text>
+
+    <rect x="40" y="140" width="160" height="60" rx="6" />
+    <text x="120" y="165" text-anchor="middle" font-weight="600">Worker A</text>
+    <text x="120" y="185" text-anchor="middle" opacity="0.7">research</text>
+
+    <rect x="220" y="140" width="160" height="60" rx="6" />
+    <text x="300" y="165" text-anchor="middle" font-weight="600">Worker B</text>
+    <text x="300" y="185" text-anchor="middle" opacity="0.7">code-gen</text>
+
+    <rect x="400" y="140" width="160" height="60" rx="6" />
+    <text x="480" y="165" text-anchor="middle" font-weight="600">Worker C</text>
+    <text x="480" y="185" text-anchor="middle" opacity="0.7">summarize</text>
+
+    <rect x="580" y="140" width="160" height="60" rx="6" />
+    <text x="660" y="165" text-anchor="middle" font-weight="600">Worker D</text>
+    <text x="660" y="185" text-anchor="middle" opacity="0.7">verify</text>
+
+    <line x1="350" y1="80" x2="160" y2="135" marker-end="url(#arr11)" />
+    <line x1="370" y1="80" x2="320" y2="135" marker-end="url(#arr11)" />
+    <line x1="390" y1="80" x2="460" y2="135" marker-end="url(#arr11)" />
+    <line x1="410" y1="80" x2="640" y2="135" marker-end="url(#arr11)" />
+
+    <line x1="140" y1="200" x2="340" y2="240" marker-end="url(#arr11)" stroke-dasharray="3,3" />
+    <line x1="320" y1="200" x2="370" y2="240" marker-end="url(#arr11)" stroke-dasharray="3,3" />
+    <line x1="460" y1="200" x2="400" y2="240" marker-end="url(#arr11)" stroke-dasharray="3,3" />
+    <line x1="640" y1="200" x2="430" y2="240" marker-end="url(#arr11)" stroke-dasharray="3,3" />
+
+    <rect x="280" y="245" width="200" height="50" rx="6" />
+    <text x="380" y="275" text-anchor="middle" font-weight="600">Shared state / artifacts</text>
+  </g>
+</svg>
+</div>
+
+The supervisor reads input, picks workers, dispatches work, reads results, decides what's next. Workers do their narrow thing and return. Shared state lives in a persistent store the supervisor and (sometimes) workers read from.
+
+This isn't novel — it's the org chart pattern applied to agents. The shape works for the same reasons org charts work: specialization scales, coordination is centralized, and accountability is clear.
+
+## Implementing the supervisor
+
+The supervisor is itself an LLM agent. Its tools are the worker invocations:
+
+```python
+from langgraph.graph import StateGraph, END
+from typing import Annotated, TypedDict
+
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+    artifacts: Annotated[dict, merge_dicts]
+    completed: list[str]
+    next_worker: str | None
+
+async def supervisor(state: State):
+    """Decide which worker should act next, or finish."""
+    prompt = build_supervisor_prompt(state)
+    response = await supervisor_llm.ainvoke(prompt)
+    decision = parse_decision(response)
+    if decision.action == "finish":
+        return {"next_worker": None, "messages": [response]}
+    return {"next_worker": decision.worker, "messages": [response]}
+
+async def call_worker(state: State):
+    worker = WORKERS[state["next_worker"]]
+    output = await worker.ainvoke({"context": state["artifacts"], "task": state["messages"][-1]})
+    return {
+        "artifacts": {state["next_worker"]: output},
+        "completed": [state["next_worker"]],
+    }
+
+def route(state: State):
+    if state["next_worker"] is None or len(state["completed"]) >= MAX_WORKER_CALLS:
+        return END
+    return "call_worker"
+
+graph.add_node("supervisor", supervisor)
+graph.add_node("call_worker", call_worker)
+graph.add_edge("__start__", "supervisor")
+graph.add_conditional_edges("supervisor", route, ["call_worker", END])
+graph.add_edge("call_worker", "supervisor")
+```
+
+Things to notice:
+
+- **The supervisor is small.** It plans, routes, and finishes. It doesn't do the work itself. Keeping it small keeps its prompt short and its decisions fast.
+- **Workers don't see each other.** They take a context and a task; they return a result. The supervisor mediates.
+- **Step budget at the supervisor level.** `MAX_WORKER_CALLS` is the cap on how many times the supervisor can dispatch before ending. Prevents loops where the supervisor keeps re-routing.
+- **Artifacts live in shared state.** Each worker's output is keyed and persisted; subsequent workers can read prior workers' results from `state["artifacts"]`.
+
+## Worker design
+
+Workers are agents themselves. Three rules that make the system maintainable:
+
+- **Each worker has one job.** "Research a topic," "summarize a document," "verify a claim." If you can't describe the worker in one short sentence, split it.
+- **Workers are stateless across calls.** Each invocation reads context from the input, produces output. No worker holds memory across supervisor dispatches.
+- **Workers can fail predictably.** A worker that can't complete returns a structured `{"status": "failed", "reason": "..."}` rather than throwing. The supervisor handles failures explicitly.
+
+The contract between supervisor and worker is the most important interface in the system. Use a typed schema:
+
+```python
+class WorkerInput(BaseModel):
+    task: str
+    context: dict
+    constraints: dict = {}
+
+class WorkerOutput(BaseModel):
+    status: Literal["success", "failed", "needs_clarification"]
+    result: dict | None = None
+    reason: str | None = None
+```
+
+## Patterns that hold up
+
+### Plan-then-execute
+
+The supervisor's first action is to lay out a plan: which workers, in what order, what each produces. The plan is stored in state. Subsequent supervisor calls track progress against the plan, not just "what next?" This catches plans that go off the rails — the agent's later decisions are visibly diverging from the original plan.
+
+```python
+async def supervisor(state):
+    if "plan" not in state["artifacts"]:
+        plan = await llm.ainvoke(PLAN_PROMPT.format(task=state["messages"][-1]))
+        return {"artifacts": {"plan": parse_plan(plan)}, "next_worker": plan.steps[0].worker}
+    # Subsequent calls: check progress vs. plan, dispatch next step or replan.
+    ...
+```
+
+### Specialist + reviewer
+
+Pair every doing worker with a reviewing worker. The doer produces a draft; the reviewer scores it; the supervisor decides whether to ship, retry, or escalate. This is the multi-agent version of pair programming, and it catches a lot of bad-faith model behavior.
+
+### Bounded recursion
+
+Workers can themselves be hierarchical (a worker is a supervisor over its own narrower set of workers). Useful for genuinely deep tasks. Risky if you don't cap the recursion — without a depth limit, you can produce a fractal of supervisors.
+
+### Worker pool with load balancing
+
+For high throughput, multiple instances of the same worker run in parallel. The supervisor dispatches; a queue picks an available worker. Looks like classic worker-pool architecture because that's exactly what it is.
+
+## Failure modes specific to hierarchical systems
+
+The new ones beyond single-agent debugging:
+
+- **Supervisor hallucinated plan.** The supervisor produces a plan referencing workers that don't exist or capabilities they don't have. Mitigation: enumerate available workers in the supervisor's prompt; reject plans referencing unknown workers; constrain via structured output.
+- **Workers diverge from supervisor's intent.** The supervisor delegated "summarize this technical brief," the worker produced a marketing rewrite. Mitigation: tighten worker instructions; have the supervisor inspect outputs against intent.
+- **Re-route loops.** The supervisor keeps re-trying the same worker that keeps failing in the same way. Mitigation: track per-worker failure counts; force escalation after N failures.
+- **Distributed context drift.** Each worker's output is summarized for the next worker, and summaries lose detail. Five hops in, the original task is unrecognizable. Mitigation: keep the original task verbatim in shared state; pass it to every worker.
+- **Cost compounding.** N worker calls × M tokens each. A hierarchical system can cost an order of magnitude more than a single agent doing the same work. Track cost per task; many "multi-agent" systems would be cheaper as well-designed single agents.
+
+## When NOT to use hierarchy
+
+The pragmatic checks before going hierarchical:
+
+- **The task fits in one agent's planning capacity.** Frontier models in 2026 can plan and execute 10-step tasks coherently. If your task is 4 steps, hierarchy is overhead.
+- **The specializations are real.** "Researcher" and "Writer" being separate agents only earns its keep if the researcher knows things the writer doesn't (different tools, different prompts, different models). Otherwise it's two LLM calls to do one LLM's work.
+- **You can debug it.** Multi-agent traces are harder to read. If your observability isn't already strong (Post 12), adding multi-agent complexity will hurt.
+
+A single well-instrumented agent often beats a poorly-instrumented multi-agent system. The bar for going hierarchical is "I have a single agent that works, I've measured its limits, and I can articulate which specific limit a hierarchy would lift."
+
+## Cross-framework hierarchies
+
+A useful 2026 capability: the supervisor can dispatch to workers in *different* frameworks via A2A. A LangGraph supervisor calling CrewAI crews. A Google ADK supervisor calling a worker hosted as a Claude Managed Agent. The Post 10 protocols make this practical.
+
+The pattern that works: workers are A2A endpoints; the supervisor doesn't know or care what framework implements them. Same Agent Card, same call shape, regardless of internal implementation. This is the integration story for organizations that picked different frameworks for different teams and now want to compose them.
+
+## What "good" looks like
+
+A 2026 hierarchical agent system worth shipping:
+
+- Small, focused supervisor with a clear plan-then-execute shape.
+- Workers with one job each and typed I/O.
+- Shared state with versioned artifacts; every worker's output keyed and retrievable.
+- Step budget at the supervisor level; failure counts at the worker level.
+- Trace propagation across supervisor and worker boundaries.
+- Cost-per-task and worker-utilization dashboards.
+- A "single-agent baseline" you compare against, to keep the complexity earning its keep.
+
+Next week we put the major frameworks side by side — LangGraph vs CrewAI vs ADK vs Managed Agents — with the honest comparison table.
+
+## References
+
+- [LangGraph multi-agent — supervisor pattern](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)
+- [CrewAI hierarchical process docs](https://docs.crewai.com/concepts/processes)
+- [Google ADK multi-agent](https://google.github.io/adk-docs/agents/multi-agent/)
+- [Best multi-agent frameworks 2026](https://gurusup.com/blog/best-multi-agent-frameworks-2026)
