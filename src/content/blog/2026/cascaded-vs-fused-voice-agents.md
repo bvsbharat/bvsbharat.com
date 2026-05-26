@@ -4,6 +4,8 @@ title: "Cascaded vs Fused Voice Agents: A Builder's Perspective on Architecture 
 slug: cascaded-vs-fused-voice-agents-2026
 description: "Deep dive into voice agent architectures. Why cascaded models give you control and fused models trade complexity for naturalness. What we're learning from shipping production agents at scale."
 tags: ["voice-ai", "agents", "architecture", "llm", "speech-recognition"]
+heroImage: "/images/cascaded-vs-fused-hero.svg"
+ogImage: "/images/cascaded-vs-fused-hero.svg"
 ---
 
 # Cascaded vs Fused Voice Agents: A Builder's Perspective on Architecture Choices
@@ -199,14 +201,14 @@ Most discussions frame this as a two-choice problem. But in reality, there are a
     <line x1="770" y1="120" x2="815" y2="120" marker-end="url(#vc2)"/>
   </g>
 
-  <rect x="310" y="42" width="50" height="20" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
-  <text x="335" y="56" text-anchor="middle" fill="#78350F" font-size="10" font-weight="700">text + ctx</text>
+  <rect x="306" y="98" width="64" height="22" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="338" y="113" text-anchor="middle" fill="#78350F" font-size="10" font-weight="700">text + ctx</text>
 
-  <rect x="545" y="42" width="60" height="20" rx="4" fill="#FCE7F3" stroke="#EC4899" stroke-width="1.5"/>
-  <text x="575" y="56" text-anchor="middle" fill="#831843" font-size="10" font-weight="700">instructions</text>
+  <rect x="538" y="98" width="68" height="22" rx="6" fill="#FCE7F3" stroke="#EC4899" stroke-width="1.5"/>
+  <text x="572" y="113" text-anchor="middle" fill="#831843" font-size="10" font-weight="700">instructions</text>
 
-  <text x="450" y="250" text-anchor="middle" fill="#0F172A" font-size="13" font-weight="600">Cascaded transparency + fused-like naturalness · production sweet-spot</text>
-  <text x="450" y="270" text-anchor="middle" fill="#475569" font-size="11" font-style="italic">guardrails still live at the text boundary</text>
+  <text x="450" y="222" text-anchor="middle" fill="#0F172A" font-size="13" font-weight="600">Cascaded transparency + fused-like naturalness · production sweet-spot</text>
+  <text x="450" y="244" text-anchor="middle" fill="#475569" font-size="11" font-style="italic">guardrails still live at the text boundary</text>
 </svg>
 </div>
 
@@ -310,17 +312,17 @@ If an emotion signal needs to flow into the LLM quickly, embeddings are faster t
   <text x="440" y="72" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="13" letter-spacing="2">SINGLE  END-TO-END  NETWORK</text>
 
   <g transform="translate(190, 100)">
-    <circle cx="60" cy="40" r="30" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
-    <text x="60" y="46" text-anchor="middle" fill="#a78bfa" font-weight="700" font-size="13">STT</text>
+    <line x1="90" y1="40" x2="188" y2="40" stroke="#6D28D9" stroke-width="2.5" stroke-dasharray="6,3"/>
+    <line x1="252" y1="40" x2="350" y2="40" stroke="#6D28D9" stroke-width="2.5" stroke-dasharray="6,3"/>
+
+    <circle cx="60" cy="40" r="30" fill="#1e293b" stroke="#a78bfa" stroke-width="2.5"/>
+    <text x="60" y="46" text-anchor="middle" fill="#c4b5fd" font-weight="700" font-size="13">STT</text>
 
     <circle cx="220" cy="40" r="32" fill="#1e293b" stroke="#a78bfa" stroke-width="2.5"/>
-    <text x="220" y="46" text-anchor="middle" fill="#a78bfa" font-weight="700" font-size="14">LLM</text>
+    <text x="220" y="46" text-anchor="middle" fill="#c4b5fd" font-weight="700" font-size="14">LLM</text>
 
-    <circle cx="380" cy="40" r="30" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
-    <text x="380" y="46" text-anchor="middle" fill="#a78bfa" font-weight="700" font-size="13">TTS</text>
-
-    <line x1="90" y1="40" x2="188" y2="40" stroke="#a78bfa" stroke-width="2"/>
-    <line x1="252" y1="40" x2="350" y2="40" stroke="#a78bfa" stroke-width="2"/>
+    <circle cx="380" cy="40" r="30" fill="#1e293b" stroke="#a78bfa" stroke-width="2.5"/>
+    <text x="380" y="46" text-anchor="middle" fill="#c4b5fd" font-weight="700" font-size="13">TTS</text>
   </g>
 
   <text x="440" y="190" text-anchor="middle" fill="#4C1D95" font-size="11" font-style="italic">single weight set · audio in, audio out · no text leaks</text>
