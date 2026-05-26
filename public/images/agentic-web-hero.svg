@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="hexes" x="0" y="0" width="120" height="104" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.22">
+        <polygon points="60,4 116,36 116,100 60,132 4,100 4,36"/>
+        <polygon points="0,-48 56,-16 56,48 0,80 -56,48 -56,-16"/>
+        <polygon points="120,-48 176,-16 176,48 120,80 64,48 64,-16"/>
+      </g>
+    </pattern>
+    <linearGradient id="blueBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f0f12"/>
+      <stop offset="100%" stop-color="#1c1c22"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left panel: deep blue with hex pattern -->
+  <rect x="0" y="0" width="600" height="630" fill="url(#blueBg)"/>
+  <rect x="0" y="0" width="600" height="630" fill="url(#hexes)"/>
+
+  <!-- Logo mark: stylized "many → one" — three converging chevron bars over an arc -->
+  <!-- Arc (intent dome) -->
+  <path d="M 215 290 A 85 85 0 0 1 385 290"
+        stroke="#ffffff" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <!-- Three thick chevron bars converging downward -->
+  <g stroke="#ffffff" stroke-width="22" stroke-linecap="round" fill="none">
+    <path d="M 225 310 L 300 380"/>
+    <path d="M 375 310 L 300 380"/>
+    <path d="M 250 345 L 300 385"/>
+    <path d="M 350 345 L 300 385"/>
+  </g>
+  <!-- Convergence dot -->
+  <circle cx="300" cy="395" r="14" fill="#ffffff"/>
+
+  <!-- URL bottom-left -->
+  <text x="60" y="595" fill="#ffffff" font-size="18" font-weight="500" letter-spacing="0.5" opacity="0.95">www.bvsbharat.com</text>
+
+  <!-- Right panel: white with headline + body -->
+  <rect x="600" y="0" width="600" height="630" fill="#ffffff"/>
+
+  <!-- Headline (tight, bold, dark) -->
+  <g fill="#0f172a" font-weight="800" letter-spacing="-1.2">
+    <text x="660" y="200" font-size="64">Tell me</text>
+    <text x="660" y="270" font-size="64">what I need.</text>
+    <text x="660" y="340" font-size="64">Make it</text>
+    <text x="660" y="410" font-size="64">happen.</text>
+  </g>
+
+  <!-- Body copy -->
+  <g fill="#475569" font-size="16" font-weight="400">
+    <text x="660" y="465">For thirty years we optimised the web for clicks.</text>
+    <text x="660" y="490">The next interface just listens, decides, and acts.</text>
+    <text x="660" y="515">The browse-click-compare web is quietly ending.</text>
+  </g>
+
+  <!-- Small brand mark bottom-right -->
+  <g transform="translate(1100, 555)">
+    <rect x="0" y="0" width="56" height="42" rx="6" fill="none" stroke="#0f172a" stroke-width="2"/>
+    <path d="M 12 22 A 16 16 0 0 1 44 22"
+          stroke="#0f172a" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <circle cx="28" cy="30" r="3" fill="#0f172a"/>
+  </g>
+</svg>

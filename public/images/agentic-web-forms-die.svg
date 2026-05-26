@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" fill="none" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <pattern id="hexesTerra" x="0" y="0" width="120" height="104" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.22">
+        <polygon points="60,4 116,36 116,100 60,132 4,100 4,36"/>
+        <polygon points="0,-48 56,-16 56,48 0,80 -56,48 -56,-16"/>
+        <polygon points="120,-48 176,-16 176,48 120,80 64,48 64,-16"/>
+      </g>
+    </pattern>
+    <linearGradient id="terraBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b3360b"/>
+      <stop offset="100%" stop-color="#8a2a08"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left panel: terracotta with hex pattern -->
+  <rect x="0" y="0" width="600" height="420" fill="url(#terraBg)"/>
+  <rect x="0" y="0" width="600" height="420" fill="url(#hexesTerra)"/>
+
+  <!-- Mark: a stack of "form field" pills, the top one intact, the lower ones dissolving / fragmenting -->
+  <g stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+    <!-- Intact top field -->
+    <rect x="170" y="100" width="260" height="38" rx="8"/>
+    <line x1="186" y1="119" x2="270" y2="119" stroke-width="6"/>
+    <!-- Second field, partially broken (gap in the rectangle) -->
+    <path d="M 170 165 L 260 165 M 290 165 L 430 165 L 430 203 L 350 203 M 320 203 L 170 203 Z"/>
+    <line x1="186" y1="184" x2="240" y2="184"/>
+    <line x1="280" y1="184" x2="320" y2="184"/>
+    <!-- Third field, more broken / fragmented -->
+    <path d="M 170 230 L 220 230 M 250 230 L 310 230 M 340 230 L 430 230"/>
+    <path d="M 170 268 L 200 268 M 235 268 L 290 268 M 320 268 L 380 268 M 410 268 L 430 268"/>
+    <path d="M 170 230 L 170 268 M 430 230 L 430 268"/>
+    <!-- Bottom field: fully dissolved into floating dots -->
+    <g fill="#ffffff" stroke="none">
+      <circle cx="180" cy="310" r="3"/>
+      <circle cx="208" cy="316" r="3"/>
+      <circle cx="240" cy="308" r="3"/>
+      <circle cx="272" cy="318" r="3"/>
+      <circle cx="305" cy="306" r="3"/>
+      <circle cx="338" cy="314" r="3"/>
+      <circle cx="370" cy="308" r="3"/>
+      <circle cx="402" cy="316" r="3"/>
+      <circle cx="425" cy="310" r="3"/>
+    </g>
+  </g>
+
+  <!-- URL bottom-left -->
+  <text x="60" y="385" fill="#ffffff" font-size="15" font-weight="500" letter-spacing="0.5" opacity="0.95">www.bvsbharat.com</text>
+
+  <!-- Right panel: white with headline -->
+  <rect x="600" y="0" width="600" height="420" fill="#ffffff"/>
+
+  <g fill="#0f172a" font-weight="800" letter-spacing="-1.2">
+    <text x="660" y="170" font-size="68">Forms</text>
+    <text x="660" y="245" font-size="68">die first.</text>
+  </g>
+
+  <g fill="#475569" font-size="15" font-weight="400">
+    <text x="660" y="305">Flight bookings, insurance claims, expense reports,</text>
+    <text x="660" y="327">tax interviews, KYC. The highest-friction, lowest-value</text>
+    <text x="660" y="349">layer of the modern web is also the easiest to replace.</text>
+  </g>
+</svg>
