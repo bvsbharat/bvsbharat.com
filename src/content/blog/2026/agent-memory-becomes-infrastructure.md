@@ -1,7 +1,7 @@
 ---
 title: "Agent Memory Just Became Infrastructure"
 description: "Mid-May 2026 shipped offline reflection, hybrid retrieval, and the first hard benchmarks for memory staleness. Here's what changed and what's still broken."
-pubDatetime: 2026-05-25T23:50:00Z
+pubDatetime: 2026-05-25T11:00:00-07:00
 tags:
   - agents
   - memory
