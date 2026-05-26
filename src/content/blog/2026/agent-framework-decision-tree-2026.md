@@ -11,6 +11,8 @@ tags:
   - architecture
 featured: false
 draft: false
+heroImage: "/images/agent-framework-hero.svg"
+ogImage: "/images/agent-framework-hero.svg"
 ---
 
 Three weeks into the new year, the most common question in my DMs is some variant of "should we use LangGraph or the OpenAI Agents SDK." It is the wrong question, asked at the wrong altitude, and answering it well requires more honesty about what you're building than most of those messages contain.

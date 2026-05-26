@@ -11,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/deep-agents-hero.svg"
+ogImage: "/images/deep-agents-hero.svg"
 ---
 
 LangChain's [Deep Agents](https://www.langchain.com/deep-agents) framework went 1.0 in late January, and the shape it crystallizes — planner, executor, critic, with a shared todo list — is now the dominant pattern for any agent expected to do more than three tool calls in a row. I've spent the last six weeks rebuilding three production agents around it and the lessons are clear enough to write down.

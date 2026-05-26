@@ -11,6 +11,8 @@ tags:
   - langsmith
 featured: false
 draft: false
+heroImage: "/images/agent-evals-hero.svg"
+ogImage: "/images/agent-evals-hero.svg"
 ---
 
 The mood at every agent engineering meetup I've been to in 2026 is the same: people are tired of vibes-based evals and they're starting to do the thing they should have done a year ago. The "LLM-as-judge scores this 8/10" baseline is the *floor*, not the ceiling. The ceiling is a real test pyramid — unit tests at the bottom, integration in the middle, golden replays and trajectory evals at the top — applied to agents the way you'd apply it to any other software.

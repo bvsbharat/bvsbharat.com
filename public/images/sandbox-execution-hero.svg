@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">SANDBOX  EXECUTION</text>
+    <text x="80" y="186" font-size="58" font-weight="800" fill="#f8fafc">Code interpreters</text>
+    <text x="80" y="250" font-size="58" font-weight="800" fill="url(#cyanGrad)">grew up</text>
+    <text x="80" y="302" font-size="22" font-weight="400" fill="#cbd5e1">microVMs, gVisor, persistent workspaces</text>
+  </g>
+
+  <!-- 3 isolation models -->
+  <g transform="translate(80, 360)" filter="url(#softShadow)">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="335" height="200" rx="14" fill="#1e293b" stroke="url(#greenGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#34d399" letter-spacing="2">FIRECRACKER µVM</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#f8fafc">E2B</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">~150 ms cold start</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">dedicated kernel</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">hardware isolation</text>
+      <!-- iso shield -->
+      <g transform="translate(280, 100)">
+        <path d="M 0 -20 L 18 -10 L 18 10 Q 18 22 0 30 Q -18 22 -18 10 L -18 -10 Z" fill="none" stroke="#34d399" stroke-width="2"/>
+        <text x="0" y="6" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" font-weight="700" fill="#34d399">VM</text>
+      </g>
+      <text x="20" y="170" font-family="Inter, sans-serif" font-size="11" fill="#64748b" font-style="italic">best isolation · default for LLM code</text>
+    </g>
+
+    <g transform="translate(350, 0)">
+      <rect x="0" y="0" width="335" height="200" rx="14" fill="#1e293b" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#22d3ee" letter-spacing="2">gVISOR</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#f8fafc">Modal</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">syscall interception</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">GPU first-class</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">H100 attachable</text>
+      <g transform="translate(280, 100)">
+        <rect x="-20" y="-20" width="40" height="40" rx="6" fill="none" stroke="#22d3ee" stroke-width="2"/>
+        <text x="0" y="6" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="9" font-weight="700" fill="#22d3ee">GPU</text>
+      </g>
+      <text x="20" y="170" font-family="Inter, sans-serif" font-size="11" fill="#64748b" font-style="italic">for model inference inside sandbox</text>
+    </g>
+
+    <g transform="translate(700, 0)">
+      <rect x="0" y="0" width="335" height="200" rx="14" fill="#1e293b" stroke="url(#amberGrad)" stroke-width="2"/>
+      <text x="20" y="34" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fbbf24" letter-spacing="2">PERSISTENT WORKSPACE</text>
+      <text x="20" y="62" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#f8fafc">Daytona</text>
+      <text x="20" y="92" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">sub-90 ms cold</text>
+      <text x="20" y="112" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">days-long sessions</text>
+      <text x="20" y="132" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#94a3b8">$24M Series A · Feb</text>
+      <g transform="translate(280, 100)">
+        <rect x="-20" y="-16" width="40" height="32" rx="3" fill="none" stroke="#fbbf24" stroke-width="2"/>
+        <line x1="-12" y1="-8" x2="12" y2="-8" stroke="#fbbf24" stroke-width="1.5"/>
+        <line x1="-12" y1="0" x2="12" y2="0" stroke="#fbbf24" stroke-width="1.5"/>
+        <line x1="-12" y1="8" x2="6" y2="8" stroke="#fbbf24" stroke-width="1.5"/>
+      </g>
+      <text x="20" y="170" font-family="Inter, sans-serif" font-size="11" fill="#64748b" font-style="italic">coding agents that live for days</text>
+    </g>
+  </g>
+
+  <g transform="translate(80, 590)">
+    <circle cx="0" cy="-6" r="5" fill="url(#cyanGrad)"/>
+    <text x="14" y="0" font-family="Inter, sans-serif" font-size="14" fill="#64748b">bvsbharat.com  ·  Apr 2026</text>
+  </g>
+</svg>

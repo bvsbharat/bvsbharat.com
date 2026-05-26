@@ -11,6 +11,8 @@ tags:
   - infrastructure
 featured: false
 draft: false
+heroImage: "/images/agent-observability-hero.svg"
+ogImage: "/images/agent-observability-hero.svg"
 ---
 
 Three things happened to the agent observability landscape in the first four months of 2026, and you can read the whole reshuffle as a single coherent story.

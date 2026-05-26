@@ -11,6 +11,8 @@ tags:
   - performance
 featured: false
 draft: false
+heroImage: "/images/cost-optimization-hero.svg"
+ogImage: "/images/cost-optimization-hero.svg"
 ---
 
 A team I worked with last quarter cut their agent's per-task cost from $0.39 to $0.037 — almost exactly 10x — without touching the model and without anyone in their user base noticing a quality drop. The savings came from four moves they made in sequence, and the moves stack in a specific order. This is the order.

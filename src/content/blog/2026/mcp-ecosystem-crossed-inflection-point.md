@@ -11,6 +11,8 @@ tags:
   - anthropic
 featured: false
 draft: false
+heroImage: "/images/mcp-ecosystem-hero.svg"
+ogImage: "/images/mcp-ecosystem-hero.svg"
 ---
 
 The first weekend of 2026 I ran `mcp list` against the [official registry](https://registry.modelcontextprotocol.io/) and got back 2,047 servers. A year ago that number was 714. PulseMCP — which indexes the long tail — passed 15,000 a week before Christmas. Smithery is north of 7,000. Composio claims 20,000+ tools across 1,000+ toolkits. The pace isn't slowing down; if anything, the holidays were a step function.

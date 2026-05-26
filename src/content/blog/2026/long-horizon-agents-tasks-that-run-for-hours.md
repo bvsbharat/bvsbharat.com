@@ -11,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/long-horizon-agents-hero.svg"
+ogImage: "/images/long-horizon-agents-hero.svg"
 ---
 
 The longest agent run I've personally orchestrated this month was 6 hours and 41 minutes. It started at 11pm, ran overnight, and produced 23 pull requests by morning. About forty minutes in it crashed, restarted from a checkpoint, and the user (me, asleep) never knew. About four hours in it hit a tool failure, retried with backoff, and continued. By 5am it was waiting on a CI run for one of its earlier PRs; it polled until the run finished and continued.

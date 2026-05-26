@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="118" font-size="22" font-weight="500" fill="#94a3b8" letter-spacing="3">DEEP  AGENTS</text>
+    <text x="80" y="186" font-size="60" font-weight="800" fill="#f8fafc">Planner ·</text>
+    <text x="80" y="252" font-size="60" font-weight="800" fill="url(#indigoGrad)">Executor · Critic</text>
+    <text x="80" y="308" font-size="22" font-weight="400" fill="#cbd5e1">Three roles, one shared state, a loop</text>
+  </g>
+
+  <!-- The triangle / loop diagram -->
+  <g transform="translate(720, 130)" filter="url(#softShadow)">
+    <!-- Planner top -->
+    <g transform="translate(165, 0)">
+      <rect x="-90" y="0" width="180" height="76" rx="14" fill="#1e293b" stroke="url(#indigoGrad)" stroke-width="2.5"/>
+      <text x="0" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#818cf8" letter-spacing="2">PLANNER</text>
+      <text x="0" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#cbd5e1">writes todo list</text>
+      <text x="0" y="68" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#64748b">Opus</text>
+    </g>
+
+    <!-- Executor bottom-left -->
+    <g transform="translate(0, 200)">
+      <rect x="0" y="0" width="180" height="76" rx="14" fill="#1e293b" stroke="url(#greenGrad)" stroke-width="2.5"/>
+      <text x="90" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#34d399" letter-spacing="2">EXECUTOR</text>
+      <text x="90" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#cbd5e1">does the task</text>
+      <text x="90" y="68" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#64748b">Sonnet</text>
+    </g>
+
+    <!-- Critic bottom-right -->
+    <g transform="translate(255, 200)">
+      <rect x="0" y="0" width="180" height="76" rx="14" fill="#1e293b" stroke="url(#cyanGrad)" stroke-width="2.5"/>
+      <text x="90" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#22d3ee" letter-spacing="2">CRITIC</text>
+      <text x="90" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#cbd5e1">verifies output</text>
+      <text x="90" y="68" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#64748b">Haiku</text>
+    </g>
+
+    <!-- arrows around the loop -->
+    <g stroke="#475569" stroke-width="1.5" fill="none">
+      <path d="M 130 76 Q 90 130 95 200" marker-end="url(#arrowhead)"/>
+      <path d="M 180 240 L 255 240" marker-end="url(#arrowhead)"/>
+      <path d="M 360 200 Q 380 130 200 76" marker-end="url(#arrowhead)"/>
+    </g>
+
+    <!-- center shared state -->
+    <g transform="translate(165, 130)">
+      <rect x="-50" y="0" width="100" height="50" rx="10" fill="#0b1220" stroke="url(#amberGrad)" stroke-width="1.5"/>
+      <text x="0" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#fbbf24" letter-spacing="1.5">SHARED STATE</text>
+      <text x="0" y="37" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#94a3b8">todo · scratchpad</text>
+    </g>
+
+    <text x="165" y="310" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64748b" font-style="italic">different roles · different models · different contexts</text>
+  </g>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <g transform="translate(80, 590)">
+    <circle cx="0" cy="-6" r="5" fill="url(#indigoGrad)"/>
+    <text x="14" y="0" font-family="Inter, sans-serif" font-size="14" fill="#64748b">bvsbharat.com  ·  Mar 2026</text>
+  </g>
+</svg>

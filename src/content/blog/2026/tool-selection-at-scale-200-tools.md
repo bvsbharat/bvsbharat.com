@@ -11,6 +11,8 @@ tags:
   - patterns
 featured: false
 draft: false
+heroImage: "/images/tool-selection-hero.svg"
+ogImage: "/images/tool-selection-hero.svg"
 ---
 
 The numbers I've been collecting from production agent deployments over the last six months tell a consistent story. Up to about 30 tools, an agent picks the right one at >95% accuracy. From 30 to 100, accuracy drops to roughly 80%. Past 100, it's somewhere between 60% and "depends what model you're using and which way the wind is blowing." At 200 tools — a number every multi-server MCP deployment is now reaching — you have what is technically called a problem.

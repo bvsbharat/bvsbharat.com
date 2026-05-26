@@ -11,6 +11,8 @@ tags:
   - announcements
 featured: false
 draft: false
+heroImage: "/images/code-with-claude-recap-hero.svg"
+ogImage: "/images/code-with-claude-recap-hero.svg"
 ---
 
 [Code with Claude 2026](https://www.infoq.com/news/2026/05/code-with-claude/) ran in San Francisco yesterday. Anthropic shipped enough that you could write 12 blog posts about it; most of those blog posts have already been written, mostly by people who hadn't tried any of it yet. This post is the opposite: five things from the day that actually change how you build agents, with the rest filed under "interesting but downstream."

@@ -11,6 +11,8 @@ tags:
   - modal
 featured: false
 draft: false
+heroImage: "/images/sandbox-execution-hero.svg"
+ogImage: "/images/sandbox-execution-hero.svg"
 ---
 
 Daytona raised a $24M Series A in February. E2B has been running production sandboxes for Anthropic and OpenAI under the hood for over a year. Modal added Python sandboxes for agent code execution and the demand has reportedly outstripped their initial capacity planning. There's a quiet infrastructure layer beneath every serious agent right now, and it's getting big enough that the people building it stopped having to explain themselves.
