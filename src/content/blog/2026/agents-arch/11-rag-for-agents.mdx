@@ -9,6 +9,8 @@ tags:
   - vector-search
 featured: false
 draft: false
+heroImage: "/images/agents-arch/11-rag-hero.svg"
+ogImage: "/images/agents-arch/11-rag-hero.svg"
 ---
 
 The 2023-era RAG stack — "embed the docs, vector-search the user's question, stuff results into context" — is a tutorial pattern, not a production one. Agents made it more obvious. An agent asks dozens of small retrieval queries per task, each shaped by what it just learned, and the answers feed *back* into the next step of reasoning. Top-k from a vector store breaks in interesting new ways at that scale.
