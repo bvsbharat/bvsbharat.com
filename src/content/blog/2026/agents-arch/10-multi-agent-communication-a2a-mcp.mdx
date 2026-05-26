@@ -24,46 +24,56 @@ This post is the map of how they fit, with the patterns that hold up in producti
 
 MCP connects a single agent to external **tools, databases, and APIs**. A2A enables multiple agents to **communicate and delegate tasks to each other**. They are not competitors; most production deployments use both. The pithy framing from the 2026 protocol surveys: *MCP is the universal adapter for tools; A2A is the standard for structured, secure communication between autonomous agents.*
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="MCP vs A2A topology">
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="MCP for tools, A2A for inter-agent">
   <defs>
-    <marker id="arr8" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+    <marker id="a10" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#475569"/></marker>
   </defs>
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <text x="380" y="22" text-anchor="middle" font-weight="700">Two protocols, one system</text>
 
-    <rect x="120" y="60" width="160" height="60" rx="6" />
-    <text x="200" y="85" text-anchor="middle" font-weight="600">Agent A</text>
-    <text x="200" y="105" text-anchor="middle" opacity="0.7">researcher</text>
+  <text x="450" y="30" text-anchor="middle" fill="#0F172A" font-weight="700" font-size="18">MCP for tools · A2A for inter-agent</text>
 
-    <rect x="480" y="60" width="160" height="60" rx="6" />
-    <text x="560" y="85" text-anchor="middle" font-weight="600">Agent B</text>
-    <text x="560" y="105" text-anchor="middle" opacity="0.7">writer</text>
+  <rect x="100" y="60" width="220" height="100" rx="12" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <text x="210" y="92" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="17">Agent A</text>
+  <text x="210" y="115" text-anchor="middle" fill="#065F46" font-size="13">researcher</text>
+  <text x="210" y="135" text-anchor="middle" fill="#065F46" font-size="12">LangGraph runtime</text>
 
-    <line x1="280" y1="90" x2="480" y2="90" marker-end="url(#arr8)" />
-    <line x1="480" y1="100" x2="280" y2="100" marker-end="url(#arr8)" stroke-dasharray="3,3" />
-    <text x="380" y="78" text-anchor="middle" font-size="11" font-weight="600">A2A</text>
-    <text x="380" y="118" text-anchor="middle" font-size="11" opacity="0.7">delegate · receive · respond</text>
+  <rect x="580" y="60" width="220" height="100" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5"/>
+  <text x="690" y="92" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="17">Agent B</text>
+  <text x="690" y="115" text-anchor="middle" fill="#1E40AF" font-size="13">writer</text>
+  <text x="690" y="135" text-anchor="middle" fill="#1E40AF" font-size="12">CrewAI crew</text>
 
-    <rect x="60" y="200" width="160" height="60" rx="6" />
-    <text x="140" y="225" text-anchor="middle">MCP server</text>
-    <text x="140" y="245" text-anchor="middle" opacity="0.7">web_search</text>
+  <rect x="375" y="95" width="150" height="30" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <text x="450" y="116" text-anchor="middle" fill="#7F1D1D" font-weight="700" font-size="14">A2A protocol</text>
 
-    <rect x="270" y="200" width="160" height="60" rx="6" />
-    <text x="350" y="225" text-anchor="middle">MCP server</text>
-    <text x="350" y="245" text-anchor="middle" opacity="0.7">billing</text>
-
-    <rect x="480" y="200" width="160" height="60" rx="6" />
-    <text x="560" y="225" text-anchor="middle">MCP server</text>
-    <text x="560" y="245" text-anchor="middle" opacity="0.7">cms</text>
-
-    <line x1="180" y1="120" x2="140" y2="195" marker-end="url(#arr8)" />
-    <line x1="220" y1="120" x2="320" y2="195" marker-end="url(#arr8)" />
-    <line x1="560" y1="120" x2="560" y2="195" marker-end="url(#arr8)" />
-
-    <rect x="120" y="300" width="520" height="50" rx="6" stroke-dasharray="3,3" />
-    <text x="380" y="330" text-anchor="middle" font-weight="600">Durable bus — Kafka · Redis Streams · NATS (optional, for long-running)</text>
+  <g stroke="#EF4444" stroke-width="2.5" fill="none">
+    <line x1="320" y1="100" x2="370" y2="100" marker-end="url(#a10)"/>
+    <line x1="580" y1="120" x2="530" y2="120" marker-end="url(#a10)" stroke-dasharray="5,4"/>
   </g>
+
+  <rect x="60" y="230" width="220" height="100" rx="12" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="170" y="262" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="16">MCP Server</text>
+  <text x="170" y="287" text-anchor="middle" fill="#5B21B6" font-size="13">web_search</text>
+  <text x="170" y="307" text-anchor="middle" fill="#5B21B6" font-size="12">arxiv · google · brave</text>
+
+  <rect x="340" y="230" width="220" height="100" rx="12" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="450" y="262" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="16">MCP Server</text>
+  <text x="450" y="287" text-anchor="middle" fill="#5B21B6" font-size="13">billing</text>
+  <text x="450" y="307" text-anchor="middle" fill="#5B21B6" font-size="12">internal API surface</text>
+
+  <rect x="620" y="230" width="220" height="100" rx="12" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="730" y="262" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="16">MCP Server</text>
+  <text x="730" y="287" text-anchor="middle" fill="#5B21B6" font-size="13">cms</text>
+  <text x="730" y="307" text-anchor="middle" fill="#5B21B6" font-size="12">publish drafts</text>
+
+  <g stroke="#475569" stroke-width="2.5" fill="none">
+    <line x1="180" y1="160" x2="170" y2="225" marker-end="url(#a10)"/>
+    <line x1="240" y1="160" x2="430" y2="225" marker-end="url(#a10)"/>
+    <line x1="690" y1="160" x2="730" y2="225" marker-end="url(#a10)"/>
+  </g>
+
+  <rect x="100" y="380" width="700" height="60" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="6,4"/>
+  <text x="450" y="410" text-anchor="middle" fill="#78350F" font-weight="700" font-size="15">Durable bus — Kafka · Redis Streams · NATS · SQS</text>
+  <text x="450" y="430" text-anchor="middle" fill="#92400E" font-size="12">optional, for long-running async workflows</text>
 </svg>
 </div>
 

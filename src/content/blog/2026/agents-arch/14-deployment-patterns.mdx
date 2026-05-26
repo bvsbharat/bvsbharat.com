@@ -21,39 +21,55 @@ These three properties push you toward different infrastructure than a typical w
 
 ## The three shapes
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Three agent deployment shapes">
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="30" y="30" width="220" height="240" rx="8" />
-    <text x="140" y="55" text-anchor="middle" font-weight="700">Request / response</text>
-    <text x="140" y="80" text-anchor="middle" opacity="0.7">latency-sensitive chat</text>
-    <text x="140" y="115" text-anchor="middle">Cloud Run</text>
-    <text x="140" y="135" text-anchor="middle">Lambda / Functions</text>
-    <text x="140" y="155" text-anchor="middle">Fargate / k8s</text>
-    <text x="140" y="195" text-anchor="middle" opacity="0.8">no checkpoint</text>
-    <text x="140" y="215" text-anchor="middle" opacity="0.8">tight timeouts</text>
-    <text x="140" y="235" text-anchor="middle" opacity="0.8">autoscales on RPS</text>
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="Three agent deployment shapes">
+  <rect x="30" y="30" width="270" height="320" rx="14" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5"/>
+  <text x="165" y="64" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="17">Request / Response</text>
+  <text x="165" y="86" text-anchor="middle" fill="#1E40AF" font-size="13">latency-sensitive chat</text>
 
-    <rect x="270" y="30" width="220" height="240" rx="8" />
-    <text x="380" y="55" text-anchor="middle" font-weight="700">Long-running stateful</text>
-    <text x="380" y="80" text-anchor="middle" opacity="0.7">multi-step / HITL</text>
-    <text x="380" y="115" text-anchor="middle">Managed runtimes</text>
-    <text x="380" y="135" text-anchor="middle">k8s with PVCs</text>
-    <text x="380" y="155" text-anchor="middle">VMs + checkpointer</text>
-    <text x="380" y="195" text-anchor="middle" opacity="0.8">durable session state</text>
-    <text x="380" y="215" text-anchor="middle" opacity="0.8">resume after restart</text>
-    <text x="380" y="235" text-anchor="middle" opacity="0.8">scales on session count</text>
+  <rect x="55" y="110" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="165" y="132" text-anchor="middle" fill="#1E3A8A" font-size="13" font-weight="600">Cloud Run</text>
+  <rect x="55" y="150" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="165" y="172" text-anchor="middle" fill="#1E3A8A" font-size="13" font-weight="600">Lambda / Functions</text>
+  <rect x="55" y="190" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="165" y="212" text-anchor="middle" fill="#1E3A8A" font-size="13" font-weight="600">Fargate / k8s</text>
 
-    <rect x="510" y="30" width="220" height="240" rx="8" />
-    <text x="620" y="55" text-anchor="middle" font-weight="700">Background batch</text>
-    <text x="620" y="80" text-anchor="middle" opacity="0.7">async, queue-driven</text>
-    <text x="620" y="115" text-anchor="middle">Queue worker pool</text>
-    <text x="620" y="135" text-anchor="middle">SQS / Pub/Sub / NATS</text>
-    <text x="620" y="155" text-anchor="middle">Step Functions / DAGs</text>
-    <text x="620" y="195" text-anchor="middle" opacity="0.8">at-least-once delivery</text>
-    <text x="620" y="215" text-anchor="middle" opacity="0.8">retries + DLQ</text>
-    <text x="620" y="235" text-anchor="middle" opacity="0.8">scales on queue depth</text>
-  </g>
+  <text x="165" y="252" text-anchor="middle" fill="#1E40AF" font-size="12">• no checkpoint</text>
+  <text x="165" y="272" text-anchor="middle" fill="#1E40AF" font-size="12">• tight timeouts</text>
+  <text x="165" y="292" text-anchor="middle" fill="#1E40AF" font-size="12">• autoscale on concurrency</text>
+  <text x="165" y="328" text-anchor="middle" fill="#1E3A8A" font-size="12" font-style="italic" font-weight="600">scales on requests</text>
+
+  <rect x="315" y="30" width="270" height="320" rx="14" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <text x="450" y="64" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="17">Long-running Stateful</text>
+  <text x="450" y="86" text-anchor="middle" fill="#065F46" font-size="13">multi-step · HITL</text>
+
+  <rect x="340" y="110" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#10B981" stroke-width="1.5"/>
+  <text x="450" y="132" text-anchor="middle" fill="#064E3B" font-size="13" font-weight="600">Managed runtimes</text>
+  <rect x="340" y="150" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#10B981" stroke-width="1.5"/>
+  <text x="450" y="172" text-anchor="middle" fill="#064E3B" font-size="13" font-weight="600">k8s + PVCs</text>
+  <rect x="340" y="190" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#10B981" stroke-width="1.5"/>
+  <text x="450" y="212" text-anchor="middle" fill="#064E3B" font-size="13" font-weight="600">VMs + checkpointer</text>
+
+  <text x="450" y="252" text-anchor="middle" fill="#065F46" font-size="12">• durable session state</text>
+  <text x="450" y="272" text-anchor="middle" fill="#065F46" font-size="12">• resume after restart</text>
+  <text x="450" y="292" text-anchor="middle" fill="#065F46" font-size="12">• HITL pause / approve</text>
+  <text x="450" y="328" text-anchor="middle" fill="#064E3B" font-size="12" font-style="italic" font-weight="600">scales on active sessions</text>
+
+  <rect x="600" y="30" width="270" height="320" rx="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="735" y="64" text-anchor="middle" fill="#78350F" font-weight="700" font-size="17">Background Batch</text>
+  <text x="735" y="86" text-anchor="middle" fill="#92400E" font-size="13">async, queue-driven</text>
+
+  <rect x="625" y="110" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="735" y="132" text-anchor="middle" fill="#78350F" font-size="13" font-weight="600">Queue worker pool</text>
+  <rect x="625" y="150" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="735" y="172" text-anchor="middle" fill="#78350F" font-size="13" font-weight="600">SQS · Pub/Sub · NATS</text>
+  <rect x="625" y="190" width="220" height="34" rx="8" fill="#FFFFFF" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="735" y="212" text-anchor="middle" fill="#78350F" font-size="13" font-weight="600">Step Functions / DAGs</text>
+
+  <text x="735" y="252" text-anchor="middle" fill="#92400E" font-size="12">• at-least-once delivery</text>
+  <text x="735" y="272" text-anchor="middle" fill="#92400E" font-size="12">• retries + DLQ</text>
+  <text x="735" y="292" text-anchor="middle" fill="#92400E" font-size="12">• backpressure-aware</text>
+  <text x="735" y="328" text-anchor="middle" fill="#78350F" font-size="12" font-style="italic" font-weight="600">scales on queue depth</text>
 </svg>
 </div>
 

@@ -19,49 +19,48 @@ This post is the deep dive: what the graph actually is, what the four primitives
 
 A LangGraph agent is **a graph of nodes** that read from and write to a shared state object. The runtime walks the graph: at each step it executes a node, the node returns a partial state update, the runtime merges it via reducers, and an edge function decides which node runs next.
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="LangGraph state machine diagram">
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="LangGraph state machine">
   <defs>
-    <marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+    <marker id="a3" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#475569"/></marker>
   </defs>
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <ellipse cx="80" cy="50" rx="40" ry="22" />
-    <text x="80" y="55" text-anchor="middle" font-weight="600">START</text>
 
-    <rect x="180" y="25" width="150" height="50" rx="6" />
-    <text x="255" y="55" text-anchor="middle" font-weight="600">plan</text>
+  <ellipse cx="90" cy="80" rx="55" ry="34" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="90" y="86" text-anchor="middle" fill="#78350F" font-weight="700" font-size="15">START</text>
 
-    <polygon points="400,50 460,25 520,50 460,75" />
-    <text x="460" y="55" text-anchor="middle" font-weight="600">route?</text>
+  <rect x="210" y="46" width="170" height="68" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <text x="295" y="78" text-anchor="middle" fill="#064E3B" font-weight="700" font-size="15">plan</text>
+  <text x="295" y="98" text-anchor="middle" fill="#065F46" font-size="12">LLM call</text>
 
-    <rect x="560" y="25" width="150" height="50" rx="6" />
-    <text x="635" y="55" text-anchor="middle" font-weight="600">call_tool</text>
+  <polygon points="460,80 530,40 600,80 530,120" fill="#FEE2E2" stroke="#EF4444" stroke-width="2.5"/>
+  <text x="530" y="76" text-anchor="middle" fill="#7F1D1D" font-weight="700" font-size="14">route?</text>
+  <text x="530" y="93" text-anchor="middle" fill="#991B1B" font-size="11">conditional edge</text>
 
-    <rect x="380" y="140" width="160" height="50" rx="6" />
-    <text x="460" y="170" text-anchor="middle" font-weight="600">summarize</text>
+  <rect x="670" y="46" width="170" height="68" rx="10" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2.5"/>
+  <text x="755" y="78" text-anchor="middle" fill="#164E63" font-weight="700" font-size="15">call_tool</text>
+  <text x="755" y="98" text-anchor="middle" fill="#155E75" font-size="12">execute action</text>
 
-    <rect x="180" y="240" width="150" height="50" rx="6" />
-    <text x="255" y="270" text-anchor="middle" font-weight="600">human_review</text>
+  <rect x="445" y="190" width="170" height="68" rx="10" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="530" y="222" text-anchor="middle" fill="#4C1D95" font-weight="700" font-size="15">summarize</text>
+  <text x="530" y="242" text-anchor="middle" fill="#5B21B6" font-size="12">budget exceeded</text>
 
-    <ellipse cx="635" cy="265" rx="40" ry="22" />
-    <text x="635" y="270" text-anchor="middle" font-weight="600">END</text>
+  <rect x="210" y="320" width="200" height="68" rx="10" fill="#FCE7F3" stroke="#EC4899" stroke-width="2.5"/>
+  <text x="310" y="352" text-anchor="middle" fill="#831843" font-weight="700" font-size="15">human_review</text>
+  <text x="310" y="372" text-anchor="middle" fill="#9D174D" font-size="12">interrupt + resume</text>
 
-    <line x1="120" y1="50" x2="175" y2="50" marker-end="url(#arr2)" />
-    <line x1="330" y1="50" x2="395" y2="50" marker-end="url(#arr2)" />
-    <line x1="520" y1="50" x2="555" y2="50" marker-end="url(#arr2)" />
-    <line x1="635" y1="75" x2="635" y2="240" marker-end="url(#arr2)" stroke-dasharray="3,3" />
-    <text x="650" y="160" font-size="11" opacity="0.7">if final</text>
+  <ellipse cx="755" cy="354" rx="55" ry="34" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5"/>
+  <text x="755" y="360" text-anchor="middle" fill="#1E3A8A" font-weight="700" font-size="15">END</text>
 
-    <path d="M635,75 C635,110 540,140 540,140" marker-end="url(#arr2)" />
-    <text x="555" y="115" font-size="11" opacity="0.7">if more steps</text>
-
-    <line x1="460" y1="190" x2="460" y2="220" />
-    <line x1="460" y1="220" x2="255" y2="220" />
-    <line x1="255" y1="220" x2="255" y2="235" marker-end="url(#arr2)" />
-
-    <line x1="330" y1="265" x2="595" y2="265" marker-end="url(#arr2)" />
-
-    <line x1="460" y1="75" x2="460" y2="135" marker-end="url(#arr2)" />
+  <g stroke="#475569" stroke-width="2.5" fill="none">
+    <line x1="145" y1="80" x2="205" y2="80" marker-end="url(#a3)"/>
+    <line x1="380" y1="80" x2="455" y2="80" marker-end="url(#a3)"/>
+    <line x1="600" y1="80" x2="665" y2="80" marker-end="url(#a3)"/>
+    <path d="M755 114 Q755 200 615 224" marker-end="url(#a3)" stroke-dasharray="5,4"/>
+    <line x1="530" y1="120" x2="530" y2="186" marker-end="url(#a3)"/>
+    <path d="M445 224 Q310 224 310 316" marker-end="url(#a3)"/>
+    <line x1="410" y1="354" x2="700" y2="354" marker-end="url(#a3)"/>
+    <text x="650" y="170" fill="#475569" font-size="12" font-style="italic">if final</text>
+    <text x="555" y="160" fill="#475569" font-size="12" font-style="italic">budget hit</text>
   </g>
 </svg>
 </div>

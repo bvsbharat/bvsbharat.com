@@ -25,21 +25,31 @@ Three orthogonal axes:
 
 A change that improves correctness but blows up cost is not an improvement. A change that's faster but cites hallucinated sources is regression. Track all three; don't let one axis cannibalize another silently.
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Three-layer evaluation stack">
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="30" y="30" width="700" height="60" rx="6" />
-    <text x="60" y="55" font-weight="700">Layer 3 — LLM-as-judge / human review</text>
-    <text x="60" y="75" opacity="0.8">faithfulness, helpfulness, calibrated against humans</text>
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="Three-layer eval stack">
+  <rect x="40" y="30" width="820" height="90" rx="12" fill="#FEE2E2" stroke="#EF4444" stroke-width="2.5"/>
+  <circle cx="80" cy="62" r="20" fill="#EF4444"/>
+  <text x="80" y="69" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="15">L3</text>
+  <text x="118" y="60" fill="#7F1D1D" font-weight="700" font-size="17">LLM-as-judge / human review</text>
+  <text x="118" y="85" fill="#991B1B" font-size="13">faithfulness · helpfulness · safety</text>
+  <text x="118" y="105" fill="#991B1B" font-size="13">calibrated against humans · runs nightly</text>
+  <text x="850" y="62" text-anchor="end" fill="#7F1D1D" font-size="12" font-weight="600">slow · expensive</text>
 
-    <rect x="30" y="110" width="700" height="60" rx="6" />
-    <text x="60" y="135" font-weight="700">Layer 2 — Trajectory grading</text>
-    <text x="60" y="155" opacity="0.8">right tools, right order, right step count — replay-based</text>
+  <rect x="40" y="135" width="820" height="90" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+  <circle cx="80" cy="167" r="20" fill="#F59E0B"/>
+  <text x="80" y="174" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="15">L2</text>
+  <text x="118" y="165" fill="#78350F" font-weight="700" font-size="17">Trajectory grading</text>
+  <text x="118" y="190" fill="#92400E" font-size="13">right tools · right order · right step count</text>
+  <text x="118" y="210" fill="#92400E" font-size="13">replay-based · structural assertions on the trace</text>
+  <text x="850" y="167" text-anchor="end" fill="#78350F" font-size="12" font-weight="600">on every PR</text>
 
-    <rect x="30" y="190" width="700" height="60" rx="6" />
-    <text x="60" y="215" font-weight="700">Layer 1 — Unit / golden-set tests</text>
-    <text x="60" y="235" opacity="0.8">deterministic assertions, fixtures, contract tests on tools</text>
-  </g>
+  <rect x="40" y="240" width="820" height="90" rx="12" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <circle cx="80" cy="272" r="20" fill="#10B981"/>
+  <text x="80" y="279" text-anchor="middle" fill="#FFFFFF" font-weight="700" font-size="15">L1</text>
+  <text x="118" y="270" fill="#064E3B" font-weight="700" font-size="17">Unit / golden-set tests</text>
+  <text x="118" y="295" fill="#065F46" font-size="13">deterministic assertions · fixtures · contract tests on tools</text>
+  <text x="118" y="315" fill="#065F46" font-size="13">30–100 curated cases · grows with incidents</text>
+  <text x="850" y="272" text-anchor="end" fill="#064E3B" font-size="12" font-weight="600">fast · cheap</text>
 </svg>
 </div>
 

@@ -19,31 +19,35 @@ This post is the 2026 observability stack — what to instrument, what to measur
 
 A trace is the full record of one agent run: every node executed, every LLM call, every tool call, every state mutation, with timestamps, tokens, costs, and parent-child relationships. If you have the trace, you can replay; if you don't, you're guessing.
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Agent trace tree">
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="12">
-    <rect x="40" y="30" width="680" height="36" rx="6" />
-    <text x="60" y="53" font-weight="700">trace: ticket-9421</text>
-    <text x="680" y="53" text-anchor="end" opacity="0.7">3.4s · 12k tokens · $0.094</text>
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="Agent trace tree with spans">
+  <rect x="30" y="30" width="840" height="50" rx="10" fill="#F1F5F9" stroke="#475569" stroke-width="2.5"/>
+  <text x="50" y="58" fill="#0F172A" font-weight="700" font-size="15">trace · ticket-9421</text>
+  <text x="850" y="58" text-anchor="end" fill="#334155" font-size="13">3.4s · 12k tokens · $0.094</text>
 
-    <rect x="60" y="80" width="660" height="28" rx="4" />
-    <text x="80" y="98">span: plan · 410ms · 1.8k tokens</text>
+  <rect x="60" y="100" width="810" height="38" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="80" y="124" fill="#064E3B" font-weight="600" font-size="13">plan</text>
+  <text x="850" y="124" text-anchor="end" fill="#065F46" font-size="12">410ms · 1.8k tokens</text>
 
-    <rect x="80" y="118" width="640" height="28" rx="4" />
-    <text x="100" y="136">span: llm.invoke (claude-opus-4-7) · 380ms · 1842/67 in/out</text>
+  <rect x="100" y="148" width="770" height="38" rx="8" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="120" y="172" fill="#4C1D95" font-weight="600" font-size="13">llm.invoke (claude-opus-4-7)</text>
+  <text x="850" y="172" text-anchor="end" fill="#5B21B6" font-size="12">380ms · 1842 in / 67 out</text>
 
-    <rect x="60" y="158" width="660" height="28" rx="4" />
-    <text x="80" y="176">span: call_tool: get_invoice · 142ms · args INV-2026-0042</text>
+  <rect x="60" y="196" width="810" height="38" rx="8" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2"/>
+  <text x="80" y="220" fill="#164E63" font-weight="600" font-size="13">call_tool · get_invoice</text>
+  <text x="850" y="220" text-anchor="end" fill="#155E75" font-size="12">142ms · args: INV-2026-0042</text>
 
-    <rect x="80" y="196" width="640" height="28" rx="4" />
-    <text x="100" y="214">span: http.get billing.internal/invoices/INV-2026-0042 · 128ms · 200</text>
+  <rect x="100" y="244" width="770" height="38" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="120" y="268" fill="#78350F" font-weight="600" font-size="13">http.get billing.internal/invoices/INV-2026-0042</text>
+  <text x="850" y="268" text-anchor="end" fill="#92400E" font-size="12">128ms · 200 OK</text>
 
-    <rect x="60" y="236" width="660" height="28" rx="4" />
-    <text x="80" y="254">span: plan · 380ms · 2.1k tokens</text>
+  <rect x="60" y="292" width="810" height="38" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="80" y="316" fill="#064E3B" font-weight="600" font-size="13">plan (loop iter 2)</text>
+  <text x="850" y="316" text-anchor="end" fill="#065F46" font-size="12">380ms · 2.1k tokens</text>
 
-    <rect x="60" y="274" width="660" height="28" rx="4" />
-    <text x="80" y="292">span: call_tool: issue_refund · awaiting_approval (interrupt)</text>
-  </g>
+  <rect x="60" y="340" width="810" height="38" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <text x="80" y="364" fill="#7F1D1D" font-weight="600" font-size="13">call_tool · issue_refund</text>
+  <text x="850" y="364" text-anchor="end" fill="#991B1B" font-size="12">awaiting_approval — interrupt</text>
 </svg>
 </div>
 

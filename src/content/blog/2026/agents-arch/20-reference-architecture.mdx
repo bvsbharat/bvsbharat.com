@@ -17,70 +17,81 @@ The shape is what a thoughtful organization actually builds in 2026. Real teams 
 
 ## The diagram
 
-<div class="my-8 overflow-x-auto rounded-lg border border-border bg-muted/30 p-4">
-<svg viewBox="0 0 880 540" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto" role="img" aria-label="Reference enterprise agent architecture">
+<div class="my-8 overflow-x-auto rounded-xl" style="background:#f8fafc;padding:1.75rem;border:1px solid #e2e8f0">
+<svg viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" class="mx-auto block" style="max-width:100%;height:auto;font-family:Inter,system-ui,sans-serif" role="img" aria-label="Reference enterprise agent platform">
   <defs>
-    <marker id="arr13" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor" /></marker>
+    <marker id="a20" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#475569"/></marker>
   </defs>
-  <g fill="none" stroke="currentColor" stroke-width="1.5" font-family="ui-monospace, Menlo, monospace" font-size="11">
-    <rect x="20" y="20" width="840" height="50" rx="6" />
-    <text x="60" y="45" font-weight="700">Client surfaces</text>
-    <text x="200" y="45" opacity="0.8">Web UI · Slack · API · CLI · Mobile · Workflow triggers</text>
 
-    <rect x="20" y="90" width="840" height="60" rx="6" />
-    <text x="60" y="115" font-weight="700">Gateway</text>
-    <text x="60" y="135" opacity="0.7">Auth · rate-limit · tenant scope · request shaping</text>
+  <rect x="30" y="20" width="900" height="70" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2.5"/>
+  <text x="60" y="50" fill="#1E3A8A" font-weight="700" font-size="16">Client Surfaces</text>
+  <text x="60" y="74" fill="#1E40AF" font-size="13">Web UI · Slack · API · CLI · Mobile · Workflow triggers</text>
 
-    <rect x="20" y="170" width="270" height="120" rx="6" />
-    <text x="40" y="195" font-weight="700">Foreground agents</text>
-    <text x="40" y="215" opacity="0.7">request/response</text>
-    <text x="40" y="240" opacity="0.8">LangGraph runtime</text>
-    <text x="40" y="258" opacity="0.8">streaming chat</text>
-    <text x="40" y="276" opacity="0.8">latency-tuned</text>
+  <rect x="30" y="110" width="900" height="70" rx="12" fill="#FEE2E2" stroke="#EF4444" stroke-width="2.5"/>
+  <text x="60" y="140" fill="#7F1D1D" font-weight="700" font-size="16">Gateway</text>
+  <text x="60" y="164" fill="#991B1B" font-size="13">auth · rate-limit · tenant scope · request shaping · actor identity</text>
 
-    <rect x="305" y="170" width="270" height="120" rx="6" />
-    <text x="325" y="195" font-weight="700">Background workers</text>
-    <text x="325" y="215" opacity="0.7">queue-driven</text>
-    <text x="325" y="240" opacity="0.8">durable bus (SQS/NATS)</text>
-    <text x="325" y="258" opacity="0.8">worker pool</text>
-    <text x="325" y="276" opacity="0.8">retry · DLQ</text>
+  <rect x="30" y="200" width="290" height="140" rx="12" fill="#D1FAE5" stroke="#10B981" stroke-width="2.5"/>
+  <text x="60" y="232" fill="#064E3B" font-weight="700" font-size="16">Foreground Agents</text>
+  <text x="60" y="252" fill="#065F46" font-size="12" font-style="italic">request/response</text>
+  <text x="60" y="280" fill="#065F46" font-size="13">• LangGraph runtime</text>
+  <text x="60" y="300" fill="#065F46" font-size="13">• streaming chat</text>
+  <text x="60" y="320" fill="#065F46" font-size="13">• latency-tuned</text>
 
-    <rect x="590" y="170" width="270" height="120" rx="6" />
-    <text x="610" y="195" font-weight="700">Long-running stateful</text>
-    <text x="610" y="215" opacity="0.7">multi-step · HITL</text>
-    <text x="610" y="240" opacity="0.8">Managed Agents</text>
-    <text x="610" y="258" opacity="0.8">durable sessions</text>
-    <text x="610" y="276" opacity="0.8">approval queue</text>
+  <rect x="335" y="200" width="290" height="140" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="365" y="232" fill="#78350F" font-weight="700" font-size="16">Background Workers</text>
+  <text x="365" y="252" fill="#92400E" font-size="12" font-style="italic">queue-driven</text>
+  <text x="365" y="280" fill="#92400E" font-size="13">• durable bus (SQS/NATS)</text>
+  <text x="365" y="300" fill="#92400E" font-size="13">• worker pool</text>
+  <text x="365" y="320" fill="#92400E" font-size="13">• retry + DLQ</text>
 
-    <rect x="20" y="310" width="840" height="90" rx="6" />
-    <text x="60" y="335" font-weight="700">Shared platform services</text>
-    <rect x="40" y="350" width="160" height="40" rx="6" />
-    <text x="120" y="375" text-anchor="middle">MCP servers</text>
-    <rect x="220" y="350" width="160" height="40" rx="6" />
-    <text x="300" y="375" text-anchor="middle">Memory store</text>
-    <rect x="400" y="350" width="160" height="40" rx="6" />
-    <text x="480" y="375" text-anchor="middle">Vector + BM25 + graph</text>
-    <rect x="580" y="350" width="160" height="40" rx="6" />
-    <text x="660" y="375" text-anchor="middle">Eval pipeline</text>
-    <rect x="760" y="350" width="80" height="40" rx="6" />
-    <text x="800" y="375" text-anchor="middle">Registry</text>
+  <rect x="640" y="200" width="290" height="140" rx="12" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="670" y="232" fill="#4C1D95" font-weight="700" font-size="16">Long-running Stateful</text>
+  <text x="670" y="252" fill="#5B21B6" font-size="12" font-style="italic">multi-step · HITL</text>
+  <text x="670" y="280" fill="#5B21B6" font-size="13">• Managed Agents</text>
+  <text x="670" y="300" fill="#5B21B6" font-size="13">• durable sessions</text>
+  <text x="670" y="320" fill="#5B21B6" font-size="13">• approval queue</text>
 
-    <rect x="20" y="420" width="840" height="60" rx="6" />
-    <text x="60" y="445" font-weight="700">Cross-cutting</text>
-    <text x="60" y="465" opacity="0.7">OTel tracing · LangSmith/Langfuse · OPA policy · credential vault · audit log</text>
+  <rect x="30" y="360" width="900" height="120" rx="12" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2.5"/>
+  <text x="60" y="388" fill="#164E63" font-weight="700" font-size="16">Shared Platform Services</text>
 
-    <rect x="20" y="500" width="840" height="30" rx="6" />
-    <text x="440" y="520" text-anchor="middle" opacity="0.8">LLM providers (Anthropic · OpenAI · Google · Bedrock) — failover-capable</text>
+  <rect x="50" y="404" width="170" height="60" rx="8" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/>
+  <text x="135" y="430" text-anchor="middle" fill="#164E63" font-weight="700" font-size="13">MCP servers</text>
+  <text x="135" y="450" text-anchor="middle" fill="#155E75" font-size="11">tool registry</text>
 
-    <line x1="440" y1="70" x2="440" y2="85" marker-end="url(#arr13)" />
-    <line x1="155" y1="150" x2="155" y2="165" marker-end="url(#arr13)" />
-    <line x1="440" y1="150" x2="440" y2="165" marker-end="url(#arr13)" />
-    <line x1="725" y1="150" x2="725" y2="165" marker-end="url(#arr13)" />
-    <line x1="155" y1="290" x2="155" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
-    <line x1="440" y1="290" x2="440" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
-    <line x1="725" y1="290" x2="725" y2="305" marker-end="url(#arr13)" stroke-dasharray="3,3" />
-    <line x1="440" y1="400" x2="440" y2="415" marker-end="url(#arr13)" stroke-dasharray="3,3" />
-    <line x1="440" y1="480" x2="440" y2="495" marker-end="url(#arr13)" stroke-dasharray="3,3" />
+  <rect x="232" y="404" width="170" height="60" rx="8" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/>
+  <text x="317" y="430" text-anchor="middle" fill="#164E63" font-weight="700" font-size="13">Memory store</text>
+  <text x="317" y="450" text-anchor="middle" fill="#155E75" font-size="11">4-tier · reflective</text>
+
+  <rect x="414" y="404" width="170" height="60" rx="8" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/>
+  <text x="499" y="430" text-anchor="middle" fill="#164E63" font-weight="700" font-size="13">Hybrid retrieval</text>
+  <text x="499" y="450" text-anchor="middle" fill="#155E75" font-size="11">vector + BM25 + graph</text>
+
+  <rect x="596" y="404" width="170" height="60" rx="8" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/>
+  <text x="681" y="430" text-anchor="middle" fill="#164E63" font-weight="700" font-size="13">Eval pipeline</text>
+  <text x="681" y="450" text-anchor="middle" fill="#155E75" font-size="11">golden + traj + judge</text>
+
+  <rect x="778" y="404" width="132" height="60" rx="8" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/>
+  <text x="844" y="430" text-anchor="middle" fill="#164E63" font-weight="700" font-size="13">Registry</text>
+  <text x="844" y="450" text-anchor="middle" fill="#155E75" font-size="11">agent inventory</text>
+
+  <rect x="30" y="500" width="900" height="70" rx="12" fill="#FCE7F3" stroke="#EC4899" stroke-width="2.5"/>
+  <text x="60" y="528" fill="#831843" font-weight="700" font-size="16">Cross-cutting</text>
+  <text x="60" y="552" fill="#9D174D" font-size="13">OTel tracing · LangSmith/Langfuse · OPA policy · credential vault · audit log</text>
+
+  <rect x="30" y="590" width="900" height="40" rx="12" fill="#F1F5F9" stroke="#475569" stroke-width="2"/>
+  <text x="480" y="615" text-anchor="middle" fill="#0F172A" font-weight="600" font-size="14">LLM Providers — Anthropic · OpenAI · Google · Bedrock (failover-capable)</text>
+
+  <g stroke="#475569" stroke-width="2.5" fill="none">
+    <line x1="480" y1="90" x2="480" y2="105" marker-end="url(#a20)"/>
+    <line x1="175" y1="180" x2="175" y2="195" marker-end="url(#a20)"/>
+    <line x1="480" y1="180" x2="480" y2="195" marker-end="url(#a20)"/>
+    <line x1="785" y1="180" x2="785" y2="195" marker-end="url(#a20)"/>
+    <line x1="175" y1="340" x2="175" y2="355" marker-end="url(#a20)" stroke-dasharray="4,4"/>
+    <line x1="480" y1="340" x2="480" y2="355" marker-end="url(#a20)" stroke-dasharray="4,4"/>
+    <line x1="785" y1="340" x2="785" y2="355" marker-end="url(#a20)" stroke-dasharray="4,4"/>
+    <line x1="480" y1="480" x2="480" y2="495" marker-end="url(#a20)" stroke-dasharray="4,4"/>
+    <line x1="480" y1="570" x2="480" y2="585" marker-end="url(#a20)" stroke-dasharray="4,4"/>
   </g>
 </svg>
 </div>
