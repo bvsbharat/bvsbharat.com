@@ -1,0 +1,17 @@
+{
+  "name": "bvsbharat.com",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev -- --host 0.0.0.0",
+      "description": "Astro dev server on http://localhost:4321"
+    }
+  ],
+  "ports": [
+    {
+      "name": "dev server",
+      "port": 4321
+    }
+  ]
+}
