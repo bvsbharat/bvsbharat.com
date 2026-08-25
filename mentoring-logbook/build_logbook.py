@@ -94,6 +94,16 @@ label { font-size: 9pt; color: #3a4a5a; font-weight: 600; }
   margin: 0 16mm 4px;
 }
 .inst-meta { font-size: 9.5pt; color: #3a4a5a; margin: 2px 20mm; }
+.filled {
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #0b3d5c;
+  border-bottom: 1px solid #c5d0da;
+  min-height: 1.55em;
+  padding: 2px 0 4px;
+  margin: 0 0 8px;
+  text-align: left;
+}
 .cover {
   text-align: center;
   padding-top: 18mm;
@@ -183,9 +193,9 @@ def cover():
   <div class="box" style="text-align:left; margin: 0 18mm;">
     <div class="row"><div class="col"><label>Academic year</label>{lines()}</div>
         <div class="col"><label>Batch / admission year</label>{lines()}</div></div>
-    <div class="row"><div class="col"><label>Faculty mentor (full name)</label>{lines()}</div></div>
-    <div class="row"><div class="col"><label>Designation</label>{lines()}</div>
-        <div class="col"><label>Department</label>{lines()}</div></div>
+    <div class="row"><div class="col"><label>Faculty mentor (full name)</label><div class="filled">Dr. Sushma Korukonda, MD, ACME</div></div></div>
+    <div class="row"><div class="col"><label>Designation</label><div class="filled">Professor</div></div>
+        <div class="col"><label>Department</label><div class="filled">Anatomy</div></div></div>
     <div class="row"><div class="col"><label>Employee / faculty ID</label>{lines()}</div>
         <div class="col"><label>Mobile</label>{lines()}</div></div>
     <label>College email</label>{lines()}
@@ -204,7 +214,7 @@ def how_to_use():
   <p>This book is for <strong>one faculty mentor</strong> and <strong>three Phase I mentees</strong> (NMC CBME 2024 ratio 1:3). Meet about <strong>once a month</strong>. There are <strong>12 meeting sheets per mentee</strong> for this academic year. Add extra sheets later if needed.</p>
   <h3>Before the first meeting</h3>
   <ol>
-    <li>Fill your name and department on the cover and the mentor page.</li>
+    <li>Confirm the cover (already printed with your name) and add academic year / batch.</li>
     <li>Complete one <strong>Student profile</strong> with each mentee in the Foundation Course week.</li>
     <li>Fill SWOC together. Keep health and family issues brief; use the confidential note if needed.</li>
   </ol>
@@ -253,8 +263,8 @@ def mentor_and_tracker():
   <div class="banner">MENTOR RECORD</div>
   <div class="box">
     <div class="row">
-      <div class="col"><label>Name</label>{lines()}</div>
-      <div class="col"><label>Department &amp; designation</label>{lines()}</div>
+      <div class="col"><label>Name</label><div class="filled">Dr. Sushma Korukonda, MD, ACME</div></div>
+      <div class="col"><label>Department &amp; designation</label><div class="filled">Professor, Department of Anatomy</div></div>
     </div>
     <div class="row">
       <div class="col"><label>Allotted on (Foundation Course date)</label>{lines()}</div>

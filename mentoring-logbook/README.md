@@ -19,7 +19,7 @@ Printable faculty logbook for **Gayatri Vidya Parishad Institute of Health Care 
 ## Before first use
 
 1. Cover already has the **GVPIHCMT emblem**, college name and Visakhapatnam address.
-2. Fill **your** name, designation, department, academic year.
+2. Faculty mentor is already printed: **Dr. Sushma Korukonda, MD, ACME**, Professor, Department of Anatomy. Fill academic year and batch.
 3. During Foundation Course, complete each student’s **profile + SWOC** with them present.
 4. Tick the **year-at-a-glance** table whenever a monthly meeting is done.
 
