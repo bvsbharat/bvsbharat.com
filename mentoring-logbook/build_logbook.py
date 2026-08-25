@@ -79,12 +79,11 @@ label { font-size: 9pt; color: #3a4a5a; font-weight: 600; }
   background: #f7fafc;
 }
 .cover-logo {
-  width: 38mm; height: 38mm;
+  width: 42mm; height: 42mm;
   object-fit: contain;
   display: block;
-  margin: 0 auto 10px;
-  background: #0b3d5c;
-  border-radius: 6px;
+  margin: 0 auto 8px;
+  background: transparent;
 }
 .inst-name {
   font-size: 13.5pt;
@@ -106,7 +105,7 @@ label { font-size: 9pt; color: #3a4a5a; font-weight: 600; }
 }
 .cover {
   text-align: center;
-  padding-top: 18mm;
+  padding-top: 10mm;
 }
 .cover h1 { font-size: 22pt; letter-spacing: .08em; margin: 8px 0; }
 .cover .inst { font-size: 16pt; min-height: 1.6em; border-bottom: 1px solid #0b3d5c; margin: 6px 40px; }
@@ -181,7 +180,7 @@ def lines(n=1, cls="line"):
 def cover():
     return f"""
 <section class="page cover">
-  <img class="cover-logo" src="assets/gvp-logo.jpg" alt="GVPIHCMT emblem">
+  <img class="cover-logo" src="assets/gvp-logo.png" alt="GVPIHCMT emblem">
   <p class="inst-name">GAYATRI VIDYA PARISHAD<br>INSTITUTE OF HEALTH CARE AND<br>MEDICAL TECHNOLOGY</p>
   <p class="inst-meta">Visakhapatnam &nbsp;·&nbsp; Andhra Pradesh</p>
   <p class="inst-meta">#6-25, Maridi Valley, Marikavalasa, Madhurawada, Visakhapatnam – 530048</p>
