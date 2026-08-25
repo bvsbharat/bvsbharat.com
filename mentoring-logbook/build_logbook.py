@@ -78,6 +78,22 @@ label { font-size: 9pt; color: #3a4a5a; font-weight: 600; }
   margin: 0 auto 14px;
   background: #f7fafc;
 }
+.cover-logo {
+  width: 38mm; height: 38mm;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 10px;
+  background: #0b3d5c;
+  border-radius: 6px;
+}
+.inst-name {
+  font-size: 13.5pt;
+  font-weight: 700;
+  color: #0b3d5c;
+  line-height: 1.3;
+  margin: 0 16mm 4px;
+}
+.inst-meta { font-size: 9.5pt; color: #3a4a5a; margin: 2px 20mm; }
 .cover {
   text-align: center;
   padding-top: 18mm;
@@ -155,11 +171,11 @@ def lines(n=1, cls="line"):
 def cover():
     return f"""
 <section class="page cover">
-  <div class="logo-box">Paste / stamp<br>Institution logo<br>here</div>
-  <div class="tiny">INSTITUTION</div>
-  <div class="inst">&nbsp;</div>
-  <div class="inst" style="font-size:12pt;border-style:dotted;">&nbsp;</div>
-  <p class="small" style="margin-top:4px;">(Write college name, city and affiliating university on the lines above)</p>
+  <img class="cover-logo" src="assets/gvp-logo.jpg" alt="GVPIHCMT emblem">
+  <p class="inst-name">GAYATRI VIDYA PARISHAD<br>INSTITUTE OF HEALTH CARE AND<br>MEDICAL TECHNOLOGY</p>
+  <p class="inst-meta">Visakhapatnam &nbsp;·&nbsp; Andhra Pradesh</p>
+  <p class="inst-meta">#6-25, Maridi Valley, Marikavalasa, Madhurawada, Visakhapatnam – 530048</p>
+  <p class="inst-meta">Affiliated to Dr. NTR University of Health Sciences &nbsp;·&nbsp; Recognised by NMC</p>
   <hr class="rule">
   <p class="small" style="letter-spacing:.18em; font-weight:700; color:#0b3d5c;">CBME 2024 · NMC MENTOR–MENTEE PROGRAMME</p>
   <h1>MENTOR–MENTEE<br>LOGBOOK</h1>
@@ -175,7 +191,7 @@ def cover():
     <label>College email</label>{lines()}
     <label>MEU / Mentoring cell in-charge (name)</label>{lines()}
   </div>
-  <p class="tiny" style="margin-top:18px;">Confidential faculty record &nbsp;·&nbsp; Not for student circulation &nbsp;·&nbsp; Retain till CRMI as per CBME 2024<br>
+  <p class="tiny" style="margin-top:18px;">GVPIHCMT, Visakhapatnam &nbsp;·&nbsp; Confidential faculty record &nbsp;·&nbsp; Not for student circulation &nbsp;·&nbsp; Retain till CRMI as per CBME 2024<br>
   Allotment during Foundation Course &nbsp;·&nbsp; Mentee remains with the same mentor till CRMI</p>
 </section>
 """
@@ -188,7 +204,7 @@ def how_to_use():
   <p>This book is for <strong>one faculty mentor</strong> and <strong>three Phase I mentees</strong> (NMC CBME 2024 ratio 1:3). Meet about <strong>once a month</strong>. There are <strong>12 meeting sheets per mentee</strong> for this academic year. Add extra sheets later if needed.</p>
   <h3>Before the first meeting</h3>
   <ol>
-    <li>Fill the cover (institution, logo, your details) and the mentor page.</li>
+    <li>Fill your name and department on the cover and the mentor page.</li>
     <li>Complete one <strong>Student profile</strong> with each mentee in the Foundation Course week.</li>
     <li>Fill SWOC together. Keep health and family issues brief; use the confidential note if needed.</li>
   </ol>
@@ -470,7 +486,7 @@ def extras():
     <li>Extra meeting + confidential referral log</li>
   </ol>
   <p>Print <strong>single-sided</strong> if you write in pen; or duplex and use a ring file with three colour flags (A / B / C).</p>
-  <div class="note">Prepared for Phase I MBBS faculty mentors under NMC CBME 2024 (1 mentor : 3 mentees; allotment in Foundation Course; continuity till CRMI). Adapt the institution name and logo on the cover. This is a documentation aid, not a substitute for college SOP or counselling services.</div>
+  <div class="note">Gayatri Vidya Parishad Institute of Health Care and Medical Technology, Visakhapatnam. Prepared for Phase I MBBS faculty mentors under NMC CBME 2024 (1 mentor : 3 mentees; allotment in Foundation Course; continuity till CRMI). This is a documentation aid, not a substitute for college SOP or counselling services.</div>
 </section>
 """
 

@@ -1,6 +1,8 @@
 # Phase I MBBS Mentor–Mentee Logbook (CBME 2024)
 
-Printable faculty logbook for **1 mentor : 3 mentees**, monthly meetings, **12 sheets per mentee**.
+Printable faculty logbook for **Gayatri Vidya Parishad Institute of Health Care and Medical Technology, Visakhapatnam**.
+
+**1 mentor : 3 mentees**, monthly meetings, **12 sheets per mentee**.
 
 ## Files
 
@@ -16,7 +18,7 @@ Printable faculty logbook for **1 mentor : 3 mentees**, monthly meetings, **12 s
 
 ## Before first use
 
-1. On the **cover**, paste or stamp the college logo and write the institution name.
+1. Cover already has the **GVPIHCMT emblem**, college name and Visakhapatnam address.
 2. Fill **your** name, designation, department, academic year.
 3. During Foundation Course, complete each student’s **profile + SWOC** with them present.
 4. Tick the **year-at-a-glance** table whenever a monthly meeting is done.
