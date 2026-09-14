@@ -8,7 +8,6 @@
   <style>
     :root {
       --paper: #f3eee3;
-      --paper-deep: #ebe3d4;
       --ink: #2a241c;
       --ink-soft: #5a5146;
       --rule: #b9a37f;
@@ -18,299 +17,128 @@
       --gold: #b8925a;
       --cream: #f7f2e8;
     }
-
     * { box-sizing: border-box; }
-
     html, body {
-      margin: 0;
-      padding: 0;
-      background: #cfc3ad;
-      color: var(--ink);
-      font-family: "Jost", "Inter", sans-serif;
-      font-size: 9.2pt;
-      line-height: 1.35;
+      margin: 0; padding: 0; background: #cfc3ad; color: var(--ink);
+      font-family: "Jost", "Inter", sans-serif; font-size: 8.8pt; line-height: 1.32;
     }
-
-    .desk {
-      padding: 28px 0 64px;
-    }
-
+    .desk { padding: 28px 0 64px; }
     .toolbar {
-      max-width: 148mm;
-      margin: 0 auto 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: 12px;
-      color: #3d3428;
+      max-width: 148mm; margin: 0 auto 18px; display: flex;
+      justify-content: space-between; align-items: center; gap: 12px;
+      font-size: 12px; color: #3d3428;
     }
-
-    .toolbar button, .toolbar a {
-      appearance: none;
-      border: 1px solid #31462f;
-      background: #31462f;
-      color: #f7f2e8;
-      padding: 8px 14px;
-      border-radius: 999px;
-      text-decoration: none;
-      font: 600 12px/1 "Jost", sans-serif;
-      cursor: pointer;
+    .toolbar button {
+      appearance: none; border: 1px solid #31462f; background: #31462f;
+      color: #f7f2e8; padding: 8px 14px; border-radius: 999px;
+      font: 600 12px/1 "Jost", sans-serif; cursor: pointer;
     }
-
-    .toolbar .hint { font-size: 11px; max-width: 42ch; }
-
+    .toolbar .hint { font-size: 11px; max-width: 46ch; }
     .page {
-      width: 148mm;
-      height: 210mm;
-      margin: 0 auto 22px;
-      background: var(--paper);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 18px 40px rgba(42, 36, 28, 0.22);
-      page-break-after: always;
-      break-after: page;
+      width: 148mm; height: 210mm; margin: 0 auto 22px; background: var(--paper);
+      position: relative; overflow: hidden; box-shadow: 0 18px 40px rgba(42,36,28,.22);
+      page-break-after: always; break-after: page;
     }
-
     .page:last-of-type { page-break-after: auto; break-after: auto; }
-
     .frame {
-      position: absolute;
-      inset: 7mm;
-      border: 0.6pt solid rgba(49, 70, 47, 0.55);
-      pointer-events: none;
-      z-index: 4;
+      position: absolute; inset: 7mm; border: 0.6pt solid rgba(49,70,47,.55);
+      pointer-events: none; z-index: 4;
     }
-
     .frame::after {
-      content: "";
-      position: absolute;
-      inset: 2.2mm;
-      border: 0.35pt solid rgba(166, 90, 58, 0.45);
+      content: ""; position: absolute; inset: 2.2mm;
+      border: 0.35pt solid rgba(166,90,58,.45);
     }
-
-    .inner {
-      position: relative;
-      z-index: 2;
-      height: 100%;
-      padding: 11mm 12mm 10mm;
-    }
-
+    .inner { position: relative; z-index: 2; height: 100%; padding: 11mm 12mm 10mm; }
     .cover .inner { padding: 0; }
-
     h1, h2, h3 { margin: 0; font-family: "Cormorant Garamond", "Times New Roman", serif; font-weight: 600; }
     .kicker {
-      font-family: "Jost", sans-serif;
-      font-size: 7pt;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--terracotta);
-      font-weight: 500;
+      font-size: 6.8pt; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--terracotta); font-weight: 500;
     }
     .script { font-family: "Caveat", cursive; color: var(--olive); }
     .muted { color: var(--ink-soft); }
-    .tiny { font-size: 7pt; letter-spacing: 0.04em; color: var(--ink-soft); }
+    .tiny { font-size: 7pt; letter-spacing: .03em; color: var(--ink-soft); }
     .pg {
-      position: absolute;
-      bottom: 8.2mm;
-      right: 12mm;
-      font-size: 7.5pt;
-      letter-spacing: 0.18em;
-      color: var(--olive);
-      z-index: 5;
+      position: absolute; bottom: 8.2mm; right: 12mm; font-size: 7.5pt;
+      letter-spacing: .18em; color: var(--olive); z-index: 5;
     }
     .pg-left { left: 12mm; right: auto; }
-
-    .lines {
-      background-image: repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 6.1mm,
-        var(--rule) 6.1mm,
-        var(--rule) calc(6.1mm + 0.35pt)
-      );
-      background-position: 0 1.6mm;
-    }
-
     .line {
-      border-bottom: 0.35pt solid var(--rule);
-      min-height: 6.2mm;
-      display: flex;
-      align-items: flex-end;
-      gap: 4px;
-      font-size: 8pt;
-      color: var(--ink-soft);
+      border-bottom: .35pt solid var(--rule); min-height: 5.8mm;
+      display: flex; align-items: flex-end; gap: 4px; font-size: 7.6pt; color: var(--ink-soft);
     }
-
-    .line span { white-space: nowrap; font-size: 7pt; letter-spacing: 0.08em; text-transform: uppercase; }
-
+    .line span { white-space: nowrap; font-size: 6.6pt; letter-spacing: .08em; text-transform: uppercase; }
     .box {
-      display: inline-block;
-      width: 2.4mm;
-      height: 2.4mm;
-      border: 0.5pt solid var(--forest);
-      margin-right: 1.6mm;
-      vertical-align: -0.2mm;
-      background: #fffdf8;
+      display: inline-block; width: 2.3mm; height: 2.3mm; border: .5pt solid var(--forest);
+      margin-right: 1.5mm; vertical-align: -.2mm; background: #fffdf8;
     }
-
     .row { display: flex; gap: 4mm; }
     .grow { flex: 1; }
-    .stack { display: flex; flex-direction: column; gap: 2.2mm; }
-
     .label {
-      font-size: 6.6pt;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--forest);
-      font-weight: 500;
-      margin-bottom: 1mm;
+      font-size: 6.5pt; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--forest); font-weight: 500; margin: 2mm 0 1mm;
     }
-
-    .rule-top {
-      border-top: 0.4pt solid rgba(49, 70, 47, 0.35);
-      padding-top: 2.4mm;
-      margin-top: 2.6mm;
+    .rule-top { border-top: .4pt solid rgba(49,70,47,.35); padding-top: 2.2mm; margin-top: 2.4mm; }
+    .card { background: rgba(255,253,248,.55); border: .4pt solid rgba(49,70,47,.22); padding: 2.2mm 2.6mm; }
+    .split { display: grid; grid-template-columns: 1.1fr .9fr; gap: 3.5mm; }
+    .split-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; }
+    .sketch {
+      border: .4pt dashed rgba(92,115,70,.55); background: rgba(255,253,248,.4);
+      min-height: 34mm; position: relative;
     }
-
-    .chip {
-      display: inline-block;
-      border: 0.4pt solid rgba(166, 90, 58, 0.5);
-      padding: 0.6mm 2mm;
-      font-size: 6.6pt;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--terracotta);
+    .sketch .hint {
+      position: absolute; inset: auto 3mm 2mm 3mm; font-family: "Caveat", cursive;
+      font-size: 11pt; color: rgba(92,115,70,.75);
     }
-
-    /* COVER */
+    .phrase {
+      display: grid; grid-template-columns: 32mm 1fr 30mm; gap: 2mm;
+      align-items: baseline; border-bottom: .35pt solid var(--rule);
+      padding: 1.15mm 0; font-size: 7.6pt;
+    }
+    .phrase b { font-family: "Noto Serif Bengali","Noto Sans Bengali",serif; font-weight: 600; color: var(--forest); }
+    .phrase em { font-style: italic; color: var(--ink-soft); font-size: 7pt; }
+    .day-block h3 { font-size: 12pt; color: var(--forest); }
+    img.fit { width: 100%; height: 100%; object-fit: cover; display: block; }
+    img.contain { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 4mm; font-size: 8pt; }
+    .check-table { width: 100%; border-collapse: collapse; font-size: 7.6pt; }
+    .check-table td { padding: .6mm 2mm .6mm 0; width: 50%; vertical-align: top; }
+    .wm { position: absolute; opacity: .08; pointer-events: none; z-index: 1; }
     .hero {
-      height: 118mm;
+      height: 108mm;
       background: url("assets/assam-journal-cover-estate.png") center 42% / cover no-repeat;
       position: relative;
     }
     .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 42mm;
-      background: linear-gradient(to top, rgba(243, 238, 227, 0.97), rgba(243, 238, 227, 0.08));
+      content: ""; position: absolute; inset: auto 0 0 0; height: 42mm;
+      background: linear-gradient(to top, rgba(243,238,227,.97), rgba(243,238,227,.08));
     }
-    .cover-title {
-      position: absolute;
-      left: 12mm;
-      right: 12mm;
-      bottom: 8mm;
-      z-index: 2;
-    }
-    .cover-title h1 {
-      font-size: 34pt;
-      letter-spacing: 0.18em;
-      color: var(--forest);
-      line-height: 0.9;
-      font-weight: 600;
-    }
-    .cover-body {
-      padding: 4mm 12mm 11mm;
-    }
+    .cover-title { position: absolute; left: 12mm; right: 12mm; bottom: 8mm; z-index: 2; }
+    .cover-title h1 { font-size: 32pt; letter-spacing: .18em; color: var(--forest); line-height: .9; }
+    .cover-body { padding: 3.5mm 12mm 11mm; }
     .route {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1.4mm 2mm;
-      font-size: 7.4pt;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--forest);
-      margin: 2.5mm 0 3mm;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 1.4mm 2mm;
+      font-size: 7.2pt; letter-spacing: .08em; text-transform: uppercase; color: var(--forest);
+      margin: 2mm 0 2.4mm;
     }
-    .route i {
-      font-style: normal;
-      color: var(--terracotta);
+    .route i { font-style: normal; color: var(--terracotta); }
+    .plate { overflow: hidden; border: .4pt solid rgba(49,70,47,.2); background: #f7f2e8; }
+    .plate.coverish img { object-fit: cover; width: 100%; height: 100%; display: block; }
+    .prose { font-size: 7.7pt; line-height: 1.42; margin: 0 0 2mm; color: var(--ink); }
+    .facts { font-size: 7.5pt; line-height: 1.4; margin: 0; }
+    .facts li { margin: 0 0 1.4mm; }
+    .key {
+      display: grid; grid-template-columns: 28mm 1fr; gap: 1mm 3mm;
+      font-size: 7.4pt; line-height: 1.35; margin: 0;
     }
-
-    /* WATERMARKS */
-    .wm {
-      position: absolute;
-      opacity: 0.08;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .check-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1mm 4mm;
-      font-size: 8pt;
-    }
-
-    .check-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 7.7pt;
-    }
-    .check-table td {
-      padding: 0.7mm 2mm 0.7mm 0;
-      width: 50%;
-      vertical-align: top;
-    }
-
-    .card {
-      background: rgba(255, 253, 248, 0.55);
-      border: 0.4pt solid rgba(49, 70, 47, 0.22);
-      padding: 2.4mm 2.8mm;
-    }
-
-    .split { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 4mm; }
-
-    .sketch {
-      border: 0.4pt dashed rgba(92, 115, 70, 0.55);
-      background: rgba(255, 253, 248, 0.4);
-      min-height: 38mm;
-      position: relative;
-    }
-    .sketch .hint {
-      position: absolute;
-      inset: auto 3mm 2mm 3mm;
-      font-family: "Caveat", cursive;
-      font-size: 11pt;
-      color: rgba(92, 115, 70, 0.75);
-    }
-
-    .phrase {
-      display: grid;
-      grid-template-columns: 22mm 1fr 28mm;
-      gap: 2mm;
-      align-items: baseline;
-      border-bottom: 0.35pt solid var(--rule);
-      padding: 1.2mm 0;
-      font-size: 8pt;
-    }
-    .phrase b { font-family: "Noto Serif Bengali", "Noto Sans Bengali", serif; font-weight: 600; color: var(--forest); }
-    .phrase em { font-style: italic; color: var(--ink-soft); font-size: 7.4pt; }
-
-    .day-block h3 {
-      font-size: 12pt;
-      color: var(--forest);
-    }
-
-    img.fit {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
+    .key b { color: var(--forest); font-weight: 500; }
+    .noticed { margin-top: 2mm; }
+    h2.sec { font-size: 18pt; color: var(--forest); letter-spacing: .02em; }
     @media print {
       html, body { background: white; }
       .desk { padding: 0; }
       .toolbar { display: none !important; }
-      .page {
-        margin: 0;
-        box-shadow: none;
-        width: 148mm;
-        height: 210mm;
-      }
+      .page { margin: 0; box-shadow: none; width: 148mm; height: 210mm; }
       @page { size: A5 portrait; margin: 0; }
     }
   </style>
@@ -318,114 +146,334 @@
 <body>
   <div class="desk">
     <div class="toolbar">
-      <div class="hint">Print on A5, or A4 with “fit to printable area”. Double-sided is fine. Take a pencil.</div>
+      <div class="hint">16 A5 pages. Print colour. Pencil for the trip pages at the back.</div>
       <button type="button" onclick="window.print()">Print / Save PDF</button>
     </div>
 
-    <!-- PAGE 1 COVER -->
+    <!-- 01 COVER -->
     <article class="page cover">
       <div class="frame"></div>
       <div class="hero">
         <div class="cover-title">
-          <div class="kicker">A field journal</div>
+          <div class="kicker">A field journal · 16 pages</div>
           <h1>ASSAM</h1>
-          <div class="script" style="font-size:16pt;margin-top:1mm;">tea country · November · the red river</div>
+          <div class="script" style="font-size:15pt;margin-top:1mm;">tea country · November · the red river</div>
         </div>
       </div>
       <div class="cover-body">
         <div class="row">
-          <div class="grow">
-            <div class="label">Traveller</div>
-            <div class="line"></div>
-          </div>
-          <div class="grow">
-            <div class="label">Dates</div>
-            <div class="line"></div>
-          </div>
+          <div class="grow"><div class="label" style="margin-top:0">Traveller</div><div class="line"></div></div>
+          <div class="grow"><div class="label" style="margin-top:0">Dates</div><div class="line"></div></div>
         </div>
-        <div class="route">
-          Visakhapatnam <i>→</i> Bhubaneswar <i>→</i> Guwahati <i>→</i> Durrung
-        </div>
-        <p class="tiny" style="margin:0 0 2.5mm;">
-          Three nights at The Postcard in the Durrung Tea Estate, Tezpur.
-          Airport pickup from GAU · ~216 km · about 4 hours through the Brahmaputra country.
-          Kaziranga booked through the estate.
-        </p>
+        <div class="route">Visakhapatnam <i>→</i> Bhubaneswar <i>→</i> Guwahati <i>→</i> Durrung</div>
+        <p class="tiny" style="margin:0 0 2mm;">Three nights, The Postcard in the Durrung Tea Estate, Tezpur. Pickup from GAU · ~216 km · ~4 hours. Kaziranga through the estate.</p>
         <div class="row">
           <div class="grow card">
-            <div class="label">How to use this book</div>
-            <p style="margin:0;font-size:7.6pt;line-height:1.45;">
-              Write on the outbound flights. Fill the car window on the road from Guwahati.
-              After each meal, after safari, last night at Durrung, and on the way home.
-              Pencil travels better than ink. Tea stains are allowed.
-            </p>
+            <div class="label" style="margin-top:0">In this book</div>
+            <p class="facts" style="margin:0">01 Cover · 02 India &amp; the Northeast · 03 Assam · 04 Geography &amp; culture · 05 Brahmaputra · 06 Parks · 07 Flora &amp; fauna · 08 Handloom · 09 Festivals · 10 Tea · 11 Assamese · 12–16 The journey, written in.</p>
           </div>
-          <div style="width:38mm;" class="card">
-            <div class="label">November</div>
-            <p style="margin:0;font-size:7.4pt;line-height:1.4;">
-              Mornings ~12°C<br />
-              Afternoons ~25°C<br />
-              Park open · grass still tall<br />
-              26.7162°N 92.7278°E
-            </p>
+          <div class="card" style="width:40mm">
+            <div class="label" style="margin-top:0">November</div>
+            <p class="facts">Mornings ~12°C<br>Afternoons ~25°C<br>Park newly open<br>26.7162°N 92.7278°E</p>
           </div>
         </div>
-        <p class="script" style="margin:4mm 0 0;font-size:13pt;color:var(--forest);">
-          নমস্কাৰ · in the land of the red river and blue hills
-        </p>
+        <p class="script" style="margin:3mm 0 0;font-size:12.5pt;color:var(--forest);">নমস্কাৰ · in the land of the red river and blue hills</p>
       </div>
       <div class="pg">01</div>
     </article>
 
-    <!-- PAGE 2 THE GOING -->
+    <!-- 02 INDIA + NORTHEAST -->
     <article class="page">
       <div class="frame"></div>
-      <img class="wm" src="assets/assam-journal-brahmaputra.png" alt="" style="right:-18mm;top:28mm;width:70mm;" />
+      <div class="inner">
+        <div class="kicker">Maps</div>
+        <h2 class="sec">India, then the Northeast</h2>
+        <p class="prose">Assam sits in the far north-east of the country, joined to the rest of India by a narrow corridor. The maps here are watercolour, schematic — not for navigation. They are to place you.</p>
+        <div class="split" style="grid-template-columns:.9fr 1.1fr;margin-top:2mm">
+          <div>
+            <div class="plate" style="height:128mm">
+              <img class="contain" src="assets/assam-journal-map-india.png" alt="Map of India with the Northeast marked">
+            </div>
+            <p class="tiny" style="margin:1.5mm 0 0">India. The boxed terracotta wash is the Northeast.</p>
+          </div>
+          <div>
+            <div class="plate" style="height:78mm;margin-bottom:2mm">
+              <img class="contain" src="assets/assam-journal-map-northeast.png" alt="Map of Northeast India">
+            </div>
+            <p class="tiny" style="margin:0 0 2mm">Seven Sisters: Assam in the river valley; Arunachal to the north; Meghalaya the plateau south; Nagaland and Manipur east; Mizoram further south; Tripura south-west. Sikkim is often counted as the eighth.</p>
+            <div class="line"><span>I found myself on this map when</span></div>
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pg pg-left">02</div>
+    </article>
+
+    <!-- 03 ASSAM MAP -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">This journey</div>
+        <h2 class="sec">Assam</h2>
+        <p class="prose">A long east–west valley, a great river through the middle, hills on both rims. You land at Guwahati, on the south bank in the west, then drive east-north to Tezpur and Durrung. Kaziranga lies on the south bank, a morning’s outing from the estate.</p>
+        <div class="plate" style="height:68mm;margin:1mm 0 2mm">
+          <img class="contain" src="assets/assam-journal-map-assam.png" alt="Schematic map of Assam">
+        </div>
+        <div class="key">
+          <b>Guwahati</b><span>West. GAU. South bank. The city you fly into.</span>
+          <b>Tezpur / Durrung</b><span>North bank. Your stay. ~4 hours from the airport.</span>
+          <b>Kaziranga</b><span>South bank, east of Tezpur. UNESCO. One-horned rhino.</span>
+          <b>Nameri</b><span>North of Durrung, toward Arunachal. Jia Bharali river.</span>
+          <b>Brahmaputra</b><span>The pale river on the map. You will cross it, or drive beside it.</span>
+        </div>
+        <div class="label">The road from the airport showed</div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg">03</div>
+    </article>
+
+    <!-- 04 GEOGRAPHY & CULTURE -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">A note</div>
+        <h2 class="sec">Geography and culture</h2>
+        <p class="prose">Assam is about 78,400 square kilometres: the wide Brahmaputra valley, the smaller Barak valley in the south, and two hill districts — Karbi Anglong and Dima Hasao. Nearly two-fifths of the state can flood. That is not a disaster footnote. Flood is how this land was made, and how Kaziranga still works.</p>
+        <p class="prose">People here call the place Axom. The old phrase is “the land of the red river and the blue hills.” Assamese is the link language; Bodo, Mishing, Karbi, Dimasa and many others are spoken too, and so are the languages of the tea-garden communities. Hindu Vaishnavite satras — monasteries of Sankardev’s faith — sit beside namghars, mosques, churches and indigenous shrines. A xorai (bell-metal offering stand) and a gamosa (the red-and-white towel) are the two objects you will see again and again.</p>
+        <p class="prose">Food is lighter than much of India: rice, fish, greens, a sour note (tenga) and an alkaline one (khar). Hospitality is a greeting — <i>bhaat khaisa ne?</i> means have you eaten? Accept tea when it is offered. Fold your hands for <b>নমস্কাৰ</b>.</p>
+        <div class="split-eq" style="margin-top:2mm">
+          <div class="card">
+            <div class="label" style="margin-top:0">Hold in mind</div>
+            <p class="facts">Valley, not hill station.<br>River first, then forest, then tea.<br>Many peoples, one guest-right.<br>Silk, bamboo, and the gamosa.</p>
+          </div>
+          <div class="card">
+            <div class="label" style="margin-top:0">November here</div>
+            <p class="facts">Clear, dry, cool mornings.<br>Kati Bihu has just passed.<br>Parks are open.<br>Tea is in its late season.</p>
+          </div>
+        </div>
+        <div class="label">What culture felt like, on the ground</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg pg-left">04</div>
+    </article>
+
+    <!-- 05 BRAHMAPUTRA -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">The red river · Luit</div>
+        <h2 class="sec">Brahmaputra</h2>
+        <div class="plate" style="height:48mm;margin:1.5mm 0 2.5mm">
+          <img class="fit" src="assets/assam-journal-river.png" alt="The Brahmaputra">
+        </div>
+        <p class="prose">It is born as the Yarlung Tsangpo in Tibet, becomes the Siang or Dihang in Arunachal, the Brahmaputra in Assam, and the Jamuna in Bangladesh. About 2,900 kilometres from glacier to Bay of Bengal. In Assam it is a moving country: sandbars, chars, and Majuli, one of the world’s great river islands.</p>
+        <p class="prose">The water often looks pale with silt — hence “red river.” It feeds the beels of Kaziranga, the dolphins of the river, the paddy, and the fear of June. From the Tezpur side you may cross on the Kolia Bhomora bridge. Watch how wide it is. That width is the story.</p>
+        <div class="label">First sight of the river</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="label">Colour, boats, birds, the far bank</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg">05</div>
+    </article>
+
+    <!-- 06 PARKS -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">Protected Assam</div>
+        <h2 class="sec">National parks</h2>
+        <p class="prose">Assam’s official list has seven national parks. You are going to one of them. Nameri is the neighbour of Durrung, if a spare morning appears.</p>
+        <div class="key" style="margin-top:2mm">
+          <b>Kaziranga</b><span>UNESCO. One-horned rhino, elephant, wild buffalo, swamp deer, tiger. Your safari.</span>
+          <b>Manas</b><span>UNESCO. Himalayan foothills, west. Tiger, pygmy hog, golden langur.</span>
+          <b>Nameri</b><span>Sonitpur, by Arunachal. Jia Bharali rafting, hornbill, tiger. Close to the estate.</span>
+          <b>Orang</b><span>North bank. A smaller rhino landscape, sometimes called a mini-Kaziranga.</span>
+          <b>Dibru-Saikhowa</b><span>Riverine, east. Maguri beel, feral horses, winter birds.</span>
+          <b>Dehing Patkai</b><span>Rainforest of upper Assam, notified 2021. Hoolock, hollong trees.</span>
+          <b>Raimona</b><span>Western Assam, 2021. Golden langur country, next to Bhutan.</span>
+        </div>
+        <p class="tiny" style="margin:2.5mm 0 2mm">Ranges at Kaziranga: Kohora (central), Bagori (west, often best for rhino), Agaratoli (east, birds), Burapahar (hills, gibbon).</p>
+        <div class="card">
+          <div class="label" style="margin-top:0">If a spare morning from Durrung</div>
+          <p class="facts" style="margin:0">Nameri is the close one — Jia Bharali, hornbills, a different forest from Kaziranga’s grass. Orang is a smaller rhino park on the north bank. Ask the estate; do not freelance a gate.</p>
+        </div>
+        <p class="prose" style="margin-top:2.5mm">In any park: muted clothes, no playback of animal calls, no litter, no getting down where you were not asked. The jeep is a hide, not a throne.</p>
+        <div class="label">Parks I touched, or only passed</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg pg-left">06</div>
+    </article>
+
+    <!-- 07 FLORA & FAUNA -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">Living things</div>
+        <h2 class="sec">Flora and fauna</h2>
+        <p class="prose">This is monsoon forest, flood grassland, river, and tea. Kaziranga’s “big five” are the greater one-horned rhinoceros, Asian elephant, wild water buffalo, swamp deer (barasingha) and tiger. The western hoolock gibbon — India’s only ape — sings from canopy south of the Brahmaputra. Gangetic dolphins still roll in the river. In November, migratory waterbirds arrive on the beels.</p>
+        <div class="split" style="margin-top:2mm">
+          <div>
+            <div class="label" style="margin-top:0">Fauna to watch for</div>
+            <p class="facts">Greater one-horned rhino<br>Asian elephant · wild buffalo<br>Swamp deer · hog deer · sambar<br>Tiger · leopard · wild boar<br>Hoolock gibbon · capped langur<br>Gangetic dolphin · otter<br>Great Indian hornbill<br>Greater adjutant stork<br>Bar-headed goose · whistling duck<br>Pied kingfisher · fish-eagle</p>
+            <div class="label">Flora</div>
+            <p class="facts">Hollong — state tree<br>Kopou phul — foxtail orchid, state flower<br>Nahor · simul · bamboo · cane<br>Elephant grass · water hyacinth<br>Tea · outenga · thekera · rice</p>
+          </div>
+          <div>
+            <div class="plate" style="height:52mm;margin-bottom:2mm">
+              <img class="fit" src="assets/assam-journal-rhino.png" alt="One-horned rhinoceros">
+            </div>
+            <div class="label">I saw, and I missed</div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pg">07</div>
+    </article>
+
+    <!-- 08 HANDLOOM -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">Cloth of the valley</div>
+        <h2 class="sec">Assamese handloom</h2>
+        <div class="plate" style="height:52mm;margin:1.5mm 0 2.5mm">
+          <img class="fit" src="assets/assam-journal-handloom.png" alt="Muga silk, gamosa and jaapi">
+        </div>
+        <p class="prose">Assam weaves three silks. <b>Muga</b> is the golden one, from the moth <i>Antheraea assamensis</i>, almost unique to this valley — it deepens with wear. <b>Eri</b> (endi) is the warm, wool-like silk; the moth is allowed to leave the cocoon, so it is often called ahimsa silk. <b>Pat</b> is the white mulberry silk. Sualkuchi, on the north bank near Guwahati, is the weaving town.</p>
+        <p class="prose">The woman’s dress is the mekhela chador — a wrap skirt and a drape — often in muga or pat with red geometric borders. The gamosa, white cotton with a red woven end, is towel, gift, honour, and flag of feeling. The jaapi is the wide bamboo hat of the fields. A gamosa offered to you is not a souvenir first. It is a welcome.</p>
+        <div class="label">Saw · wore · was given</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="label">Colour, weave, who made it</div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg pg-left">08</div>
+    </article>
+
+    <!-- 09 FESTIVALS -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">The year in three Bihus</div>
+        <h2 class="sec">Annual festivals</h2>
+        <div class="plate" style="height:46mm;margin:1.5mm 0 2.5mm">
+          <img class="fit" src="assets/assam-journal-bihu.png" alt="Bihu dancers, dhol and pepa">
+        </div>
+        <div class="key">
+          <b>Rongali / Bohag</b><span>Mid-April. Assamese new year. The great one: dance, dhol, pepa (buffalo horn), new clothes, the spring.</span>
+          <b>Kati / Kongali</b><span>Mid-October. Quiet, lamps in the paddy (saki). You have just missed it in November.</span>
+          <b>Magh / Bhogali</b><span>Mid-January. Harvest feast, community fire (meji), uruka night, feasting.</span>
+        </div>
+        <p class="prose" style="margin-top:2.5mm">Other days you may hear of: Ambubachi Mela at Kamakhya in June; Raas at the satras of Majuli in autumn; Ali-Aye-Ligang of the Mishing in February. Bihu is not only a performance. It is the calendar the valley still keeps.</p>
+        <div class="label">Trace of a festival I noticed — song, lamp, cloth, food</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="label">A Bihu step, a drum, a horn I want to remember</div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg">09</div>
+    </article>
+
+    <!-- 10 TEA -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">Camellia sinensis var. assamica</div>
+        <h2 class="sec">About tea</h2>
+        <div class="plate" style="height:38mm;margin:1.5mm 0 2mm">
+          <img class="fit" src="assets/assam-journal-tea-pluck.png" alt="Plucking two leaves and a bud">
+        </div>
+        <p class="prose">Left alone, tea is a tree. In Assam it is trained as a low bush with a flat <b>plucking table</b>. The harvest is the young shoot: <b>two leaves and a bud</b>. Durrung has done this since 1864, across 1,400 acres.</p>
+        <div class="key">
+          <b>Pruning</b><span>December–January, when the bush is dormant. A 2–4 year cycle in the plains. Between prunes, a light cut called skiffing keeps the table.</span>
+          <b>Harvest</b><span>Plucking rounds every week or so, March to November. Fine plucking = two leaves and a bud. Coarser plucking makes stronger, rougher tea.</span>
+          <b>Flushes</b><span>First flush (Mar–Apr) is lighter. Second flush (May–Jun) is the famous malty Assam, often with golden tips. Then rains, then autumn.</span>
+          <b>November</b><span>Late season. Some sections still plucked; others heading toward prune. Ask what the bushes are doing this week.</span>
+        </div>
+        <div class="label">Types you may be poured</div>
+        <p class="facts"><b>Orthodox black</b> — whole or broken leaf, rolled, oxidised; aroma and malt. <b>CTC</b> — crush, tear, curl; strong, brisk, the everyday chai leaf. <b>Green / white / oolong</b> — less oxidation; some estates now make them for tasting. <b>Second-flush golden tips</b> — the prize cup if they have it.</p>
+        <p class="tiny">Factory steps, orthodox: wither → roll → oxidise → dry → sort. CTC skips the gentle roll.</p>
+        <div class="line"><span>What they were pruning or plucking at Durrung</span></div>
+        <div class="line"></div>
+        <div class="label">Cups I tasted, in order</div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="pg pg-left">10</div>
+    </article>
+
+    <!-- 11 ASSAMESE -->
+    <article class="page">
+      <div class="frame"></div>
+      <div class="inner">
+        <div class="kicker">A little of the language</div>
+        <h2 class="sec">Assamese to learn</h2>
+        <p class="prose">Assamese (Axomiya) uses the Bengali–Assamese script. English and Hindi will carry you at the hotel. A few words will carry you further. Tick when you have said them out loud.</p>
+        <div class="phrase"><b>নমস্কাৰ</b><span>Nomoskar</span><em>hello</em></div>
+        <div class="phrase"><b>আপুনি কেনেকুৱা আছে?</b><span>Apuni kenekuwa ase?</span><em>how are you?</em></div>
+        <div class="phrase"><b>মই ভাল আছোঁ</b><span>Moi bhal asu</span><em>I am fine</em></div>
+        <div class="phrase"><b>মোৰ নাম …</b><span>Mor naam …</span><em>my name is …</em></div>
+        <div class="phrase"><b>ধন্যবাদ</b><span>Dhanyabad</span><em>thank you</em></div>
+        <div class="phrase"><b>মাফ কৰিবা</b><span>Maaph koriba</span><em>sorry / excuse me</em></div>
+        <div class="phrase"><b>ভাত খাইছানে?</b><span>Bhaat khaisa ne?</span><em>have you eaten?</em></div>
+        <div class="phrase"><b>একাপ চাহ দিব</b><span>Ekap sah diba</span><em>please give a cup of tea</em></div>
+        <div class="phrase"><b>পানী দিয়ক</b><span>Paani diyok</span><em>please give water</em></div>
+        <div class="phrase"><b>কি এইটো?</b><span>Ki eitu?</span><em>what is this?</em></div>
+        <div class="phrase"><b>বহুত ভাল</b><span>Bohut bhal</span><em>very good</em></div>
+        <div class="phrase"><b>ভাল লাগিল</b><span>Bhal lagil</span><em>I liked it / nice to meet you</em></div>
+        <div class="label">Words I picked up</div>
+        <div class="phrase"><span class="muted">word</span><span></span><em>meaning</em></div>
+        <div class="phrase"><span class="muted">word</span><span></span><em>meaning</em></div>
+        <div class="phrase"><span class="muted">word</span><span></span><em>meaning</em></div>
+        <div class="line noticed"><span>The sentence I actually used</span></div>
+      </div>
+      <div class="pg">11</div>
+    </article>
+
+    <!-- 12 THE GOING -->
+    <article class="page">
+      <div class="frame"></div>
+      <img class="wm" src="assets/assam-journal-brahmaputra.png" alt="" style="right:-18mm;top:28mm;width:70mm;">
       <div class="inner">
         <div class="kicker">The going</div>
-        <h2 style="font-size:22pt;color:var(--forest);letter-spacing:0.04em;">Vizag to the gardens</h2>
-        <p class="tiny" style="margin:1mm 0 3mm;">Two hops, then a long green road. Record the unremarkable bits. They become the trip.</p>
-
+        <h2 class="sec">Vizag to the gardens</h2>
+        <p class="tiny" style="margin:1mm 0 2.5mm">Two hops, then a long green road. Record the unremarkable bits. They become the trip.</p>
         <div class="label">Flight one · VTZ → BBI</div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>No.</span></div></div>
-          <div class="grow"><div class="line"><span>Seat</span></div></div>
-        </div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>Dep</span></div></div>
-          <div class="grow"><div class="line"><span>Arr</span></div></div>
-        </div>
+        <div class="row"><div class="grow"><div class="line"><span>No.</span></div></div><div class="grow"><div class="line"><span>Seat</span></div></div></div>
+        <div class="row"><div class="grow"><div class="line"><span>Dep</span></div></div><div class="grow"><div class="line"><span>Arr</span></div></div></div>
         <div class="line"><span>Sky / airport</span></div>
-
-        <div class="label" style="margin-top:3mm;">Flight two · BBI → GAU</div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>No.</span></div></div>
-          <div class="grow"><div class="line"><span>Seat</span></div></div>
-        </div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>Dep</span></div></div>
-          <div class="grow"><div class="line"><span>Arr</span></div></div>
-        </div>
+        <div class="label">Flight two · BBI → GAU</div>
+        <div class="row"><div class="grow"><div class="line"><span>No.</span></div></div><div class="grow"><div class="line"><span>Seat</span></div></div></div>
+        <div class="row"><div class="grow"><div class="line"><span>Dep</span></div></div><div class="grow"><div class="line"><span>Arr</span></div></div></div>
         <div class="line"><span>First glimpse of Assam from the air</span></div>
-
         <div class="rule-top">
           <div class="label">Pickup · Lokpriya Gopinath Bordoloi, Guwahati</div>
-          <div class="row">
-            <div class="grow"><div class="line"><span>Driver / vehicle</span></div></div>
-            <div style="width:28mm;"><div class="line"><span>Left at</span></div></div>
-          </div>
-          <div class="row">
-            <div class="grow"><div class="line"><span>Arrived Durrung</span></div></div>
-            <div style="width:28mm;"><div class="line"><span>Km</span></div></div>
-          </div>
+          <div class="row"><div class="grow"><div class="line"><span>Driver / vehicle</span></div></div><div style="width:28mm"><div class="line"><span>Left at</span></div></div></div>
+          <div class="row"><div class="grow"><div class="line"><span>Arrived Durrung</span></div></div><div style="width:28mm"><div class="line"><span>Km</span></div></div></div>
         </div>
-
-        <div class="label" style="margin-top:3.2mm;">What the road showed me</div>
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="line"></div>
-
+        <div class="label">What the road showed me</div>
+        <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
         <div class="rule-top">
           <div class="label">Pack before you leave · November</div>
           <div class="check-grid">
@@ -442,55 +490,35 @@
           </div>
         </div>
       </div>
-      <div class="pg pg-left">02</div>
+      <div class="pg pg-left">12</div>
     </article>
 
-    <!-- PAGE 3 DURRUNG -->
+    <!-- 13 DURRUNG -->
     <article class="page">
       <div class="frame"></div>
       <div class="inner">
         <div class="kicker">The stay · three nights</div>
-        <h2 style="font-size:18pt;color:var(--forest);">The Postcard · Durrung</h2>
-        <p class="tiny" style="margin:1mm 0 2.2mm;">
-          A working estate since 1864 · 1,400 acres between Nameri and the Brahmaputra · twelve rooms.
-          Planter’s bungalow or a chang chalet on stilts among the tea.
-        </p>
-        <div style="height:28mm;overflow:hidden;border:0.4pt solid rgba(49,70,47,0.2);margin-bottom:2.8mm;">
-          <img class="fit" src="assets/assam-journal-chalet.png" alt="Chalet among the tea" />
+        <h2 class="sec">The Postcard · Durrung</h2>
+        <p class="tiny" style="margin:1mm 0 2mm">Working estate since 1864 · 1,400 acres · twelve rooms. Planter’s bungalow or a chang chalet on stilts among the tea.</p>
+        <div class="plate" style="height:26mm;margin-bottom:2.4mm">
+          <img class="fit" src="assets/assam-journal-chalet.png" alt="Chalet among the tea">
         </div>
-
         <div class="row">
           <div class="grow"><div class="line"><span>Room · bungalow / chalet no.</span></div></div>
           <div class="grow"><div class="line"><span>First cup at</span></div></div>
         </div>
         <div class="line"><span>How that first cup tasted</span></div>
-
-        <div class="split" style="margin-top:3mm;">
+        <div class="split" style="margin-top:2.5mm">
           <div>
-            <div class="label">Days in the garden</div>
-            <div class="day-block">
-              <h3>Day one</h3>
-              <div class="line"><span>Morning</span></div>
-              <div class="line"><span>Afternoon</span></div>
-              <div class="line"><span>Night</span></div>
-            </div>
-            <div class="day-block" style="margin-top:2mm;">
-              <h3>Day two</h3>
-              <div class="line"><span>Morning</span></div>
-              <div class="line"><span>Afternoon</span></div>
-              <div class="line"><span>Night</span></div>
-            </div>
-            <div class="day-block" style="margin-top:2mm;">
-              <h3>Day three</h3>
-              <div class="line"><span>Morning</span></div>
-              <div class="line"><span>Afternoon</span></div>
-              <div class="line"><span>Leaving</span></div>
-            </div>
+            <div class="label" style="margin-top:0">Days in the garden</div>
+            <div class="day-block"><h3>Day one</h3><div class="line"><span>Morning</span></div><div class="line"><span>Afternoon</span></div><div class="line"><span>Night</span></div></div>
+            <div class="day-block" style="margin-top:1.6mm"><h3>Day two</h3><div class="line"><span>Morning</span></div><div class="line"><span>Afternoon</span></div><div class="line"><span>Night</span></div></div>
+            <div class="day-block" style="margin-top:1.6mm"><h3>Day three</h3><div class="line"><span>Morning</span></div><div class="line"><span>Afternoon</span></div><div class="line"><span>Leaving</span></div></div>
           </div>
           <div>
-            <div class="label">Tea tasting</div>
-            <div class="card" style="margin-bottom:2.4mm;">
-              <div class="tiny" style="margin-bottom:1.5mm;">Two leaves and a bud. Write the ones they pour.</div>
+            <div class="label" style="margin-top:0">Tea tasting</div>
+            <div class="card" style="margin-bottom:2mm">
+              <p class="tiny" style="margin:0 0 1mm">Two leaves and a bud.</p>
               <div class="line"><span>Dry leaf</span></div>
               <div class="line"><span>Liquor colour</span></div>
               <div class="line"><span>Aroma</span></div>
@@ -498,52 +526,46 @@
               <div class="line"><span>The cup I want again</span></div>
             </div>
             <div class="label">At the table</div>
-            <div class="tiny" style="margin-bottom:1mm;">Tick what you ate. Note the one that stays.</div>
             <div><span class="box"></span>Masor tenga</div>
             <div><span class="box"></span>Khar / xaak</div>
             <div><span class="box"></span>Aloo pitika</div>
             <div><span class="box"></span>Pitha / jolpaan</div>
             <div><span class="box"></span>Joha or boka saul rice</div>
             <div><span class="box"></span>Plantation trail / factory</div>
-            <div class="line" style="margin-top:1.4mm;"><span>Favourite plate</span></div>
+            <div class="line" style="margin-top:1.2mm"><span>Favourite plate</span></div>
             <div class="line"><span>People I met</span></div>
           </div>
         </div>
       </div>
-      <div class="pg">03</div>
+      <div class="pg">13</div>
     </article>
 
-    <!-- PAGE 4 KAZIRANGA -->
+    <!-- 14 KAZIRANGA -->
     <article class="page">
       <div class="frame"></div>
       <div class="inner">
         <div class="kicker">The park · UNESCO</div>
-        <h2 style="font-size:20pt;color:var(--forest);">Kaziranga</h2>
-        <p class="tiny" style="margin:1mm 0 2.4mm;">
-          Arranged through the estate. Cool, dry November. Grass can still be tall early in the month —
-          look along the beels and the burnt patches. Neutral clothes. No calling to animals. Let the jeep stop for you.
-        </p>
-
-        <div class="row" style="margin-bottom:2.6mm;">
+        <h2 class="sec">Kaziranga</h2>
+        <p class="tiny" style="margin:1mm 0 2mm">Arranged through the estate. Grass can still be tall in early November — look along the beels and the burnt patches. Neutral clothes. No calling to animals.</p>
+        <div class="row" style="margin-bottom:2mm">
           <div class="grow">
-            <div class="label">Safari one</div>
+            <div class="label" style="margin-top:0">Safari one</div>
             <div class="line"><span>Date / AM · PM</span></div>
             <div class="line"><span>Jeep / elephant</span></div>
-            <div class="line"><span>Range · Kohora · Bagori · Agaratoli · Burapahar</span></div>
+            <div class="line"><span>Kohora · Bagori · Agaratoli · Burapahar</span></div>
             <div class="line"><span>Guide / vehicle</span></div>
           </div>
           <div class="grow">
-            <div class="label">Safari two · if you go again</div>
+            <div class="label" style="margin-top:0">Safari two</div>
             <div class="line"><span>Date / AM · PM</span></div>
             <div class="line"><span>Jeep / elephant</span></div>
             <div class="line"><span>Range</span></div>
             <div class="line"><span>Guide / vehicle</span></div>
           </div>
         </div>
-
         <div class="split">
           <div>
-            <div class="label">Seen · tick in the field</div>
+            <div class="label" style="margin-top:0">Seen · tick in the field</div>
             <table class="check-table">
               <tr><td><span class="box"></span>One-horned rhino</td><td><span class="box"></span>Asian elephant</td></tr>
               <tr><td><span class="box"></span>Wild water buffalo</td><td><span class="box"></span>Swamp deer</td></tr>
@@ -551,42 +573,39 @@
               <tr><td><span class="box"></span>Wild boar</td><td><span class="box"></span>Otter</td></tr>
               <tr><td><span class="box"></span>Hoolock gibbon</td><td><span class="box"></span>Tiger · lucky day</td></tr>
             </table>
-            <div class="line" style="margin-top:2mm;"><span>Birds</span></div>
+            <div class="line" style="margin-top:1.6mm"><span>Birds</span></div>
             <div class="line"></div>
             <div class="line"></div>
-            <div class="label" style="margin-top:2.6mm;">The moment I will remember</div>
-            <div class="line"></div>
+            <div class="label">The moment I will remember</div>
             <div class="line"></div>
             <div class="line"></div>
             <div class="line"></div>
           </div>
           <div>
-            <div style="height:42mm;overflow:hidden;border:0.4pt solid rgba(49,70,47,0.2);margin-bottom:2mm;">
-              <img class="fit" src="assets/assam-journal-rhino.png" alt="Greater one-horned rhinoceros" />
+            <div class="plate" style="height:40mm;margin-bottom:2mm">
+              <img class="fit" src="assets/assam-journal-rhino.png" alt="Greater one-horned rhinoceros">
             </div>
-            <div class="sketch" style="min-height:46mm;">
+            <div class="sketch" style="min-height:42mm">
               <div class="hint">sketch a horn, a beel, a silhouette in grass</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="pg pg-left">04</div>
+      <div class="pg pg-left">14</div>
     </article>
 
-    <!-- PAGE 5 SLOWER -->
+    <!-- 15 SLOWER -->
     <article class="page">
       <div class="frame"></div>
-      <img class="wm" src="assets/assam-journal-tea-botanical.png" alt="" style="right:-6mm;top:22mm;width:58mm;" />
+      <img class="wm" src="assets/assam-journal-tea-botanical.png" alt="" style="right:-6mm;top:22mm;width:58mm;">
       <div class="inner">
         <div class="kicker">Slower notes</div>
-        <h2 style="font-size:20pt;color:var(--forest);">What the estate kept</h2>
-        <p class="tiny" style="margin:1mm 0 3mm;">Fill this on a quiet afternoon. Pool, library, bungalow verandah, or the deck of the chalet.</p>
-
+        <h2 class="sec">What the estate kept</h2>
+        <p class="tiny" style="margin:1mm 0 2.5mm">Fill this on a quiet afternoon. Pool, library, verandah, or the deck of the chalet.</p>
         <div class="label">Sounds</div>
         <div class="line"><span>Morning</span></div>
         <div class="line"><span>Noon</span></div>
         <div class="line"><span>Night · the estate sits on an elephant corridor</span></div>
-
         <div class="row rule-top">
           <div class="grow">
             <div class="label">Weather</div>
@@ -601,56 +620,35 @@
             <div class="line"></div>
           </div>
         </div>
-
-        <div class="rule-top">
-          <div class="label">Assamese I used</div>
-          <div class="phrase"><b>নমস্কাৰ</b><span>Nomoskar</span><em>hello</em></div>
-          <div class="phrase"><b>ধন্যবাদ</b><span>Dhanyabad</span><em>thank you</em></div>
-          <div class="phrase"><b>চাহ</b><span>Sah / cha</span><em>tea</em></div>
-          <div class="phrase"><b>বহুত ভাল</b><span>Bohut bhal</span><em>very good</em></div>
-          <div class="phrase"><span class="muted">word I learned</span><span></span><em>meaning</em></div>
-          <div class="phrase"><span class="muted">word I learned</span><span></span><em>meaning</em></div>
-        </div>
-
         <div class="rule-top">
           <div class="label">A leaf, a stamp, a small thing pressed here</div>
-          <div class="sketch" style="min-height:36mm;">
+          <div class="sketch" style="min-height:48mm">
             <div class="hint">tape a tea leaf, a gamosa thread, a boarding pass stub</div>
           </div>
         </div>
       </div>
-      <div class="pg">05</div>
+      <div class="pg">15</div>
     </article>
 
-    <!-- PAGE 6 HOMEWARD -->
+    <!-- 16 HOMEWARD -->
     <article class="page">
       <div class="frame"></div>
       <div class="inner">
         <div class="kicker">The return</div>
-        <h2 style="font-size:20pt;color:var(--forest);">Homeward</h2>
-        <p class="tiny" style="margin:1mm 0 3mm;">Estate drop to Guwahati, then the same sky in reverse. Write before the trip becomes a story you tidy.</p>
-
+        <h2 class="sec">Homeward</h2>
+        <p class="tiny" style="margin:1mm 0 2.5mm">Estate drop to Guwahati, then the same sky in reverse. Write before the trip becomes a story you tidy.</p>
         <div class="label">Durrung → GAU</div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>Left at</span></div></div>
-          <div class="grow"><div class="line"><span>Reached airport</span></div></div>
-        </div>
+        <div class="row"><div class="grow"><div class="line"><span>Left at</span></div></div><div class="grow"><div class="line"><span>Reached airport</span></div></div></div>
         <div class="line"><span>Last look at the gardens</span></div>
-
-        <div class="label" style="margin-top:2.8mm;">GAU → BBI → VTZ</div>
-        <div class="row">
-          <div class="grow"><div class="line"><span>Flight · seat</span></div></div>
-          <div class="grow"><div class="line"><span>Flight · seat</span></div></div>
-        </div>
+        <div class="label">GAU → BBI → VTZ</div>
+        <div class="row"><div class="grow"><div class="line"><span>Flight · seat</span></div></div><div class="grow"><div class="line"><span>Flight · seat</span></div></div></div>
         <div class="line"><span>What I carried back that is not in a bag</span></div>
-
         <div class="rule-top">
           <div class="label">Three things I will keep</div>
           <div class="line"><span>1</span></div>
           <div class="line"><span>2</span></div>
           <div class="line"><span>3</span></div>
         </div>
-
         <div class="rule-top">
           <div class="label">A note to myself in six months</div>
           <div class="line"></div>
@@ -658,26 +656,22 @@
           <div class="line"></div>
           <div class="line"></div>
         </div>
-
         <div class="row rule-top">
           <div class="grow">
             <div class="label">Tea to pack</div>
             <div class="line"></div>
             <div class="line"></div>
-            <div class="label" style="margin-top:2mm;">Thank you, said to</div>
+            <div class="label">Thank you, said to</div>
             <div class="line"></div>
             <div class="line"></div>
           </div>
-          <div style="width:42mm;overflow:hidden;border:0.4pt solid rgba(49,70,47,0.18);">
-            <img class="fit" src="assets/assam-journal-tea-botanical.png" alt="Tea botanical" style="height:42mm;" />
+          <div class="plate" style="width:42mm;height:42mm">
+            <img class="fit" src="assets/assam-journal-tea-botanical.png" alt="Tea botanical">
           </div>
         </div>
-
-        <p class="tiny" style="margin:4mm 0 0;letter-spacing:0.08em;text-transform:uppercase;">
-          Made for a November journey · Visakhapatnam to Assam · Durrung Tea Estate · Kaziranga
-        </p>
+        <p class="tiny" style="margin:3.5mm 0 0;letter-spacing:.08em;text-transform:uppercase">Made for a November journey · Visakhapatnam to Assam · Durrung · Kaziranga</p>
       </div>
-      <div class="pg pg-left">06</div>
+      <div class="pg pg-left">16</div>
     </article>
   </div>
 </body>
