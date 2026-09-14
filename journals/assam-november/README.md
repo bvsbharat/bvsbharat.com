@@ -1,15 +1,15 @@
 # Assam Field Journal · November
 
-A 16-page A5 travel journal for Vizag → Bhubaneswar → Guwahati, three nights at The Postcard in the Durrung Tea Estate, and Kaziranga.
+A 16-page **A4** travel journal for Vizag → Bhubaneswar → Guwahati, three nights at The Postcard in the Durrung Tea Estate, and Kaziranga.
 
 Maps are schematic watercolours, not for navigation.
 
 ## Print
 
-1. Open `index.html` or print `assam-field-journal.pdf`.
-2. Paper: **A5** (148 × 210 mm). On A4, use “fit to printable area.”
-3. Colour. Double-sided: flip on the **long edge**.
-4. Cream paper if you can. Take a **pencil**.
+1. Open `assam-field-journal.pdf` (easiest) or `index.html` → Print.
+2. Paper: **A4** (210 × 297 mm). Print at **100% / Actual size** — do not “fit to page.”
+3. Colour. Single-sided is simplest. Double-sided: flip on the **long edge**.
+4. Ordinary printer paper is fine. Take a **pencil**.
 
 ## Pages
 

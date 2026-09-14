@@ -20,11 +20,11 @@
     * { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0; background: #cfc3ad; color: var(--ink);
-      font-family: "Jost", "Inter", sans-serif; font-size: 8.8pt; line-height: 1.32;
+      font-family: "Jost", "Inter", sans-serif; font-size: 11pt; line-height: 1.38;
     }
     .desk { padding: 28px 0 64px; }
     .toolbar {
-      max-width: 148mm; margin: 0 auto 18px; display: flex;
+      max-width: 210mm; margin: 0 auto 18px; display: flex;
       justify-content: space-between; align-items: center; gap: 12px;
       font-size: 12px; color: #3d3428;
     }
@@ -33,120 +33,120 @@
       color: #f7f2e8; padding: 8px 14px; border-radius: 999px;
       font: 600 12px/1 "Jost", sans-serif; cursor: pointer;
     }
-    .toolbar .hint { font-size: 11px; max-width: 46ch; }
+    .toolbar .hint { font-size: 11px; max-width: 52ch; }
     .page {
-      width: 148mm; height: 210mm; margin: 0 auto 22px; background: var(--paper);
+      width: 210mm; height: 297mm; margin: 0 auto 22px; background: var(--paper);
       position: relative; overflow: hidden; box-shadow: 0 18px 40px rgba(42,36,28,.22);
       page-break-after: always; break-after: page;
     }
     .page:last-of-type { page-break-after: auto; break-after: auto; }
     .frame {
-      position: absolute; inset: 7mm; border: 0.6pt solid rgba(49,70,47,.55);
+      position: absolute; inset: 8mm; border: 0.7pt solid rgba(49,70,47,.55);
       pointer-events: none; z-index: 4;
     }
     .frame::after {
-      content: ""; position: absolute; inset: 2.2mm;
-      border: 0.35pt solid rgba(166,90,58,.45);
+      content: ""; position: absolute; inset: 2.6mm;
+      border: 0.4pt solid rgba(166,90,58,.45);
     }
-    .inner { position: relative; z-index: 2; height: 100%; padding: 11mm 12mm 10mm; }
+    .inner { position: relative; z-index: 2; height: 100%; padding: 14mm 16mm 14mm; }
     .cover .inner { padding: 0; }
     h1, h2, h3 { margin: 0; font-family: "Cormorant Garamond", "Times New Roman", serif; font-weight: 600; }
     .kicker {
-      font-size: 6.8pt; letter-spacing: .28em; text-transform: uppercase;
+      font-size: 8pt; letter-spacing: .28em; text-transform: uppercase;
       color: var(--terracotta); font-weight: 500;
     }
     .script { font-family: "Caveat", cursive; color: var(--olive); }
     .muted { color: var(--ink-soft); }
-    .tiny { font-size: 7pt; letter-spacing: .03em; color: var(--ink-soft); }
+    .tiny { font-size: 8.5pt; letter-spacing: .03em; color: var(--ink-soft); }
     .pg {
-      position: absolute; bottom: 8.2mm; right: 12mm; font-size: 7.5pt;
+      position: absolute; bottom: 10mm; right: 16mm; font-size: 9pt;
       letter-spacing: .18em; color: var(--olive); z-index: 5;
     }
-    .pg-left { left: 12mm; right: auto; }
+    .pg-left { left: 16mm; right: auto; }
     .line {
-      border-bottom: .35pt solid var(--rule); min-height: 5.8mm;
-      display: flex; align-items: flex-end; gap: 4px; font-size: 7.6pt; color: var(--ink-soft);
+      border-bottom: .4pt solid var(--rule); min-height: 8mm;
+      display: flex; align-items: flex-end; gap: 4px; font-size: 9.5pt; color: var(--ink-soft);
     }
-    .line span { white-space: nowrap; font-size: 6.6pt; letter-spacing: .08em; text-transform: uppercase; }
+    .line span { white-space: nowrap; font-size: 7.5pt; letter-spacing: .08em; text-transform: uppercase; }
     .box {
-      display: inline-block; width: 2.3mm; height: 2.3mm; border: .5pt solid var(--forest);
-      margin-right: 1.5mm; vertical-align: -.2mm; background: #fffdf8;
+      display: inline-block; width: 3mm; height: 3mm; border: .6pt solid var(--forest);
+      margin-right: 2mm; vertical-align: -.3mm; background: #fffdf8;
     }
     .row { display: flex; gap: 4mm; }
     .grow { flex: 1; }
     .label {
-      font-size: 6.5pt; letter-spacing: .2em; text-transform: uppercase;
-      color: var(--forest); font-weight: 500; margin: 2mm 0 1mm;
+      font-size: 7.8pt; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--forest); font-weight: 500; margin: 3mm 0 1.4mm;
     }
-    .rule-top { border-top: .4pt solid rgba(49,70,47,.35); padding-top: 2.2mm; margin-top: 2.4mm; }
-    .card { background: rgba(255,253,248,.55); border: .4pt solid rgba(49,70,47,.22); padding: 2.2mm 2.6mm; }
-    .split { display: grid; grid-template-columns: 1.1fr .9fr; gap: 3.5mm; }
-    .split-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; }
+    .rule-top { border-top: .4pt solid rgba(49,70,47,.35); padding-top: 3mm; margin-top: 3.5mm; }
+    .card { background: rgba(255,253,248,.55); border: .4pt solid rgba(49,70,47,.22); padding: 3.5mm 4mm; }
+    .split { display: grid; grid-template-columns: 1.1fr .9fr; gap: 6mm; }
+    .split-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
     .sketch {
       border: .4pt dashed rgba(92,115,70,.55); background: rgba(255,253,248,.4);
-      min-height: 34mm; position: relative;
+      min-height: 52mm; position: relative;
     }
     .sketch .hint {
-      position: absolute; inset: auto 3mm 2mm 3mm; font-family: "Caveat", cursive;
-      font-size: 11pt; color: rgba(92,115,70,.75);
+      position: absolute; inset: auto 4mm 3mm 4mm; font-family: "Caveat", cursive;
+      font-size: 14pt; color: rgba(92,115,70,.75);
     }
     .phrase {
-      display: grid; grid-template-columns: 32mm 1fr 30mm; gap: 2mm;
-      align-items: baseline; border-bottom: .35pt solid var(--rule);
-      padding: 1.15mm 0; font-size: 7.6pt;
+      display: grid; grid-template-columns: 42mm 1fr 42mm; gap: 3mm;
+      align-items: baseline; border-bottom: .4pt solid var(--rule);
+      padding: 2mm 0; font-size: 10pt;
     }
     .phrase b { font-family: "Noto Serif Bengali","Noto Sans Bengali",serif; font-weight: 600; color: var(--forest); }
-    .phrase em { font-style: italic; color: var(--ink-soft); font-size: 7pt; }
-    .day-block h3 { font-size: 12pt; color: var(--forest); }
+    .phrase em { font-style: italic; color: var(--ink-soft); font-size: 9pt; }
+    .day-block h3 { font-size: 16pt; color: var(--forest); }
     img.fit { width: 100%; height: 100%; object-fit: cover; display: block; }
     img.contain { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 4mm; font-size: 8pt; }
-    .check-table { width: 100%; border-collapse: collapse; font-size: 7.6pt; }
-    .check-table td { padding: .6mm 2mm .6mm 0; width: 50%; vertical-align: top; }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm; font-size: 10.5pt; }
+    .check-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+    .check-table td { padding: 1.4mm 3mm 1.4mm 0; width: 50%; vertical-align: top; }
     .wm { position: absolute; opacity: .08; pointer-events: none; z-index: 1; }
     .hero {
-      height: 108mm;
+      height: 158mm;
       background: url("assets/assam-journal-cover-estate.png") center 42% / cover no-repeat;
       position: relative;
     }
     .hero::after {
-      content: ""; position: absolute; inset: auto 0 0 0; height: 42mm;
+      content: ""; position: absolute; inset: auto 0 0 0; height: 52mm;
       background: linear-gradient(to top, rgba(243,238,227,.97), rgba(243,238,227,.08));
     }
-    .cover-title { position: absolute; left: 12mm; right: 12mm; bottom: 8mm; z-index: 2; }
-    .cover-title h1 { font-size: 32pt; letter-spacing: .18em; color: var(--forest); line-height: .9; }
-    .cover-body { padding: 3.5mm 12mm 11mm; }
+    .cover-title { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; z-index: 2; }
+    .cover-title h1 { font-size: 48pt; letter-spacing: .18em; color: var(--forest); line-height: .9; }
+    .cover-body { padding: 6mm 16mm 16mm; }
     .route {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 1.4mm 2mm;
-      font-size: 7.2pt; letter-spacing: .08em; text-transform: uppercase; color: var(--forest);
-      margin: 2mm 0 2.4mm;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 2mm 3mm;
+      font-size: 9.5pt; letter-spacing: .08em; text-transform: uppercase; color: var(--forest);
+      margin: 3mm 0 3.5mm;
     }
     .route i { font-style: normal; color: var(--terracotta); }
     .plate { overflow: hidden; border: .4pt solid rgba(49,70,47,.2); background: #f7f2e8; }
     .plate.coverish img { object-fit: cover; width: 100%; height: 100%; display: block; }
-    .prose { font-size: 7.7pt; line-height: 1.42; margin: 0 0 2mm; color: var(--ink); }
-    .facts { font-size: 7.5pt; line-height: 1.4; margin: 0; }
-    .facts li { margin: 0 0 1.4mm; }
+    .prose { font-size: 10.5pt; line-height: 1.48; margin: 0 0 3.5mm; color: var(--ink); }
+    .facts { font-size: 10pt; line-height: 1.45; margin: 0; }
+    .facts li { margin: 0 0 2mm; }
     .key {
-      display: grid; grid-template-columns: 28mm 1fr; gap: 1mm 3mm;
-      font-size: 7.4pt; line-height: 1.35; margin: 0;
+      display: grid; grid-template-columns: 38mm 1fr; gap: 2mm 5mm;
+      font-size: 10pt; line-height: 1.42; margin: 0;
     }
     .key b { color: var(--forest); font-weight: 500; }
-    .noticed { margin-top: 2mm; }
-    h2.sec { font-size: 18pt; color: var(--forest); letter-spacing: .02em; }
+    .noticed { margin-top: 3mm; }
+    h2.sec { font-size: 26pt; color: var(--forest); letter-spacing: .02em; }
     @media print {
       html, body { background: white; }
       .desk { padding: 0; }
       .toolbar { display: none !important; }
-      .page { margin: 0; box-shadow: none; width: 148mm; height: 210mm; }
-      @page { size: A5 portrait; margin: 0; }
+      .page { margin: 0; box-shadow: none; width: 210mm; height: 297mm; }
+      @page { size: A4 portrait; margin: 0; }
     }
   </style>
 </head>
 <body>
   <div class="desk">
     <div class="toolbar">
-      <div class="hint">16 A5 pages. Print colour. Pencil for the trip pages at the back.</div>
+      <div class="hint">16 A4 pages. Print at 100% / Actual size, colour. Pencil for the trip pages at the back.</div>
       <button type="button" onclick="window.print()">Print / Save PDF</button>
     </div>
 
@@ -157,7 +157,7 @@
         <div class="cover-title">
           <div class="kicker">A field journal · 16 pages</div>
           <h1>ASSAM</h1>
-          <div class="script" style="font-size:15pt;margin-top:1mm;">tea country · November · the red river</div>
+          <div class="script" style="font-size:20pt;margin-top:1.5mm;">tea country · November · the red river</div>
         </div>
       </div>
       <div class="cover-body">
@@ -172,12 +172,12 @@
             <div class="label" style="margin-top:0">In this book</div>
             <p class="facts" style="margin:0">01 Cover · 02 India &amp; the Northeast · 03 Assam · 04 Geography &amp; culture · 05 Brahmaputra · 06 Parks · 07 Flora &amp; fauna · 08 Handloom · 09 Festivals · 10 Tea · 11 Assamese · 12–16 The journey, written in.</p>
           </div>
-          <div class="card" style="width:40mm">
+          <div class="card" style="width:58mm">
             <div class="label" style="margin-top:0">November</div>
             <p class="facts">Mornings ~12°C<br>Afternoons ~25°C<br>Park newly open<br>26.7162°N 92.7278°E</p>
           </div>
         </div>
-        <p class="script" style="margin:3mm 0 0;font-size:12.5pt;color:var(--forest);">নমস্কাৰ · in the land of the red river and blue hills</p>
+        <p class="script" style="margin:5mm 0 0;font-size:16pt;color:var(--forest);">নমস্কাৰ · in the land of the red river and blue hills</p>
       </div>
       <div class="pg">01</div>
     </article>
@@ -191,13 +191,13 @@
         <p class="prose">Assam sits in the far north-east of the country, joined to the rest of India by a narrow corridor. The maps here are watercolour, schematic — not for navigation. They are to place you.</p>
         <div class="split" style="grid-template-columns:.9fr 1.1fr;margin-top:2mm">
           <div>
-            <div class="plate" style="height:128mm">
+            <div class="plate" style="height:198mm">
               <img class="contain" src="assets/assam-journal-map-india.png" alt="Map of India with the Northeast marked">
             </div>
             <p class="tiny" style="margin:1.5mm 0 0">India. The boxed terracotta wash is the Northeast.</p>
           </div>
           <div>
-            <div class="plate" style="height:78mm;margin-bottom:2mm">
+            <div class="plate" style="height:112mm;margin-bottom:3mm">
               <img class="contain" src="assets/assam-journal-map-northeast.png" alt="Map of Northeast India">
             </div>
             <p class="tiny" style="margin:0 0 2mm">Seven Sisters: Assam in the river valley; Arunachal to the north; Meghalaya the plateau south; Nagaland and Manipur east; Mizoram further south; Tripura south-west. Sikkim is often counted as the eighth.</p>
@@ -217,7 +217,7 @@
         <div class="kicker">This journey</div>
         <h2 class="sec">Assam</h2>
         <p class="prose">A long east–west valley, a great river through the middle, hills on both rims. You land at Guwahati, on the south bank in the west, then drive east-north to Tezpur and Durrung. Kaziranga lies on the south bank, a morning’s outing from the estate.</p>
-        <div class="plate" style="height:68mm;margin:1mm 0 2mm">
+        <div class="plate" style="height:102mm;margin:2mm 0 4mm">
           <img class="contain" src="assets/assam-journal-map-assam.png" alt="Schematic map of Assam">
         </div>
         <div class="key">
@@ -259,6 +259,8 @@
         <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
       </div>
       <div class="pg pg-left">04</div>
     </article>
@@ -269,7 +271,7 @@
       <div class="inner">
         <div class="kicker">The red river · Luit</div>
         <h2 class="sec">Brahmaputra</h2>
-        <div class="plate" style="height:48mm;margin:1.5mm 0 2.5mm">
+        <div class="plate" style="height:78mm;margin:2mm 0 4mm">
           <img class="fit" src="assets/assam-journal-river.png" alt="The Brahmaputra">
         </div>
         <p class="prose">It is born as the Yarlung Tsangpo in Tibet, becomes the Siang or Dihang in Arunachal, the Brahmaputra in Assam, and the Jamuna in Bangladesh. About 2,900 kilometres from glacier to Bay of Bengal. In Assam it is a moving country: sandbars, chars, and Majuli, one of the world’s great river islands.</p>
@@ -312,6 +314,8 @@
         <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
       </div>
       <div class="pg pg-left">06</div>
     </article>
@@ -331,7 +335,7 @@
             <p class="facts">Hollong — state tree<br>Kopou phul — foxtail orchid, state flower<br>Nahor · simul · bamboo · cane<br>Elephant grass · water hyacinth<br>Tea · outenga · thekera · rice</p>
           </div>
           <div>
-            <div class="plate" style="height:52mm;margin-bottom:2mm">
+            <div class="plate" style="height:78mm;margin-bottom:3mm">
               <img class="fit" src="assets/assam-journal-rhino.png" alt="One-horned rhinoceros">
             </div>
             <div class="label">I saw, and I missed</div>
@@ -352,7 +356,7 @@
       <div class="inner">
         <div class="kicker">Cloth of the valley</div>
         <h2 class="sec">Assamese handloom</h2>
-        <div class="plate" style="height:52mm;margin:1.5mm 0 2.5mm">
+        <div class="plate" style="height:82mm;margin:2mm 0 4mm">
           <img class="fit" src="assets/assam-journal-handloom.png" alt="Muga silk, gamosa and jaapi">
         </div>
         <p class="prose">Assam weaves three silks. <b>Muga</b> is the golden one, from the moth <i>Antheraea assamensis</i>, almost unique to this valley — it deepens with wear. <b>Eri</b> (endi) is the warm, wool-like silk; the moth is allowed to leave the cocoon, so it is often called ahimsa silk. <b>Pat</b> is the white mulberry silk. Sualkuchi, on the north bank near Guwahati, is the weaving town.</p>
@@ -374,7 +378,7 @@
       <div class="inner">
         <div class="kicker">The year in three Bihus</div>
         <h2 class="sec">Annual festivals</h2>
-        <div class="plate" style="height:46mm;margin:1.5mm 0 2.5mm">
+        <div class="plate" style="height:74mm;margin:2mm 0 4mm">
           <img class="fit" src="assets/assam-journal-bihu.png" alt="Bihu dancers, dhol and pepa">
         </div>
         <div class="key">
@@ -400,7 +404,7 @@
       <div class="inner">
         <div class="kicker">Camellia sinensis var. assamica</div>
         <h2 class="sec">About tea</h2>
-        <div class="plate" style="height:38mm;margin:1.5mm 0 2mm">
+        <div class="plate" style="height:62mm;margin:2mm 0 3.5mm">
           <img class="fit" src="assets/assam-journal-tea-pluck.png" alt="Plucking two leaves and a bud">
         </div>
         <p class="prose">Left alone, tea is a tree. In Assam it is trained as a low bush with a flat <b>plucking table</b>. The harvest is the young shoot: <b>two leaves and a bud</b>. Durrung has done this since 1864, across 1,400 acres.</p>
@@ -416,6 +420,8 @@
         <div class="line"><span>What they were pruning or plucking at Durrung</span></div>
         <div class="line"></div>
         <div class="label">Cups I tasted, in order</div>
+        <div class="line"></div>
+        <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
@@ -447,6 +453,8 @@
         <div class="phrase"><span class="muted">word</span><span></span><em>meaning</em></div>
         <div class="phrase"><span class="muted">word</span><span></span><em>meaning</em></div>
         <div class="line noticed"><span>The sentence I actually used</span></div>
+        <div class="line"></div>
+        <div class="line"></div>
       </div>
       <div class="pg">11</div>
     </article>
@@ -500,7 +508,7 @@
         <div class="kicker">The stay · three nights</div>
         <h2 class="sec">The Postcard · Durrung</h2>
         <p class="tiny" style="margin:1mm 0 2mm">Working estate since 1864 · 1,400 acres · twelve rooms. Planter’s bungalow or a chang chalet on stilts among the tea.</p>
-        <div class="plate" style="height:26mm;margin-bottom:2.4mm">
+        <div class="plate" style="height:42mm;margin-bottom:4mm">
           <img class="fit" src="assets/assam-journal-chalet.png" alt="Chalet among the tea">
         </div>
         <div class="row">
@@ -582,10 +590,10 @@
             <div class="line"></div>
           </div>
           <div>
-            <div class="plate" style="height:40mm;margin-bottom:2mm">
+            <div class="plate" style="height:62mm;margin-bottom:3mm">
               <img class="fit" src="assets/assam-journal-rhino.png" alt="Greater one-horned rhinoceros">
             </div>
-            <div class="sketch" style="min-height:42mm">
+            <div class="sketch" style="min-height:68mm">
               <div class="hint">sketch a horn, a beel, a silhouette in grass</div>
             </div>
           </div>
@@ -622,7 +630,7 @@
         </div>
         <div class="rule-top">
           <div class="label">A leaf, a stamp, a small thing pressed here</div>
-          <div class="sketch" style="min-height:48mm">
+          <div class="sketch" style="min-height:78mm">
             <div class="hint">tape a tea leaf, a gamosa thread, a boarding pass stub</div>
           </div>
         </div>
@@ -665,7 +673,7 @@
             <div class="line"></div>
             <div class="line"></div>
           </div>
-          <div class="plate" style="width:42mm;height:42mm">
+          <div class="plate" style="width:62mm;height:62mm">
             <img class="fit" src="assets/assam-journal-tea-botanical.png" alt="Tea botanical">
           </div>
         </div>
