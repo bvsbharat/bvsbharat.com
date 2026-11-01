@@ -1,6 +1,8 @@
 # bvsbharat.com
 
-Personal blog of Bharat BVS, built with Astro 5.
+Personal site and blog of Bharat Bhavnasi (Staff AI Engineer), built with Astro 5.
+
+Identity and SEO: keep the name, job title, headshot and name variants in `src/config.ts` in sync with his public profiles. Structured data lives in `src/components/JsonLD.astro`. Read the job title from `SITE.jobTitle` instead of hard-coding it (the About page experience list is the one hand-written exception).
 
 ## Tech Stack
 
@@ -14,7 +16,7 @@ Personal blog of Bharat BVS, built with Astro 5.
 ## Commands
 
 - `npm run dev` — Start dev server on localhost:4321
-- `npm run build` — Build for production (includes Pagefind indexing)
+- `npm run build` — Build for production (`prebuild` cleans stale `.vercel/output`/`dist`; Pagefind is indexed and copied into `.vercel/output/static`)
 - `npm run preview` — Preview production build locally
 
 ## Project Structure

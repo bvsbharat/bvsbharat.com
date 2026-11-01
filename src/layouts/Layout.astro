@@ -12,6 +12,15 @@ interface Props {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  /** Emit schema.org ProfilePage (About page). */
+  profilePage?: boolean;
+  /** Set automatically when this layout wraps an .md/.mdx page. */
+  frontmatter?: {
+    title?: string;
+    description?: string;
+    ogImage?: string;
+    profilePage?: boolean;
+  };
   article?: {
     title: string;
     description: string;
@@ -19,22 +28,32 @@ interface Props {
     modDatetime?: Date | null;
     heroImage?: string;
     url: string;
+    tags?: string[];
   };
 }
 
+// MDX pages (e.g. about.mdx) pass their frontmatter instead of props.
+const fm = Astro.props.frontmatter ?? {};
 const {
-  title = SITE.title,
-  description = SITE.desc,
-  ogImage = SITE.ogImage,
+  title = fm.title ?? SITE.title,
+  description = fm.description ?? SITE.desc,
+  ogImage = fm.ogImage ?? SITE.ogImage,
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  profilePage = fm.profilePage ?? false,
   article,
 } = Astro.props;
 
-const socialImageURL = new URL(ogImage ?? SITE.ogImage, Astro.url.origin).href;
-const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+// Social cards need a raster image: SVG and YouTube URLs fall back to the default card.
+const requestedOg = ogImage ?? SITE.ogImage;
+const ogUsable = !requestedOg.toLowerCase().endsWith(".svg") && !requestedOg.includes("youtube.com");
+const resolvedOg = ogUsable ? requestedOg : SITE.ogImage;
+const isDefaultOgImage = resolvedOg === SITE.ogImage;
+const socialImageURL = new URL(resolvedOg, Astro.site).href;
+// Don't append the site name when the title already contains it.
+const pageTitle = title.includes(SITE.title) ? title : `${title} | ${SITE.title}`;
 ---
 
 <!doctype html>
@@ -44,6 +63,7 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
@@ -78,7 +98,22 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={socialImageURL} />
-    <meta property="og:type" content="website" />
+    {isDefaultOgImage && (
+      <>
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${SITE.author}, ${SITE.jobTitle}`} />
+      </>
+    )}
+    <meta property="og:type" content={article ? "article" : profilePage ? "profile" : "website"} />
+    {profilePage && (
+      <>
+        <meta property="profile:first_name" content={SITE.author.split(" ")[0]} />
+        <meta property="profile:last_name" content={SITE.author.split(" ").slice(1).join(" ")} />
+        <meta property="profile:username" content="bvsbharat" />
+      </>
+    )}
+    {article && <meta property="article:author" content={SITE.profile} />}
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:locale" content="en_US" />
     {pubDatetime && (
@@ -95,11 +130,13 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     )}
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={pageTitle} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={socialImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={SITE.twitterHandle} />
+    <meta name="twitter:creator" content={SITE.twitterHandle} />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
 
     <!-- RSS -->
     <link
@@ -139,7 +176,13 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <script is:inline src="/pagefind/pagefind-ui.js"></script>
 
     <!-- Structured Data -->
-    <JsonLD article={article} />
+    <JsonLD
+      pageUrl={canonicalURL}
+      pageTitle={pageTitle}
+      pageDescription={description}
+      profilePage={profilePage}
+      article={article}
+    />
   </head>
   <body transition:animate={fade({ duration: '0.3s' })}>
     <a href="#main-content" class="skip-to-content">Skip to content</a>

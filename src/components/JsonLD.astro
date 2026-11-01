@@ -3,6 +3,14 @@ import { SITE } from "@/config";
 import { SOCIALS } from "@/consts";
 
 interface Props {
+  /** Canonical URL of the current page. */
+  pageUrl: string;
+  /** Page title as rendered in <title>. */
+  pageTitle: string;
+  /** Page meta description. */
+  pageDescription: string;
+  /** Render a ProfilePage node (About page) whose mainEntity is the Person. */
+  profilePage?: boolean;
   article?: {
     title: string;
     description: string;
@@ -10,67 +18,115 @@ interface Props {
     modDatetime?: Date | null;
     heroImage?: string;
     url: string;
+    tags?: string[];
   };
 }
 
-const { article } = Astro.props;
+const { pageUrl, pageTitle, pageDescription, profilePage = false, article } = Astro.props;
 
 const siteUrl = SITE.website;
+const personId = `${siteUrl}/#person`;
+const websiteId = `${siteUrl}/#website`;
+const abs = (path: string) => new URL(path, siteUrl).href;
 
-const sameAs = SOCIALS.filter(s => s.active && s.name !== "Email" && s.name !== "RSS")
-  .map(s => s.href);
+// Only real, verified profile links (from src/consts.ts) — never invented.
+const sameAs = SOCIALS.filter(
+  (s) => s.active && s.name !== "Email" && s.name !== "RSS",
+).map((s) => s.href);
 
-const baseGraph = [
-  {
-    "@type": "WebSite",
-    "name": SITE.title,
-    "url": siteUrl,
-    "description": SITE.desc,
-    "author": { "@id": `${siteUrl}/#person` },
+const person = {
+  "@type": "Person",
+  "@id": personId,
+  name: SITE.author,
+  alternateName: [...SITE.alternateNames],
+  jobTitle: SITE.jobTitle,
+  description: `${SITE.author} is a ${SITE.jobTitle} in the ${SITE.location} who builds voice AI agents, multi-agent systems, and developer tools, with 30+ hackathon wins.`,
+  url: `${siteUrl}/`,
+  mainEntityOfPage: abs("/about/"),
+  image: {
+    "@type": "ImageObject",
+    "@id": `${siteUrl}/#personimage`,
+    url: abs(SITE.image),
+    contentUrl: abs(SITE.image),
+    width: 800,
+    height: 800,
+    caption: SITE.author,
   },
-  {
-    "@type": "Person",
-    "@id": `${siteUrl}/#person`,
-    "name": SITE.author,
-    "url": SITE.profile,
-    "sameAs": sameAs,
-  },
-];
-
-const baseSchema = {
-  "@context": "https://schema.org",
-  "@graph": baseGraph,
+  homeLocation: { "@type": "Place", name: SITE.location },
+  knowsAbout: [
+    "Voice AI agents",
+    "Multi-agent systems",
+    "Large language models",
+    "Agent harnesses",
+    "Retrieval-augmented generation",
+  ],
+  sameAs,
 };
 
-const articleSchema = article ? {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": article.title,
-  "description": article.description,
-  "datePublished": article.pubDatetime.toISOString(),
-  ...(article.modDatetime ? { "dateModified": article.modDatetime.toISOString() } : {}),
-  "author": { "@id": `${siteUrl}/#person` },
-  "publisher": { "@id": `${siteUrl}/#person` },
-  "url": article.url,
-  ...(article.heroImage ? { "image": new URL(article.heroImage, siteUrl).href } : {}),
-  "mainEntityOfPage": { "@type": "WebPage", "@id": article.url },
-} : null;
+const website = {
+  "@type": "WebSite",
+  "@id": websiteId,
+  name: SITE.title,
+  url: `${siteUrl}/`,
+  description: SITE.desc,
+  inLanguage: "en-US",
+  author: { "@id": personId },
+  publisher: { "@id": personId },
+};
 
-const breadcrumbSchema = article ? {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl },
-    { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${siteUrl}/posts` },
-    { "@type": "ListItem", "position": 3, "name": article.title },
-  ],
-} : null;
+const graph: Record<string, unknown>[] = [website, person];
+
+if (profilePage) {
+  graph.push({
+    "@type": "ProfilePage",
+    "@id": `${pageUrl}#profilepage`,
+    url: pageUrl,
+    name: pageTitle,
+    description: pageDescription,
+    isPartOf: { "@id": websiteId },
+    mainEntity: { "@id": personId },
+    about: { "@id": personId },
+    primaryImageOfPage: { "@id": `${siteUrl}/#personimage` },
+    inLanguage: "en-US",
+  });
+}
+
+if (article) {
+  // Social/Google image must be a raster file; SVG and YouTube heroes fall back to the default.
+  const heroIsImage =
+    article.heroImage &&
+    !article.heroImage.includes("youtube.com") &&
+    !article.heroImage.toLowerCase().endsWith(".svg");
+  graph.push({
+    "@type": "BlogPosting",
+    "@id": `${article.url}#article`,
+    headline: article.title,
+    description: article.description,
+    datePublished: article.pubDatetime.toISOString(),
+    dateModified: (article.modDatetime ?? article.pubDatetime).toISOString(),
+    author: { "@id": personId },
+    publisher: { "@id": personId },
+    isPartOf: { "@id": websiteId },
+    url: article.url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": article.url },
+    image: heroIsImage ? abs(article.heroImage!) : abs(SITE.ogImage),
+    ...(article.tags && article.tags.length ? { keywords: article.tags.join(", ") } : {}),
+    inLanguage: "en-US",
+  });
+  graph.push({
+    "@type": "BreadcrumbList",
+    "@id": `${article.url}#breadcrumb`,
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: abs("/posts/") },
+      { "@type": "ListItem", position: 3, name: article.title, item: article.url },
+    ],
+  });
+}
+
+const schema = { "@context": "https://schema.org", "@graph": graph };
+// Escape "<" so post titles can never break out of the script tag.
+const json = JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(baseSchema)} />
-{articleSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-)}
-{breadcrumbSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
-)}
+<script type="application/ld+json" set:html={json} />

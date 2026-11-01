@@ -17,7 +17,10 @@ const featuredPosts = nonHackathonPosts.filter((p) => p.data.featured);
 const recentPosts = nonHackathonPosts.filter((p) => !p.data.featured);
 ---
 
-<Layout>
+<Layout
+  title={`${SITE.author} — ${SITE.jobTitle}`}
+  description={`${SITE.author} is a ${SITE.jobTitle} in the ${SITE.location} building voice AI agents, multi-agent systems, and developer tools. 30+ hackathon wins.`}
+>
   <Header />
   <main id="main-content" class="flex-1">
     <section id="hero" class="pt-6 pb-4">
@@ -26,13 +29,13 @@ const recentPosts = nonHackathonPosts.filter((p) => !p.data.featured);
         <div class="flex items-center gap-3 mb-3">
           <a href="/about" class="block flex-shrink-0 group">
             <img
-              src="/images/profile.jpg"
+              src={SITE.image}
               alt={SITE.author}
               class="w-12 h-12 rounded-full object-cover"
             />
           </a>
           <h1 class="text-lg font-light">
-            Hi, I'm <a href="https://x.com/bvsbharat" target="_blank" rel="noopener noreferrer" class="text-accent-link hover:underline decoration-dashed underline-offset-4">@bvsbharat</a>.
+            Hi, I'm <a href="/about" class="text-accent-link hover:underline decoration-dashed underline-offset-4">{SITE.author}</a>.
           </h1>
         </div>
         <p class="text-sm opacity-80">
@@ -48,14 +51,14 @@ const recentPosts = nonHackathonPosts.filter((p) => !p.data.featured);
       <div class="hidden sm:flex flex-row items-start gap-4">
         <a href="/about" class="block flex-shrink-0 group">
           <img
-            src="/images/profile.jpg"
+            src={SITE.image}
             alt={SITE.author}
             class="w-40 h-40 rounded-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
           />
         </a>
         <div class="flex-1 min-w-0">
           <h1 class="my-4 inline-block text-3xl font-light">
-            Hi, I'm <a href="https://x.com/bvsbharat" target="_blank" rel="noopener noreferrer" class="text-accent-link hover:underline decoration-dashed underline-offset-4">@bvsbharat</a>.
+            Hi, I'm <a href="/about" class="text-accent-link hover:underline decoration-dashed underline-offset-4">{SITE.author}</a>.
           </h1>
           <p class="text-base opacity-80">
             {SITE.desc}

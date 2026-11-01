@@ -7,7 +7,6 @@ Allow: /
 Disallow: /pagefind/
 
 Sitemap: ${new URL("sitemap-index.xml", siteUrl).href}
-Host: ${siteUrl}
 `.trim();
 
 export const GET: APIRoute = () => {
