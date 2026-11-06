@@ -8,6 +8,7 @@ tags:
   - agents
   - evals
 featured: true
+heroImage: "/images/simval-executable-world.jpg"
 links:
   linkedin: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7516330715936935936/"
 ---

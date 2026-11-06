@@ -8,6 +8,7 @@ tags:
   - agents
   - healthcare
 featured: true
+heroImage: "/images/meetstream-medical-voice-agent.jpg"
 links:
   linkedin: "https://www.linkedin.com/feed/update/urn:li:share:7444457287752179712/"
 ---
