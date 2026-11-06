@@ -10,6 +10,8 @@ tags:
   - vapi
 featured: true
 heroImage: "/images/ef-soma-hackathon.jpg"
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_29th-hackathonwin-bayarea-activity-7379354004314779649-cFUi"
 ---
 
 Thrilled to share that I won the Entrepreneurs First x Soma Capital Hackathon!

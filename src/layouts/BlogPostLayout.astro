@@ -6,6 +6,7 @@ import Hr from "@/components/Hr.astro";
 import FormattedDate from "@/components/FormattedDate.astro";
 import Tag from "@/components/Tag.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
+import HackathonLinks from "@/components/HackathonLinks.astro";
 import EditPost from "@/components/EditPost.astro";
 import { getReadingTime } from "@/utils/readingTime";
 import { render, type CollectionEntry } from "astro:content";
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, description, pubDatetime, modDatetime, tags, heroImage, ogImage } = post.data;
+const { title, description, pubDatetime, modDatetime, tags, heroImage, ogImage, links } = post.data;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body ?? "");
 const postUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -72,6 +73,7 @@ const sparkTransition = {
             {tags.map((tag) => <Tag tag={tag} />)}
           </div>
         )}
+        <HackathonLinks links={links} class="mt-4" />
       </header>
 
       {heroImage && heroImage.includes("youtube.com") ? (() => {

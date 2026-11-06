@@ -11,6 +11,9 @@ tags:
   - hackathon
 featured: true
 heroImage: "/images/ragformation-cloud-config.jpg"
+links:
+  devpost: "https://devpost.com/software/ragformation"
+  github: "https://github.com/RAGformation/RAGformation"
 ---
 
 Cloud architecture design shouldn't take weeks. We built **RAGformation** — an AI-powered system that automates cloud configuration, service selection, and cost estimation in minutes.

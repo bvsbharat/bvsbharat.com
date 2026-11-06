@@ -10,6 +10,8 @@ tags:
   - advertising
 featured: true
 heroImage: "/images/snowoptima-svai-hub.jpg"
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_svaihub-svaihub-aihackathon-activity-7379348952900546560-W7Rh"
 ---
 
 Hackathon winning isn't just about building fast — it's about learning how to think, plan, and win as a team under pressure.
