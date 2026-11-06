@@ -9,6 +9,10 @@ tags:
   - meta
   - chrome-extension
 featured: true
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_hackathonproject-llamanavigator-techforgood-activity-7270631760386760705-u8kh"
+  lablab: "https://lablab.ai/ai-hackathons/llama-impact-hackathon/llamanavigator/llama-navigator-ai"
+  video: "https://www.youtube.com/watch?v=avOu3tNVDFU"
 ---
 
 Excited to share that our team walked away with **three incredible prizes** at the Llama Impact Hackathon hosted by AI at Meta and partners MindsDB, Solo, LlamaIndex, Together AI, AutogenAI, Snowflake, lablab.ai, The AI Alliance, and Restack in San Francisco!

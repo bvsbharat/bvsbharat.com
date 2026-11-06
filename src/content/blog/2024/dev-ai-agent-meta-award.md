@@ -11,6 +11,11 @@ tags:
   - coding
 featured: false
 heroImage: "/images/dev-ai-agent-meta.jpg"
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_runnerup-llama3-ai-activity-7243024555038892032-s_aW"
+  lablab: "https://lablab.ai/ai-hackathons/ai-agents-hack-with-lablab-and-mindsdb/dev-ai-agent/dev-ai-agent"
+  video: "https://www.youtube.com/watch?v=pC3uMMI-JAY"
+  github: "https://github.com/dev-ai-agent/dev-ai-agent"
 ---
 
 I'm excited to share that our project **Dev_AI_Agent** received both the **Best Use of Llama 3.1 Award** from Meta and placed as **Runner-Up** at the AI Agent Hackathon!

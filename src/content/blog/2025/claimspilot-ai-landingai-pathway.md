@@ -9,6 +9,8 @@ tags:
   - automation
 featured: false
 heroImage: "/images/claimspilot-landingai.jpg"
+links:
+  linkedin: "https://www.linkedin.com/posts/supriyakorukonda_claimspilotai-hackwithbay-activity-7381594759871516672-dK0Q"
 ---
 
 My first hackathon in the financial domain — and it connected directly to my day job at Guidewire, where I build AI systems for insurance workflows. ClaimsPilot AI took that production experience and distilled it into a focused prototype.

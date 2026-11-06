@@ -9,6 +9,8 @@ tags:
   - paris
 featured: true
 heroImage: "/images/raise-summit-paris.jpg"
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_ai-hackathon-raiseyourhack-activity-7356782453685964800-tkss"
 ---
 
 We're the **2nd Runner-Up** at the World's Largest AI Hackathon — RAISE Your Hack!

@@ -9,6 +9,8 @@ tags:
   - ai-coding
 featured: true
 heroImage: "/images/general-partnership-hackathon.jpg"
+links:
+  x: "https://x.com/thegp/status/1940049304288469148"
 ---
 
 Dropped into an on-the-spot challenge with zero prep, solved it in record time: under 6 hours. One of the most creatively designed and high-impact problem statements I've tackled yet.

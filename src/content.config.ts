@@ -14,6 +14,17 @@ const blog = defineCollection({
     heroImage: z.string().optional(),
     ogImage: z.string().optional(),
     canonicalURL: z.string().url().optional(),
+    // Optional related-media chips. Rendered only for fields that are set.
+    links: z
+      .object({
+        linkedin: z.string().url().optional(),
+        x: z.string().url().optional(),
+        devpost: z.string().url().optional(),
+        lablab: z.string().url().optional(),
+        video: z.string().url().optional(),
+        github: z.string().url().optional(),
+      })
+      .optional(),
   }),
 });
 

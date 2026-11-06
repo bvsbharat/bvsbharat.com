@@ -9,6 +9,9 @@ tags:
   - coding
 featured: false
 heroImage: "/images/superflex-coding-agent.jpg"
+links:
+  video: "https://www.youtube.com/watch?v=pC3uMMI-JAY"
+  github: "https://github.com/dev-ai-agent/dev-ai-agent"
 ---
 
 This hackathon was an exercise in meta-engineering — using an AI tool to build another AI tool. I used **Superflex** to build **Dev AI Agent** from scratch in a few hours.

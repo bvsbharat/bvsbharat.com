@@ -8,6 +8,9 @@ tags:
   - ai
   - agents
 featured: true
+links:
+  linkedin: "https://www.linkedin.com/posts/bharatsatya_rebuildhackathon-aitransparency-echoforgestudio-activity-7306304608786649088-auSj"
+  video: "https://www.youtube.com/watch?v=Jzhi_yBathI"
 ---
 
 In a world where AI often feels like a black box, we set out to create something different — AI-driven voice agents with full transparency and user control.
