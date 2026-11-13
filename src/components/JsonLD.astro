@@ -40,7 +40,12 @@ const person = {
   name: SITE.author,
   alternateName: [...SITE.alternateNames],
   jobTitle: SITE.jobTitle,
-  description: `${SITE.author} is a ${SITE.jobTitle} in the ${SITE.location} who builds voice AI agents, multi-agent systems, and developer tools, with 30+ hackathon wins.`,
+  worksFor: {
+    "@type": "Organization",
+    name: "Guidewire Software",
+    url: "https://www.guidewire.com",
+  },
+  description: `${SITE.author} is a ${SITE.jobTitle} at Guidewire Software in the ${SITE.location}. He builds production voice AI agents and multi-agent systems for insurance.`,
   url: `${siteUrl}/`,
   mainEntityOfPage: abs("/about/"),
   image: {
@@ -71,7 +76,7 @@ const website = {
   description: SITE.desc,
   inLanguage: "en-US",
   author: { "@id": personId },
-  publisher: { "@id": personId },
+  publisher: { "id": personId },
 };
 
 const graph: Record<string, unknown>[] = [website, person];
